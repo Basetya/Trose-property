@@ -3,7 +3,7 @@
  * File: frontend/js/config.js
  */
 
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz_SAMPLE_DEPLOYMENT_ID/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzX9pZnyEmHZsxrehzLSSIdjQ-QIHt5Gt6kdJSgct-QnXpx73WQJhkjlNE0CQ5sSys/exec";
 
 // Default Nomor WhatsApp Resmi Kalibata City
 let OFFICIAL_WA_NUMBER = "+6281221559000";

@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Landing Page & Dynamic WA Sync (v5.4)
+ * Trose Property Manager - Landing Page & Live AI Bridge (v6.5)
  * File: frontend/js/landing.js
  */
 
@@ -8,10 +8,9 @@ async function initLandingSettings() {
     const res = await gasApiCall("getPublicSettings", {}, "GET");
     if (res && res.success && res.settings && res.settings.waNumber) {
       OFFICIAL_WA_NUMBER = res.settings.waNumber;
-      console.log("Synced official WA Number from server:", OFFICIAL_WA_NUMBER);
     }
   } catch (e) {
-    console.warn("Using default local WA Number:", OFFICIAL_WA_NUMBER);
+    console.warn("Using local fallback WA Number:", OFFICIAL_WA_NUMBER);
   }
 }
 
@@ -58,7 +57,7 @@ async function handleWidgetSend() {
 
   const btn = document.getElementById("btn-widget-send");
   btn.disabled = true;
-  btn.innerText = "...";
+  btn.innerHTML = `<span class="animate-pulse">...</span>`;
 
   const typing = appendWidgetTyping();
 
@@ -69,15 +68,37 @@ async function handleWidgetSend() {
     if (res && res.reply) {
       appendWidgetMessage(res.reply, "ai");
     } else {
-      appendWidgetMessage("Halo! Unit Kalibata City siap huni tersedia tipe Studio dan 2BR. Hubungi admin via WhatsApp untuk survei langsung.", "ai");
+      appendWidgetMessage(generateSmartFallbackReply(message), "ai");
     }
   } catch (err) {
     typing.remove();
-    appendWidgetMessage("Halo! Saya Rose. Kami menyediakan unit Studio (mulai Rp3 Jt/bln) dan 2BR (mulai Rp4.2 Jt/bln) di Kalibata City. Hubungi WA admin untuk booking.", "ai");
+    appendWidgetMessage(generateSmartFallbackReply(message), "ai");
   } finally {
     btn.disabled = false;
-    btn.innerText = "â†’";
+    btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
   }
+}
+
+function generateSmartFallbackReply(userQuery) {
+  const q = userQuery.toLowerCase();
+  
+  if (q.includes("harian") || q.includes("hari")) {
+    return "Untuk sewa unit harian di Apartemen Kalibata City, kami menyediakan unit Studio dan 2BR full-furnished (mulai Rp300rbâ€“Rp450rb/malam) tergantung ketersediaan. Silakan klik tombol 'WA' untuk booking instan dengan admin.";
+  }
+  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate")) {
+    return "Harga sewa bulanan di Kalibata City:\n- Studio Deluxe: Mulai Rp3.000.000/bulan\n- 2 Bedroom Standard: Mulai Rp4.200.000/bulan\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp5.500.000/bulan.\nSemua unit sudah full furnished (AC, kasur, kitchen set, kulkas, TV).";
+  }
+  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("mall")) {
+    return "Fasilitas lengkap di kawasan Kalibata City Superblock mencakup:\n- Mall Kalibata City Square (KCS), bioskop XXI, Farmers Market di bawah hunian.\n- Kolam renang dewasa & anak, gym indoor, lapangan tenis/basket/futsal.\n- Keamanan kartu akses lift 24 jam & Masjid Raya Nurullah.";
+  }
+  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat")) {
+    return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan perkantoran Kuningan / Gatot Subroto.";
+  }
+  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat")) {
+    return "Tentu! Jadwal survei unit (viewing) buka setiap hari (Seninâ€“Minggu, 09.00â€“18.00 WIB). Silakan klik tombol 'WA' di kanan atas untuk konfirmasi jam kedatangan Anda dengan tim pengelola.";
+  }
+
+  return "Halo! Saya Rose, asisten resmi sewa Apartemen Kalibata City. Kami menyediakan unit Studio dan 2BR siap huni (bulanan/tahunan/harian). Ada yang bisa saya bantu terkait harga, fasilitas, atau jadwal viewing?";
 }
 
 function appendWidgetMessage(text, sender) {
