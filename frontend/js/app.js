@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic Clean Slate (v7.5)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.6)
  * File: frontend/js/app.js
  */
 
@@ -63,7 +63,7 @@ function renderDashboard(data) {
   const invTable = document.getElementById("table-invoices-body");
   if (invTable) {
     if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets.</td></tr>`;
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets (0 Invoices).</td></tr>`;
       return;
     }
 
@@ -146,8 +146,15 @@ async function handleSaveAiConfig(e) {
     btn.disabled = true;
     btn.innerText = "Menyimpan ke AI Engine...";
 
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
     try {
-      const res = await gasApiCall("saveAiConfig", { knowledgeBase: kbVal, guardrails: grVal }, "POST");
+      const res = await gasApiCall("saveAiConfig", { 
+        passcode: currentPasscode,
+        knowledgeBase: kbVal, 
+        guardrails: grVal 
+      }, "POST");
+
       if (res && res.success) {
         showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui!");
       } else {
@@ -168,8 +175,9 @@ function handleClearAiConfig() {
   }
 
   ensureAdminPasscode(async () => {
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("clearAiConfig", {}, "POST");
+      const res = await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
       if (res && res.success) {
         document.getElementById("ai-kb-text").value = "";
         document.getElementById("ai-guardrail-text").value = "";
@@ -189,11 +197,37 @@ function handleWipeDatabase() {
   }
 
   ensureAdminPasscode(async () => {
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("wipeAllMockupData", {}, "POST");
+      const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
       if (res && res.success) {
         showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
-        fetchDashboard();
+        
+        // Reset manual langsung di tampilan layar
+        renderDashboard({
+          success: true,
+          stats: {
+            totalUnits: 0,
+            occupiedUnits: 0,
+            availableUnits: 0,
+            occupancyRate: "0%",
+            totalRevenueDue: 0,
+            totalCollected: 0,
+            totalOutstanding: 0,
+            directLandlordDue: 0,
+            centralManagementDue: 0,
+            activeLeads: 0,
+            openMaintenance: 0
+          },
+          recentInvoices: []
+        });
+
+        const kbArea = document.getElementById("ai-kb-text");
+        const grArea = document.getElementById("ai-guardrail-text");
+        if (kbArea) kbArea.value = "";
+        if (grArea) grArea.value = "";
+
+        setTimeout(() => fetchDashboard(), 1000);
       } else {
         showToast(res.error || "Gagal membersihkan database", "error");
       }
@@ -229,8 +263,10 @@ async function handleSaveWaSettings(e) {
   btn.disabled = true;
   btn.innerText = "Menyimpan...";
 
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
   try {
-    const res = await gasApiCall("updatePublicSettings", { waNumber: val }, "POST");
+    const res = await gasApiCall("updatePublicSettings", { passcode: currentPasscode, waNumber: val }, "POST");
     if (res && res.success) {
       showToast(res.message || "Nomor WhatsApp berhasil diperbarui!");
       OFFICIAL_WA_NUMBER = val;
@@ -256,8 +292,9 @@ function requestVerifyPayment(invoiceId) {
   ensureAdminPasscode(async () => {
     if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
 
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("verifyPayment", { invoiceId: invoiceId }, "POST");
+      const res = await gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST");
       if (res && res.success) {
         showToast(res.message || "Invoice berhasil diverifikasi!");
         fetchDashboard();

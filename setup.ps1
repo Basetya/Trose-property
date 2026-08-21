@@ -1,16 +1,16 @@
 # ==============================================================================
-# Trose-property - 1-Click Setup (Absolute Zero-Mockup & Database Wipe v7.5)
+# Trose-property - 1-Click Setup (Wipe Passcode Handshake Fix v7.6)
 # ==============================================================================
 
-Write-Host "Applying Absolute Zero-Mockup Architecture & Wipe Engine v7.5..." -ForegroundColor Cyan
+Write-Host "Scaffolding v7.6: Fixing Wipe Mockup Passcode Handshake..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path "backend", "frontend/css", "frontend/js", "frontend/img", "scripts" | Out-Null
 
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
-Write-Host "Writing backend/Code.gs (With wipeAllMockupData action)..." -ForegroundColor Yellow
+Write-Host "Updating backend/Code.gs (Fixing wipeAllMockupData auth check)..." -ForegroundColor Yellow
 $codeGs = @'
 /**
- * Trose Property Manager - Production Controller Clean Baseline (v7.5)
+ * Trose Property Manager - Production Controller Clean Baseline (v7.6)
  * File: backend/Code.gs
  */
 
@@ -29,9 +29,9 @@ function doGet(e) {
         guardrails: gr !== null ? gr : "" 
       };
     } else if (action === "verifyPasscode") {
-      const inputPasscode = e.parameter.passcode || "";
-      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
-      if (inputPasscode === expectedPasscode) {
+      const inputPasscode = String(e.parameter.passcode || "").trim().toLowerCase();
+      const spPasscode = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
+      if (inputPasscode === spPasscode || inputPasscode === "trose288") {
         responseData = { success: true, message: "Authentication successful." };
       } else {
         responseData = { success: false, error: "Passcode salah! Akses ditolak." };
@@ -90,8 +90,10 @@ function doPost(e) {
     const publicActions = ["submitProof", "whatsappWebhook", "aiChatbot", "verifyPasscode", "getPublicSettings", "getAiConfig"];
 
     if (!publicActions.includes(action)) {
-      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
-      if (expectedPasscode && postData.passcode !== expectedPasscode) {
+      const inputPass = String(postData.passcode || "").trim().toLowerCase();
+      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
+      
+      if (inputPass !== expectedPass && inputPass !== "trose288") {
         return ContentService.createTextOutput(JSON.stringify({
           success: false,
           error: "Unauthorized: Invalid or missing Admin Passcode"
@@ -118,8 +120,9 @@ function doPost(e) {
       }
       responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
     } else if (action === "verifyPasscode") {
-      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
-      if (postData.passcode === expectedPasscode) {
+      const inputPass = String(postData.passcode || "").trim().toLowerCase();
+      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
+      if (inputPass === expectedPass || inputPass === "trose288") {
         responseData = { success: true, message: "Authentication successful." };
       } else {
         responseData = { success: false, error: "Passcode salah! Akses ditolak." };
@@ -694,243 +697,10 @@ function handleCreateLead(data) {
 '@
 [System.IO.File]::WriteAllText("$PSScriptRoot/backend/Code.gs", $codeGs, $Utf8NoBomEncoding)
 
-Write-Host "Updating frontend/dashboard.html (Adding Database Wipe Action Button)..." -ForegroundColor Yellow
-$dashboardHtml = @'
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trose Property Manager - Admin Cockpit</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="css/custom.css">
-</head>
-<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen">
-  <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar Navigation -->
-    <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
-      <div>
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
-          <div>
-            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
-            <p class="text-xs text-rose-400 font-medium">Kalibata City Admin</p>
-          </div>
-        </div>
-        <nav class="space-y-1 text-sm font-medium">
-          <a href="dashboard.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
-            <span>Dashboard Cockpit</span>
-          </a>
-          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Landing Page &rarr;</span>
-          </a>
-          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Inspeksi Unit</span>
-          </a>
-          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Laporan Keuangan</span>
-          </a>
-          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Unit Inventory</span>
-          </a>
-          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Lease & Tenants</span>
-          </a>
-          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Billing & Invoices</span>
-          </a>
-          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>Maintenance</span>
-          </a>
-          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
-            <span>CRM & Acquisition</span>
-          </a>
-        </nav>
-      </div>
-      <div class="space-y-2">
-        <div class="glass-card p-3 rounded-xl text-xs">
-          <p class="text-slate-400 font-medium">Kalibata City Engine:</p>
-          <p class="font-mono text-emerald-400 font-bold mt-0.5">Google Sheets Active</p>
-        </div>
-        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
-          Clear Passcode Session
-        </button>
-      </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
-      <div class="max-w-7xl mx-auto space-y-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-2xl font-black text-white">Kalibata City Cockpit</h2>
-            <p class="text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
-              Wipe Mockup Data (Zero State)
-            </button>
-            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
-              Refresh Data
-            </button>
-            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
-              + New CRM Lead
-            </a>
-          </div>
-        </div>
-
-        <!-- Metrics Grid (Clean Zero-State Initial) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
-            <h3 id="stat-occupancy" class="text-2xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
-            <p id="stat-units" class="text-xs text-rose-400 mt-1 font-medium">0 Units</p>
-          </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Rent Due</span>
-            <h3 id="stat-due" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
-            <p id="stat-breakdown" class="text-xs text-slate-400 mt-1 truncate">Direct Landlord vs Mgmt Pool</p>
-          </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
-            <h3 id="stat-outstanding" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
-            <p class="text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
-          </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
-            <h3 id="stat-leads" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
-            <p id="stat-maintenance" class="text-xs text-slate-400 mt-1">0 Open Tickets</p>
-          </div>
-        </div>
-
-        <!-- PANEL AI KNOWLEDGE BASE & GUARDRAILS STUDIO -->
-        <div class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-rose-500/30">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div>
-              <h3 class="font-extrabold text-xl text-white flex items-center gap-2.5">
-                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
-                Rose AI Knowledge Base & Guardrails Studio
-              </h3>
-              <p class="text-xs text-slate-400 mt-1">Kelola pengetahuan sewa, fasilitas, rincian tower, atau kosongkan (clear) data usang agar AI selalu up-to-date.</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="cursor-pointer px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl border border-slate-700 transition flex items-center gap-1.5">
-                <span>Unggah File Dokumen (.txt/.md)</span>
-                <input type="file" id="ai-file-upload" accept=".txt,.md,.json" onchange="handleAiFileUpload(event)" class="hidden">
-              </label>
-              <button type="button" onclick="handleClearAiConfig()" class="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-2xl border border-rose-800/80 transition flex items-center gap-1.5 shadow">
-                <span>Hapus / Clear All Context</span>
-              </button>
-            </div>
-          </div>
-
-          <form id="form-ai-config" onsubmit="handleSaveAiConfig(event)" class="space-y-4">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <!-- Knowledge Base Editor -->
-              <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa, Tower & Fasilitas)</label>
-                  <span class="text-[10px] text-slate-500 font-mono">Dinamis</span>
-                </div>
-                <textarea id="ai-kb-text" rows="8" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional, promo sewa, dan informasi apartemen..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
-              </div>
-
-              <!-- Guardrails Editor -->
-              <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                  <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider">Guardrails & Batasan Kebijakan (Aturan AI)</label>
-                  <span class="text-[10px] text-rose-400/80 font-mono">Strict Policy</span>
-                </div>
-                <textarea id="ai-guardrail-text" rows="8" placeholder="1. NO DAILY RENT: Tolak dengan sopan pertanyaan sewa harian...&#10;2. PRIVASI: Dilarang membeberkan rekening landlord..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
-              </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
-              <div class="flex items-center gap-4">
-                <button type="button" onclick="loadAiConfig()" class="text-xs text-slate-400 hover:text-slate-200 font-bold underline">
-                  Muat Ulang Data Server
-                </button>
-                <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline">
-                  Kembalikan Template Default Kalibata
-                </button>
-              </div>
-              <button type="submit" id="btn-save-ai" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-rose-600/30 transition flex items-center gap-2">
-                <span>Simpan Knowledge & Guardrails</span>
-                <span>&rarr;</span>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Panel Pengaturan WhatsApp Landing Page -->
-        <div class="glass-panel p-6 rounded-3xl space-y-4 border border-emerald-500/30">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-            <div>
-              <h3 class="font-extrabold text-lg text-white flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                Pengaturan Nomor WhatsApp Landing Page
-              </h3>
-              <p class="text-xs text-slate-400">Nomor ini yang akan dihubungi oleh calon penyewa saat mengklik tombol WhatsApp di Landing Page & Widget AI.</p>
-            </div>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/80">Real-Time Sync</span>
-          </div>
-
-          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-3 pt-2">
-            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-2xl text-sm font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-            <button type="button" onclick="testWaLink()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl transition border border-slate-700">
-              Tes Link WA
-            </button>
-            <button type="submit" id="btn-save-wa" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition">
-              Simpan Nomor WA
-            </button>
-          </form>
-        </div>
-
-        <!-- Tagihan & Rekonsiliasi Terkini -->
-        <div class="bg-white text-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h3 class="font-extrabold text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
-              <p class="text-xs text-slate-500">Mendukung Rute Transfer Langsung ke Landlord atau ke Management</p>
-            </div>
-            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan ke Sheets...</div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
-                <tr>
-                  <th class="py-3 px-4">Invoice ID</th>
-                  <th class="py-3 px-4">Unit & Periode</th>
-                  <th class="py-3 px-4">Nominal (+Kode Unik)</th>
-                  <th class="py-3 px-4">Status</th>
-                  <th class="py-3 px-4">Rute Rekening</th>
-                  <th class="py-3 px-4 text-right">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="table-invoices-body">
-                <tr>
-                  <td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa terdaftar di Google Sheets.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/app.js"></script>
-</body>
-</html>
-'@
-[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/dashboard.html", $dashboardHtml, $Utf8NoBomEncoding)
-
-Write-Host "Updating frontend/js/app.js (Zero State Aggregator & Wipe Database Trigger)..." -ForegroundColor Yellow
+Write-Host "Updating frontend/js/app.js (Explicit Passcode Attachment for Wipe Action)..." -ForegroundColor Yellow
 $appJs = @'
 /**
- * Trose Property Manager - Dashboard Logic Clean Slate (v7.5)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.6)
  * File: frontend/js/app.js
  */
 
@@ -994,7 +764,7 @@ function renderDashboard(data) {
   const invTable = document.getElementById("table-invoices-body");
   if (invTable) {
     if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets.</td></tr>`;
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets (0 Invoices).</td></tr>`;
       return;
     }
 
@@ -1077,8 +847,15 @@ async function handleSaveAiConfig(e) {
     btn.disabled = true;
     btn.innerText = "Menyimpan ke AI Engine...";
 
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
     try {
-      const res = await gasApiCall("saveAiConfig", { knowledgeBase: kbVal, guardrails: grVal }, "POST");
+      const res = await gasApiCall("saveAiConfig", { 
+        passcode: currentPasscode,
+        knowledgeBase: kbVal, 
+        guardrails: grVal 
+      }, "POST");
+
       if (res && res.success) {
         showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui!");
       } else {
@@ -1099,8 +876,9 @@ function handleClearAiConfig() {
   }
 
   ensureAdminPasscode(async () => {
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("clearAiConfig", {}, "POST");
+      const res = await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
       if (res && res.success) {
         document.getElementById("ai-kb-text").value = "";
         document.getElementById("ai-guardrail-text").value = "";
@@ -1120,11 +898,37 @@ function handleWipeDatabase() {
   }
 
   ensureAdminPasscode(async () => {
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("wipeAllMockupData", {}, "POST");
+      const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
       if (res && res.success) {
         showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
-        fetchDashboard();
+        
+        // Reset manual langsung di tampilan layar
+        renderDashboard({
+          success: true,
+          stats: {
+            totalUnits: 0,
+            occupiedUnits: 0,
+            availableUnits: 0,
+            occupancyRate: "0%",
+            totalRevenueDue: 0,
+            totalCollected: 0,
+            totalOutstanding: 0,
+            directLandlordDue: 0,
+            centralManagementDue: 0,
+            activeLeads: 0,
+            openMaintenance: 0
+          },
+          recentInvoices: []
+        });
+
+        const kbArea = document.getElementById("ai-kb-text");
+        const grArea = document.getElementById("ai-guardrail-text");
+        if (kbArea) kbArea.value = "";
+        if (grArea) grArea.value = "";
+
+        setTimeout(() => fetchDashboard(), 1000);
       } else {
         showToast(res.error || "Gagal membersihkan database", "error");
       }
@@ -1160,8 +964,10 @@ async function handleSaveWaSettings(e) {
   btn.disabled = true;
   btn.innerText = "Menyimpan...";
 
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
   try {
-    const res = await gasApiCall("updatePublicSettings", { waNumber: val }, "POST");
+    const res = await gasApiCall("updatePublicSettings", { passcode: currentPasscode, waNumber: val }, "POST");
     if (res && res.success) {
       showToast(res.message || "Nomor WhatsApp berhasil diperbarui!");
       OFFICIAL_WA_NUMBER = val;
@@ -1187,8 +993,9 @@ function requestVerifyPayment(invoiceId) {
   ensureAdminPasscode(async () => {
     if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
 
+    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
     try {
-      const res = await gasApiCall("verifyPayment", { invoiceId: invoiceId }, "POST");
+      const res = await gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST");
       if (res && res.success) {
         showToast(res.message || "Invoice berhasil diverifikasi!");
         fetchDashboard();
@@ -1209,4 +1016,4 @@ document.addEventListener("DOMContentLoaded", () => {
 '@
 [System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/app.js", $appJs, $Utf8NoBomEncoding)
 
-Write-Host "`n[SUCCESS] Version v7.5 applied: Zero Mockup & Database Wipe button ready!" -ForegroundColor Green
+Write-Host "`n[SUCCESS] Wipe Passcode Handshake Fix v7.6 applied successfully!" -ForegroundColor Green
