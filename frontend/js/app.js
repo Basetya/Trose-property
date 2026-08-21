@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic & AI Studio Handlers (v7.1)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.4)
  * File: frontend/js/app.js
  */
 
@@ -63,7 +63,7 @@ function renderDashboard(data) {
   const invTable = document.getElementById("table-invoices-body");
   if (invTable) {
     if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa terdaftar di Google Sheets.</td></tr>`;
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada data tagihan sewa di Google Sheets (0 Invoices).</td></tr>`;
       return;
     }
 
