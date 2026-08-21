@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Controller with Strict Passcode trose288 (v5.5)
+ * Trose Property Manager - Production Controller with AI Studio & Purge (v7.1)
  * File: backend/Code.gs
  */
 
@@ -8,7 +8,17 @@ function doGet(e) {
   let responseData = {};
 
   try {
-    if (action === "verifyPasscode") {
+    if (action === "getAiConfig") {
+      const sp = PropertiesService.getScriptProperties();
+      const kb = sp.getProperty("AI_KNOWLEDGE_BASE");
+      const gr = sp.getProperty("AI_GUARDRAILS");
+      // Jika bernilai null (belum pernah di-set), kembalikan default. Jika string "" (telah di-clear), kembalikan "".
+      responseData = { 
+        success: true, 
+        knowledgeBase: kb !== null ? kb : getDefaultKnowledgeBase(), 
+        guardrails: gr !== null ? gr : getDefaultGuardrails() 
+      };
+    } else if (action === "verifyPasscode") {
       const inputPasscode = e.parameter.passcode || "";
       const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
       if (inputPasscode === expectedPasscode) {
@@ -67,7 +77,7 @@ function doPost(e) {
     }
 
     const action = postData.action;
-    const publicActions = ["submitProof", "whatsappWebhook", "aiChatbot", "verifyPasscode", "getPublicSettings"];
+    const publicActions = ["submitProof", "whatsappWebhook", "aiChatbot", "verifyPasscode", "getPublicSettings", "getAiConfig"];
 
     if (!publicActions.includes(action)) {
       const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
@@ -79,19 +89,29 @@ function doPost(e) {
       }
     }
 
-    if (action === "verifyPasscode") {
-      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
-      if (postData.passcode === expectedPasscode) {
-        responseData = { success: true, message: "Authentication successful." };
-      } else {
-        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
-      }
+    if (action === "saveAiConfig") {
+      const sp = PropertiesService.getScriptProperties();
+      sp.setProperty("AI_KNOWLEDGE_BASE", String(postData.knowledgeBase || "").trim());
+      sp.setProperty("AI_GUARDRAILS", String(postData.guardrails || "").trim());
+      responseData = { success: true, message: "Knowledge Base & Guardrails Rose AI berhasil diperbarui!" };
+    } else if (action === "clearAiConfig") {
+      const sp = PropertiesService.getScriptProperties();
+      sp.setProperty("AI_KNOWLEDGE_BASE", "");
+      sp.setProperty("AI_GUARDRAILS", "");
+      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN (dihapus)." };
     } else if (action === "updatePublicSettings") {
       const sp = PropertiesService.getScriptProperties();
       if (postData.waNumber) {
         sp.setProperty("LANDING_WA_NUMBER", String(postData.waNumber).trim());
       }
       responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
+    } else if (action === "verifyPasscode") {
+      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
+      if (postData.passcode === expectedPasscode) {
+        responseData = { success: true, message: "Authentication successful." };
+      } else {
+        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
+      }
     } else if (action === "createUnit") {
       responseData = handleCreateUnit(postData.data);
     } else if (action === "updateUnitStatus") {
@@ -129,6 +149,24 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(responseData))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getDefaultKnowledgeBase() {
+  return "SUPERBLOCK KALIBATA CITY INFORMATION:\n" +
+    "- 18 Tower Total: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.\n" +
+    "- Tower Green Palace (Mawar s/d Viola) memiliki akses kolam renang tematik & gym indoor.\n" +
+    "- Tarif Sewa Bulanan: Studio (Rp 2.8Jt - 3.5Jt/bln), 2BR Standard (Rp 3.8Jt - 4.5Jt/bln), 2BR Green Palace (Rp 4.5Jt - 5.5Jt/bln).\n" +
+    "- Seluruh unit Full Furnished (AC, springbed, lemari, kitchen set, kulkas, TV).\n" +
+    "- Mall Kalibata City Square (KCS), XXI, Farmers Market di bawah hunian.\n" +
+    "- Stasiun KRL Duren Kalibata berjarak 200m (2 menit jalan kaki).";
+}
+
+function getDefaultGuardrails() {
+  return "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Trose Property hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
+    "2. STRICT PROPERTY DOMAIN: Hanya jawab seputar properti, fasilitas, sewa, dan jadwal viewing di Kalibata City.\n" +
+    "3. PRIVACY PROTECTION: Dilarang membeberkan nama pemilik unit atau nomor rekening pribadi landlord kepada publik.\n" +
+    "4. VERIFICATION PROTOCOL: Data privat penyewa (masa sewa, sisa tagihan) hanya boleh dijawab jika Single ID (CNT-XXXX) atau No WA cocok di database.\n" +
+    "5. LEAD CAPTURE: Arahkan pengguna menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin.";
 }
 
 function getColumnMap(sheet) {

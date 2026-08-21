@@ -1,7 +1,6 @@
 /**
- * Trose Property Manager - Rose AI Concierge Engine (v6.7)
- * Policy: Monthly & Annual Rentals Only (No Daily Rentals Available)
- * Knowledge Base: Apartemen Kalibata City Superblock
+ * Trose Property Manager - Rose AI Concierge Engine (v7.1)
+ * Dynamic Knowledge Base & Purge / Context Sanitization
  * File: backend/GeminiCRM.gs
  */
 
@@ -9,13 +8,20 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
   const scriptProperties = PropertiesService.getScriptProperties();
   const apiKey = scriptProperties.getProperty("GEMINI_API_KEY");
 
-  // 1. Ambil data inventori unit aktual dari tab 02_UNITS Google Sheets
+  // 1. Ambil Knowledge Base & Guardrails Dinamis
+  const storedKb = scriptProperties.getProperty("AI_KNOWLEDGE_BASE");
+  const storedGr = scriptProperties.getProperty("AI_GUARDRAILS");
+
+  const customKnowledgeBase = storedKb !== null ? storedKb : getDefaultKnowledgeBase();
+  const customGuardrails = storedGr !== null ? storedGr : getDefaultGuardrails();
+
+  // 2. Ambil data inventori unit aktual dari tab 02_UNITS Google Sheets
   let liveUnitInventory = "";
   try {
     const units = getSheetDataAsJson("02_UNITS");
     const availableUnits = units.filter(u => u.Status === "Available");
     if (availableUnits.length > 0) {
-      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME SHEETS):\n";
+      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME SHEETS DATABASE):\n";
       availableUnits.forEach(u => {
         liveUnitInventory += `- ${u.Tower} No.${u.Unit_No} (${u.Type}): Rp${Number(u.Base_Rent).toLocaleString("id-ID")}/bln (Rute: ${u.Payment_Route}).\n`;
       });
@@ -23,10 +29,10 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
       liveUnitInventory = "STATUS UNIT: Semua unit kelolaan saat ini sedang terisi (Full Occupied).\n";
     }
   } catch (e) {
-    liveUnitInventory = "Menggunakan katalog standar bulanan & tahunan Kalibata City.\n";
+    liveUnitInventory = "Katalog sewa bulanan dan tahunan Kalibata City aktif.\n";
   }
 
-  // 2. Verifikasi Identitas Pengguna (Single ID / WhatsApp)
+  // 3. Verifikasi Identitas Pengguna (Single ID / WhatsApp)
   const cleanId = String(senderIdentifier || '').replace(/[^a-zA-Z0-9-]/g, '');
   let verifiedCustomerContext = "";
 
@@ -58,48 +64,27 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
   if (!apiKey) {
     return {
       success: true,
-      reply: generateStructuredOfflineAnswer(userMessage)
+      reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails)
     };
   }
 
-  // 3. System Prompt, Knowledge Base & Guardrail Master Directive
+  // 4. Master Directive Prompt
   const systemPrompt = `Anda adalah "Rose", Asisten Virtual AI & Leasing Concierge resmi untuk Trose Property di Superblock Apartemen Kalibata City, Jakarta Selatan.
 
-=== KEBIJAKAN UTAMA SEWA (STRICT POLICY) ===
-1. KAMI HANYA MENYEDIAKAN SEWA BULANAN DAN TAHUNAN.
-2. FASILITAS SEWA HARIAN / TRANSIT / PER MALAM TIDAK TERSEDIA DI TROSE PROPERTY.
-   - Jika pengguna menanyakan sewa harian, jawab dengan sopan dan ramah: "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property hanya melayani sewa bulanan dan tahunan demi kenyamanan dan privasi jangka panjang penghuni."
-   - Tawarkan alternatif sewa bulanan mulai dari Rp 3 Juta/bulan.
+${customKnowledgeBase ? '=== KNOWLEDGE BASE AKTIF DARI PENGELOLA ===\n' + customKnowledgeBase : '=== KNOWLEDGE BASE: Default Clean Property Context ==='}
 
-=== KNOWLEDGE BASE KALIBATA CITY SUPERBLOCK ===
-1. STRUKTUR TOWER (18 Tower Total):
-   - Kalibata Residences (8 Tower): Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras.
-   - Kalibata Regency (3 Tower): Kemuning, Jasmine, Lotus.
-   - Green Palace (7 Tower Premium): Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola. (Fasilitas eksklusif: Kolam Renang tematik, Fitness Center/Gym, Lapangan Tenis, Sauna).
-2. HARGA & TIPE SEWA RESMI:
-   - Sewa Bulanan: Studio 21 m2 (Rp 2.800.000 - Rp 3.500.000/bln), 2BR Standard 33 m2 (Rp 3.800.000 - Rp 4.500.000/bln), 2BR Green Palace (Rp 4.500.000 - Rp 5.500.000/bln).
-   - Sewa Tahunan: Mulai Rp 32 Juta - Rp 55 Juta / tahun (Hemat biaya sewa bulanan).
-   - Seluruh unit sewa standard dilengkapi AC, kasur springbed, lemari pakaian, kitchen set, kulkas, dan TV.
-3. FASILITAS & LOKASI STRATEGIS:
-   - Mall Kalibata City Square (KCS) langsung di bawah tower (XXI, Farmers Market, Starbucks, kuliner 24 jam).
-   - Stasiun KRL Duren Kalibata hanya 200 meter (2 menit jalan kaki).
-   - Akses cepat 10-15 menit ke kawasan bisnis Kuningan (Rasuna Said), Gatot Subroto, SCBD, MT Haryono.
-   - Keamanan: Kartu akses lift per lantai, CCTV 24 jam, Masjid Raya Nurullah.
-
-=== LIVE INVENTORY DATA DARI DATABASE ===
+=== LIVE INVENTORY DARI GOOGLE SHEETS ===
 ${liveUnitInventory}
+
+${customGuardrails ? '=== ATURAN GUARDRAILS & KEBIJAKAN RESPON ===\n' + customGuardrails : '=== GUARDRAILS: Strict Professional Property Guidelines ==='}
 
 === DATA PELANGGAN TERDAFTAR ===
 ${verifiedCustomerContext || "PENGGUNA SAAT INI: Pengunjung umum / Belum terverifikasi."}
 
-=== 5 GUARDRAILS & ATURAN RESPON ===
-1. BOUNDARY & NO DAILY RENT: Tolak sewa harian dengan sopan. Fokus pada sewa bulanan/tahunan.
-2. PRIVASI: JANGAN PERNAH membocorkan nama pemilik unit, nomor rekening landlord, atau data sewa orang lain.
-3. DATA PERSONAL: Jika pengguna menanyakan masa kontrak / tagihannya:
-   - Jika sudah terverifikasi di atas, jelaskan dengan ramah data kontraknya.
-   - Jika belum terverifikasi, minta pengguna mengetikkan Single ID (contoh: CNT-XXXX) atau No WhatsApp terdaftar.
-4. ACTION ORIENTED: Ajak calon penyewa untuk menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin untuk booking cepat.
-5. GAYA BICARA: Ramah, profesional, solutif, ringkas (maksimal 2-3 paragraf), bahasa Indonesia yang elegan.`;
+Panduan Respon:
+1. Bersikap ramah, sopan, profesional, ringkas (maksimal 2-3 paragraf), bahasa Indonesia elegan.
+2. JANGAN PERNAH membocorkan nama pemilik unit, nomor rekening landlord, atau data sewa penyewa lain.
+3. Selalu prioritaskan jawaban berdasarkan data aktif di atas.`;
 
   const payload = {
     contents: [
@@ -133,15 +118,15 @@ ${verifiedCustomerContext || "PENGGUNA SAAT INI: Pengunjung umum / Belum terveri
         json.candidates[0].content.parts[0].text) {
       return { success: true, reply: json.candidates[0].content.parts[0].text };
     } else {
-      return { success: true, reply: generateStructuredOfflineAnswer(userMessage) };
+      return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
     }
   } catch (err) {
     Logger.log("Gemini Live API Error: " + err.toString());
-    return { success: true, reply: generateStructuredOfflineAnswer(userMessage) };
+    return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
   }
 }
 
-function generateStructuredOfflineAnswer(userQuery) {
+function generateStructuredOfflineAnswer(userQuery, kb, gr) {
   const q = String(userQuery || '').toLowerCase();
   
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {

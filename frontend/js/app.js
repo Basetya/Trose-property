@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic & Settings Handler (v5.4)
+ * Trose Property Manager - Dashboard Logic & AI Studio Handlers (v7.1)
  * File: frontend/js/app.js
  */
 
@@ -12,6 +12,7 @@ async function fetchDashboard() {
     if (data && data.success) {
       renderDashboard(data);
       if (loadingIndicator) loadingIndicator.classList.add("hidden");
+      loadAiConfig();
       return;
     }
   } catch (err) {
@@ -37,6 +38,7 @@ async function fetchDashboard() {
     },
     recentInvoices: []
   });
+  loadAiConfig();
 }
 
 function renderDashboard(data) {
@@ -92,6 +94,109 @@ function renderDashboard(data) {
       </tr>
     `).join('');
   }
+}
+
+// AI KNOWLEDGE BASE & GUARDRAILS LOGIC
+async function loadAiConfig() {
+  const kbArea = document.getElementById("ai-kb-text");
+  const grArea = document.getElementById("ai-guardrail-text");
+  if (!kbArea || !grArea) return;
+
+  try {
+    const res = await gasApiCall("getAiConfig", {}, "GET");
+    if (res && res.success) {
+      kbArea.value = res.knowledgeBase || "";
+      grArea.value = res.guardrails || "";
+      return;
+    }
+  } catch (err) {
+    console.warn("GAS getAiConfig fallback:", err);
+  }
+}
+
+function resetToStandardDefaults() {
+  const kbArea = document.getElementById("ai-kb-text");
+  const grArea = document.getElementById("ai-guardrail-text");
+  if (kbArea) {
+    kbArea.value = "SUPERBLOCK KALIBATA CITY INFORMATION:\n" +
+      "- 18 Tower Total: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.\n" +
+      "- Tower Green Palace (Mawar s/d Viola) memiliki akses kolam renang tematik & gym indoor.\n" +
+      "- Tarif Sewa Bulanan: Studio (Rp 2.8Jt - 3.5Jt/bln), 2BR Standard (Rp 3.8Jt - 4.5Jt/bln), 2BR Green Palace (Rp 4.5Jt - 5.5Jt/bln).\n" +
+      "- Seluruh unit Full Furnished (AC, springbed, lemari, kitchen set, kulkas, TV).\n" +
+      "- Mall Kalibata City Square (KCS), XXI, Farmers Market di bawah hunian.\n" +
+      "- Stasiun KRL Duren Kalibata berjarak 200m (2 menit jalan kaki).";
+  }
+  if (grArea) {
+    grArea.value = "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Trose Property hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
+      "2. STRICT PROPERTY DOMAIN: Hanya jawab seputar properti, fasilitas, sewa, dan jadwal viewing di Kalibata City.\n" +
+      "3. PRIVACY PROTECTION: Dilarang membeberkan nama pemilik unit atau nomor rekening pribadi landlord kepada publik.\n" +
+      "4. VERIFICATION PROTOCOL: Data privat penyewa (masa sewa, sisa tagihan) hanya boleh dijawab jika Single ID (CNT-XXXX) atau No WA cocok di database.\n" +
+      "5. LEAD CAPTURE: Arahkan pengguna menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin.";
+  }
+  showToast("Template default Kalibata City dimuat ke editor!");
+}
+
+async function handleSaveAiConfig(e) {
+  e.preventDefault();
+  const kbVal = document.getElementById("ai-kb-text").value.trim();
+  const grVal = document.getElementById("ai-guardrail-text").value.trim();
+  const btn = document.getElementById("btn-save-ai");
+
+  ensureAdminPasscode(async () => {
+    btn.disabled = true;
+    btn.innerText = "Menyimpan ke AI Engine...";
+
+    try {
+      const res = await gasApiCall("saveAiConfig", { knowledgeBase: kbVal, guardrails: grVal }, "POST");
+      if (res && res.success) {
+        showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui!");
+      } else {
+        showToast(res.error || "Gagal menyimpan konfigurasi AI", "error");
+      }
+    } catch (err) {
+      showToast("Error menghubungi server Apps Script", "error");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
+    }
+  });
+}
+
+function handleClearAiConfig() {
+  if (!confirm("PERINGATAN: Apakah Anda yakin ingin MENGHAPUS / MENGOSONGKAN seluruh Knowledge Base dan Guardrails yang tersimpan di server? Data lama yang obsolete akan dihapus secara permanen.")) {
+    return;
+  }
+
+  ensureAdminPasscode(async () => {
+    try {
+      const res = await gasApiCall("clearAiConfig", {}, "POST");
+      if (res && res.success) {
+        document.getElementById("ai-kb-text").value = "";
+        document.getElementById("ai-guardrail-text").value = "";
+        showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
+      } else {
+        showToast(res.error || "Gagal mengosongkan AI Config", "error");
+      }
+    } catch (err) {
+      showToast("Error saat menghubungi server", "error");
+    }
+  });
+}
+
+function handleAiFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    const kbArea = document.getElementById("ai-kb-text");
+    if (kbArea) {
+      kbArea.value = content;
+      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base!`);
+    }
+  };
+  reader.readAsText(file);
 }
 
 async function handleSaveWaSettings(e) {
