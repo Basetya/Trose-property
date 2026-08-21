@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic Clean Slate (v7.4)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.5)
  * File: frontend/js/app.js
  */
 
@@ -63,7 +63,7 @@ function renderDashboard(data) {
   const invTable = document.getElementById("table-invoices-body");
   if (invTable) {
     if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada data tagihan sewa di Google Sheets (0 Invoices).</td></tr>`;
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets.</td></tr>`;
       return;
     }
 
@@ -163,7 +163,7 @@ async function handleSaveAiConfig(e) {
 }
 
 function handleClearAiConfig() {
-  if (!confirm("PERINGATAN: Apakah Anda yakin ingin MENGHAPUS / MENGOSONGKAN seluruh Knowledge Base dan Guardrails yang tersimpan di server? Data lama yang obsolete akan dihapus secara permanen.")) {
+  if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan di server?")) {
     return;
   }
 
@@ -176,6 +176,26 @@ function handleClearAiConfig() {
         showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
       } else {
         showToast(res.error || "Gagal mengosongkan AI Config", "error");
+      }
+    } catch (err) {
+      showToast("Error saat menghubungi server", "error");
+    }
+  });
+}
+
+function handleWipeDatabase() {
+  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
+    return;
+  }
+
+  ensureAdminPasscode(async () => {
+    try {
+      const res = await gasApiCall("wipeAllMockupData", {}, "POST");
+      if (res && res.success) {
+        showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
+        fetchDashboard();
+      } else {
+        showToast(res.error || "Gagal membersihkan database", "error");
       }
     } catch (err) {
       showToast("Error saat menghubungi server", "error");

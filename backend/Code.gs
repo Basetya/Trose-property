@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Production Controller Clean Baseline (v7.4)
+ * Trose Property Manager - Production Controller Clean Baseline (v7.5)
  * File: backend/Code.gs
  */
 
@@ -10,9 +10,13 @@ function doGet(e) {
   try {
     if (action === "getAiConfig") {
       const sp = PropertiesService.getScriptProperties();
-      const kb = sp.getProperty("AI_KNOWLEDGE_BASE") || "";
-      const gr = sp.getProperty("AI_GUARDRAILS") || "";
-      responseData = { success: true, knowledgeBase: kb, guardrails: gr };
+      const kb = sp.getProperty("AI_KNOWLEDGE_BASE");
+      const gr = sp.getProperty("AI_GUARDRAILS");
+      responseData = { 
+        success: true, 
+        knowledgeBase: kb !== null ? kb : "", 
+        guardrails: gr !== null ? gr : "" 
+      };
     } else if (action === "verifyPasscode") {
       const inputPasscode = e.parameter.passcode || "";
       const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
@@ -84,7 +88,9 @@ function doPost(e) {
       }
     }
 
-    if (action === "saveAiConfig") {
+    if (action === "wipeAllMockupData") {
+      responseData = handleWipeAllSheetsData();
+    } else if (action === "saveAiConfig") {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", String(postData.knowledgeBase || "").trim());
       sp.setProperty("AI_GUARDRAILS", String(postData.guardrails || "").trim());
@@ -93,7 +99,7 @@ function doPost(e) {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", "");
       sp.setProperty("AI_GUARDRAILS", "");
-      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN (dihapus)." };
+      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN." };
     } else if (action === "updatePublicSettings") {
       const sp = PropertiesService.getScriptProperties();
       if (postData.waNumber) {
@@ -144,6 +150,24 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(responseData))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleWipeAllSheetsData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetsToWipe = ["02_UNITS", "03_CONTACTS_360", "04_LEASES", "05_INVOICES", "06_MAINTENANCE", "07_CRM_PIPELINE", "08_WHATSAPP_LOGS", "09_INSPECTIONS"];
+  
+  sheetsToWipe.forEach(name => {
+    const sheet = ss.getSheetByName(name);
+    if (sheet && sheet.getLastRow() > 1) {
+      sheet.deleteRows(2, sheet.getLastRow() - 1);
+    }
+  });
+
+  const sp = PropertiesService.getScriptProperties();
+  sp.setProperty("AI_KNOWLEDGE_BASE", "");
+  sp.setProperty("AI_GUARDRAILS", "");
+
+  return { success: true, message: "Seluruh baris data mockup di Google Sheets & AI Memory berhasil DIBERSIHKAN (Zero State)!" };
 }
 
 function getColumnMap(sheet) {

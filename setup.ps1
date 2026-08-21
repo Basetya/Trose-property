@@ -1,104 +1,16 @@
 # ==============================================================================
-# Trose-property - 1-Click Setup (Total Mockup Elimination v7.4)
+# Trose-property - 1-Click Setup (Absolute Zero-Mockup & Database Wipe v7.5)
 # ==============================================================================
 
-Write-Host "Scaffolding v7.4: Eliminating all mockup data and hardcoded defaults..." -ForegroundColor Cyan
+Write-Host "Applying Absolute Zero-Mockup Architecture & Wipe Engine v7.5..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path "backend", "frontend/css", "frontend/js", "frontend/img", "scripts" | Out-Null
 
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
-Write-Host "Updating backend/SheetSchema.gs (Header-Only Clean Schema)..." -ForegroundColor Yellow
-$sheetSchemaGs = @'
-/**
- * Trose Property Manager - Clean Database Initializer (v7.4)
- * Header-only structure with ZERO dummy rows for a clean slate.
- * File: backend/SheetSchema.gs
- */
-
-function initializeAllSheets() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  const schemas = [
-    {
-      name: "01_PROPERTIES",
-      headers: ["Property_ID", "Property_Name", "Address", "City", "Total_Towers", "Total_Units", "Created_At"]
-    },
-    {
-      name: "02_UNITS",
-      headers: [
-        "Unit_ID", "Property_ID", "Tower", "Floor", "Unit_No", "Type", 
-        "Status", "Base_Rent", "IPL_Fee", "Management_Percent", 
-        "Landlord_Name", "Landlord_Phone", "Payment_Route", 
-        "Bank_Name", "Bank_Account_No", "Bank_Holder_Name"
-      ]
-    },
-    {
-      name: "03_CONTACTS_360",
-      headers: ["Contact_ID", "Full_Name", "Phone_WA", "Email", "Role", "Lead_Score", "Interaction_Summary", "Created_At"]
-    },
-    {
-      name: "04_LEASES",
-      headers: [
-        "Lease_ID", "Unit_ID", "Tenant_ID", "Start_Date", "End_Date", 
-        "Deposit_Amount", "Monthly_Rent", "Management_Commission_Fee", 
-        "Payment_Route", "Status", "Created_At"
-      ]
-    },
-    {
-      name: "05_INVOICES",
-      headers: [
-        "Invoice_ID", "Lease_ID", "Unit_ID", "Period", "Rent_Amount", 
-        "Utility_Amount", "IPL_Amount", "Unique_Code", "Total_Amount", 
-        "Status", "Payment_Route", "Destination_Bank", "Destination_Account_No", 
-        "Destination_Account_Holder", "Proof_URL", "Issued_Date", "Paid_Date"
-      ]
-    },
-    {
-      name: "06_MAINTENANCE",
-      headers: [
-        "Ticket_ID", "Unit_ID", "Tenant_ID", "Issue_Description", "Photo_URL", 
-        "Priority", "Status", "Estimated_Cost", "Assigned_Vendor", "Created_At", "Resolved_At"
-      ]
-    },
-    {
-      name: "07_CRM_PIPELINE",
-      headers: ["Lead_ID", "Contact_ID", "Target_Unit", "Stage", "Budget", "Viewing_Schedule", "Interaction_Notes", "Updated_At"]
-    },
-    {
-      name: "08_WHATSAPP_LOGS",
-      headers: ["Log_ID", "Direction", "Phone_WA", "Message_Content", "Status", "Timestamp"]
-    },
-    {
-      name: "09_INSPECTIONS",
-      headers: [
-        "Inspection_ID", "Unit_ID", "Lease_ID", "Inspection_Type", 
-        "Living_Room_Condition", "Bedroom_Condition", "Bathroom_Condition", 
-        "AC_Condition", "Photo_Evidence_URLs", "Deposit_Deduction_Amount", "Notes", "Created_At"
-      ]
-    }
-  ];
-
-  schemas.forEach(schema => {
-    let sheet = ss.getSheetByName(schema.name);
-    if (!sheet) {
-      sheet = ss.insertSheet(schema.name);
-    } else {
-      sheet.clear();
-    }
-    sheet.appendRow(schema.headers);
-    sheet.getRange(1, 1, 1, schema.headers.length).setFontWeight("bold").setBackground("#f1f5f9");
-    sheet.setFrozenRows(1);
-  });
-
-  return "Seluruh 9 Tab Database Berhasil Diinisialisasi Bersih (Clean Slate)!";
-}
-'@
-[System.IO.File]::WriteAllText("$PSScriptRoot/backend/SheetSchema.gs", $sheetSchemaGs, $Utf8NoBomEncoding)
-
-Write-Host "Updating backend/Code.gs (Zero-State Aggregation)..." -ForegroundColor Yellow
+Write-Host "Writing backend/Code.gs (With wipeAllMockupData action)..." -ForegroundColor Yellow
 $codeGs = @'
 /**
- * Trose Property Manager - Production Controller Clean Baseline (v7.4)
+ * Trose Property Manager - Production Controller Clean Baseline (v7.5)
  * File: backend/Code.gs
  */
 
@@ -109,9 +21,13 @@ function doGet(e) {
   try {
     if (action === "getAiConfig") {
       const sp = PropertiesService.getScriptProperties();
-      const kb = sp.getProperty("AI_KNOWLEDGE_BASE") || "";
-      const gr = sp.getProperty("AI_GUARDRAILS") || "";
-      responseData = { success: true, knowledgeBase: kb, guardrails: gr };
+      const kb = sp.getProperty("AI_KNOWLEDGE_BASE");
+      const gr = sp.getProperty("AI_GUARDRAILS");
+      responseData = { 
+        success: true, 
+        knowledgeBase: kb !== null ? kb : "", 
+        guardrails: gr !== null ? gr : "" 
+      };
     } else if (action === "verifyPasscode") {
       const inputPasscode = e.parameter.passcode || "";
       const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
@@ -183,7 +99,9 @@ function doPost(e) {
       }
     }
 
-    if (action === "saveAiConfig") {
+    if (action === "wipeAllMockupData") {
+      responseData = handleWipeAllSheetsData();
+    } else if (action === "saveAiConfig") {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", String(postData.knowledgeBase || "").trim());
       sp.setProperty("AI_GUARDRAILS", String(postData.guardrails || "").trim());
@@ -192,7 +110,7 @@ function doPost(e) {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", "");
       sp.setProperty("AI_GUARDRAILS", "");
-      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN (dihapus)." };
+      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN." };
     } else if (action === "updatePublicSettings") {
       const sp = PropertiesService.getScriptProperties();
       if (postData.waNumber) {
@@ -243,6 +161,24 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(responseData))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleWipeAllSheetsData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetsToWipe = ["02_UNITS", "03_CONTACTS_360", "04_LEASES", "05_INVOICES", "06_MAINTENANCE", "07_CRM_PIPELINE", "08_WHATSAPP_LOGS", "09_INSPECTIONS"];
+  
+  sheetsToWipe.forEach(name => {
+    const sheet = ss.getSheetByName(name);
+    if (sheet && sheet.getLastRow() > 1) {
+      sheet.deleteRows(2, sheet.getLastRow() - 1);
+    }
+  });
+
+  const sp = PropertiesService.getScriptProperties();
+  sp.setProperty("AI_KNOWLEDGE_BASE", "");
+  sp.setProperty("AI_GUARDRAILS", "");
+
+  return { success: true, message: "Seluruh baris data mockup di Google Sheets & AI Memory berhasil DIBERSIHKAN (Zero State)!" };
 }
 
 function getColumnMap(sheet) {
@@ -758,10 +694,243 @@ function handleCreateLead(data) {
 '@
 [System.IO.File]::WriteAllText("$PSScriptRoot/backend/Code.gs", $codeGs, $Utf8NoBomEncoding)
 
-Write-Host "Updating frontend/js/app.js (Clean Zero Slate Enforcement)..." -ForegroundColor Yellow
+Write-Host "Updating frontend/dashboard.html (Adding Database Wipe Action Button)..." -ForegroundColor Yellow
+$dashboardHtml = @'
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Property Manager - Admin Cockpit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+          <div>
+            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <p class="text-xs text-rose-400 font-medium">Kalibata City Admin</p>
+          </div>
+        </div>
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="dashboard.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Landing Page &rarr;</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Inspeksi Unit</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Laporan Keuangan</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Lease & Tenants</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Maintenance</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>CRM & Acquisition</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-2">
+        <div class="glass-card p-3 rounded-xl text-xs">
+          <p class="text-slate-400 font-medium">Kalibata City Engine:</p>
+          <p class="font-mono text-emerald-400 font-bold mt-0.5">Google Sheets Active</p>
+        </div>
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
+          Clear Passcode Session
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-white">Kalibata City Cockpit</h2>
+            <p class="text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
+              Wipe Mockup Data (Zero State)
+            </button>
+            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
+              Refresh Data
+            </button>
+            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
+              + New CRM Lead
+            </a>
+          </div>
+        </div>
+
+        <!-- Metrics Grid (Clean Zero-State Initial) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
+            <h3 id="stat-occupancy" class="text-2xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
+            <p id="stat-units" class="text-xs text-rose-400 mt-1 font-medium">0 Units</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Rent Due</span>
+            <h3 id="stat-due" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
+            <p id="stat-breakdown" class="text-xs text-slate-400 mt-1 truncate">Direct Landlord vs Mgmt Pool</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
+            <h3 id="stat-outstanding" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
+            <p class="text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
+            <h3 id="stat-leads" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
+            <p id="stat-maintenance" class="text-xs text-slate-400 mt-1">0 Open Tickets</p>
+          </div>
+        </div>
+
+        <!-- PANEL AI KNOWLEDGE BASE & GUARDRAILS STUDIO -->
+        <div class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-rose-500/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-extrabold text-xl text-white flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
+                Rose AI Knowledge Base & Guardrails Studio
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Kelola pengetahuan sewa, fasilitas, rincian tower, atau kosongkan (clear) data usang agar AI selalu up-to-date.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl border border-slate-700 transition flex items-center gap-1.5">
+                <span>Unggah File Dokumen (.txt/.md)</span>
+                <input type="file" id="ai-file-upload" accept=".txt,.md,.json" onchange="handleAiFileUpload(event)" class="hidden">
+              </label>
+              <button type="button" onclick="handleClearAiConfig()" class="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-2xl border border-rose-800/80 transition flex items-center gap-1.5 shadow">
+                <span>Hapus / Clear All Context</span>
+              </button>
+            </div>
+          </div>
+
+          <form id="form-ai-config" onsubmit="handleSaveAiConfig(event)" class="space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <!-- Knowledge Base Editor -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa, Tower & Fasilitas)</label>
+                  <span class="text-[10px] text-slate-500 font-mono">Dinamis</span>
+                </div>
+                <textarea id="ai-kb-text" rows="8" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional, promo sewa, dan informasi apartemen..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+
+              <!-- Guardrails Editor -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider">Guardrails & Batasan Kebijakan (Aturan AI)</label>
+                  <span class="text-[10px] text-rose-400/80 font-mono">Strict Policy</span>
+                </div>
+                <textarea id="ai-guardrail-text" rows="8" placeholder="1. NO DAILY RENT: Tolak dengan sopan pertanyaan sewa harian...&#10;2. PRIVASI: Dilarang membeberkan rekening landlord..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+              <div class="flex items-center gap-4">
+                <button type="button" onclick="loadAiConfig()" class="text-xs text-slate-400 hover:text-slate-200 font-bold underline">
+                  Muat Ulang Data Server
+                </button>
+                <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline">
+                  Kembalikan Template Default Kalibata
+                </button>
+              </div>
+              <button type="submit" id="btn-save-ai" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-rose-600/30 transition flex items-center gap-2">
+                <span>Simpan Knowledge & Guardrails</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Panel Pengaturan WhatsApp Landing Page -->
+        <div class="glass-panel p-6 rounded-3xl space-y-4 border border-emerald-500/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+              <h3 class="font-extrabold text-lg text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                Pengaturan Nomor WhatsApp Landing Page
+              </h3>
+              <p class="text-xs text-slate-400">Nomor ini yang akan dihubungi oleh calon penyewa saat mengklik tombol WhatsApp di Landing Page & Widget AI.</p>
+            </div>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/80">Real-Time Sync</span>
+          </div>
+
+          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-3 pt-2">
+            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-2xl text-sm font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <button type="button" onclick="testWaLink()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl transition border border-slate-700">
+              Tes Link WA
+            </button>
+            <button type="submit" id="btn-save-wa" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition">
+              Simpan Nomor WA
+            </button>
+          </form>
+        </div>
+
+        <!-- Tagihan & Rekonsiliasi Terkini -->
+        <div class="bg-white text-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-extrabold text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
+              <p class="text-xs text-slate-500">Mendukung Rute Transfer Langsung ke Landlord atau ke Management</p>
+            </div>
+            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan ke Sheets...</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">Invoice ID</th>
+                  <th class="py-3 px-4">Unit & Periode</th>
+                  <th class="py-3 px-4">Nominal (+Kode Unik)</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Rute Rekening</th>
+                  <th class="py-3 px-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-invoices-body">
+                <tr>
+                  <td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa terdaftar di Google Sheets.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+'@
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/dashboard.html", $dashboardHtml, $Utf8NoBomEncoding)
+
+Write-Host "Updating frontend/js/app.js (Zero State Aggregator & Wipe Database Trigger)..." -ForegroundColor Yellow
 $appJs = @'
 /**
- * Trose Property Manager - Dashboard Logic Clean Slate (v7.4)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.5)
  * File: frontend/js/app.js
  */
 
@@ -825,7 +994,7 @@ function renderDashboard(data) {
   const invTable = document.getElementById("table-invoices-body");
   if (invTable) {
     if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada data tagihan sewa di Google Sheets (0 Invoices).</td></tr>`;
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets.</td></tr>`;
       return;
     }
 
@@ -925,7 +1094,7 @@ async function handleSaveAiConfig(e) {
 }
 
 function handleClearAiConfig() {
-  if (!confirm("PERINGATAN: Apakah Anda yakin ingin MENGHAPUS / MENGOSONGKAN seluruh Knowledge Base dan Guardrails yang tersimpan di server? Data lama yang obsolete akan dihapus secara permanen.")) {
+  if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan di server?")) {
     return;
   }
 
@@ -938,6 +1107,26 @@ function handleClearAiConfig() {
         showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
       } else {
         showToast(res.error || "Gagal mengosongkan AI Config", "error");
+      }
+    } catch (err) {
+      showToast("Error saat menghubungi server", "error");
+    }
+  });
+}
+
+function handleWipeDatabase() {
+  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
+    return;
+  }
+
+  ensureAdminPasscode(async () => {
+    try {
+      const res = await gasApiCall("wipeAllMockupData", {}, "POST");
+      if (res && res.success) {
+        showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
+        fetchDashboard();
+      } else {
+        showToast(res.error || "Gagal membersihkan database", "error");
       }
     } catch (err) {
       showToast("Error saat menghubungi server", "error");
@@ -1020,4 +1209,4 @@ document.addEventListener("DOMContentLoaded", () => {
 '@
 [System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/app.js", $appJs, $Utf8NoBomEncoding)
 
-Write-Host "`n[SUCCESS] Version v7.4 Clean Slate applied: All mockup leaks removed!" -ForegroundColor Green
+Write-Host "`n[SUCCESS] Version v7.5 applied: Zero Mockup & Database Wipe button ready!" -ForegroundColor Green

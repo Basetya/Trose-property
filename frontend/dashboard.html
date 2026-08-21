@@ -68,17 +68,20 @@
             <h2 class="text-2xl font-black text-white">Kalibata City Cockpit</h2>
             <p class="text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
           </div>
-          <div class="flex items-center gap-3">
-            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-sm font-bold rounded-xl transition">
+          <div class="flex items-center gap-2">
+            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
+              Wipe Mockup Data (Zero State)
+            </button>
+            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
               Refresh Data
             </button>
-            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold rounded-xl shadow-lg transition">
+            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
               + New CRM Lead
             </a>
           </div>
         </div>
 
-        <!-- Metrics Grid (Clean Initial Zero-State) -->
+        <!-- Metrics Grid (Clean Zero-State Initial) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="glass-card p-5 rounded-3xl">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
