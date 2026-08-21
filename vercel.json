@@ -1,29 +1,79 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/img/:match*",
-      "destination": "/frontend/img/:match*"
+      "src": "frontend/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/img/(.*)",
+      "dest": "/frontend/img/$1"
     },
     {
-      "source": "/css/:match*",
-      "destination": "/frontend/css/:match*"
+      "src": "/css/(.*)",
+      "dest": "/frontend/css/$1"
     },
     {
-      "source": "/js/:match*",
-      "destination": "/frontend/js/:match*"
+      "src": "/js/(.*)",
+      "dest": "/frontend/js/$1"
     },
     {
-      "source": "/:page.html",
-      "destination": "/frontend/:page.html"
+      "src": "/(.*).html",
+      "dest": "/frontend/$1.html"
     },
     {
-      "source": "/:page",
-      "destination": "/frontend/:page.html"
+      "src": "/dashboard",
+      "dest": "/frontend/dashboard.html"
     },
     {
-      "source": "/",
-      "destination": "/frontend/index.html"
+      "src": "/concierge",
+      "dest": "/frontend/concierge.html"
+    },
+    {
+      "src": "/inspections",
+      "dest": "/frontend/inspections.html"
+    },
+    {
+      "src": "/finance",
+      "dest": "/frontend/finance.html"
+    },
+    {
+      "src": "/units",
+      "dest": "/frontend/units.html"
+    },
+    {
+      "src": "/leases",
+      "dest": "/frontend/leases.html"
+    },
+    {
+      "src": "/billing",
+      "dest": "/frontend/billing.html"
+    },
+    {
+      "src": "/maintenance",
+      "dest": "/frontend/maintenance.html"
+    },
+    {
+      "src": "/crm",
+      "dest": "/frontend/crm.html"
+    },
+    {
+      "src": "/owner-portal",
+      "dest": "/frontend/owner-portal.html"
+    },
+    {
+      "src": "/invoice-view",
+      "dest": "/frontend/invoice-view.html"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     }
   ]
 }
