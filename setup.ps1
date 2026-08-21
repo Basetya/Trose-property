@@ -1,169 +1,240 @@
 # ==============================================================================
-# Trose-property - 1-Click Setup (Resilient Passcode Protocol v7.2)
+# Trose-property - 1-Click Setup (Clean Baseline for Pitching v7.3)
 # ==============================================================================
 
-Write-Host "Hardening Admin Authentication & Passcode Handshake (trose288)..." -ForegroundColor Cyan
+Write-Host "Resetting Dashboard mockups to clean zero-baseline for pitching..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path "backend", "frontend/css", "frontend/js", "frontend/img", "scripts" | Out-Null
 
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
-Write-Host "Updating frontend/js/auth.js (Resilient Handshake with Trim & Normalize)..." -ForegroundColor Yellow
-$authJs = @'
-/**
- * Trose Property Manager - Resilient Admin Route Guard (v7.2)
- * File: frontend/js/auth.js
- */
-
-const DEFAULT_OFFLINE_PASSCODE = "trose288";
-
-document.addEventListener("DOMContentLoaded", () => {
-  const currentPath = window.location.pathname.toLowerCase();
-  const isPublicPage = currentPath.endsWith("index.html") || 
-                       currentPath.endsWith("concierge.html") || 
-                       currentPath.endsWith("owner-portal.html") || 
-                       currentPath.endsWith("invoice-view.html") ||
-                       currentPath === "/" || 
-                       currentPath.endsWith("/frontend/");
-
-  if (!isPublicPage) {
-    protectAdminRoute();
-  }
-});
-
-async function protectAdminRoute() {
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode");
-  
-  if (!currentPasscode) {
-    document.body.style.display = "none";
-    promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
-    return;
-  }
-
-  try {
-    const res = await gasApiCall("verifyPasscode", { passcode: currentPasscode }, "GET");
-    if (!res || !res.success) {
-      // Jika server secara eksplisit menolak
-      if (res && res.error && currentPasscode.trim().toLowerCase() !== DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
-        sessionStorage.removeItem("trose_admin_passcode");
-        document.body.style.display = "none";
-        promptAdminLoginRequired("Sesi tidak valid. Silakan masukkan kembali passcode admin.");
-      }
-    }
-  } catch (err) {
-    // Mode offline: izinkan jika sesi cocok dengan default
-    if (currentPasscode.trim().toLowerCase() !== DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
-      sessionStorage.removeItem("trose_admin_passcode");
-      document.body.style.display = "none";
-      promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
-    }
-  }
-}
-
-function promptAdminLoginRequired(message) {
-  let modal = document.getElementById("modal-route-guard");
-  if (!modal) {
-    modal = document.createElement("div");
-    modal.id = "modal-route-guard";
-    modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md";
-    document.documentElement.appendChild(modal);
-  }
-
-  modal.innerHTML = `
-    <div class="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl space-y-4 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-rose-600 mx-auto flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-600/30">T</div>
+Write-Host "Updating frontend/dashboard.html (Zero State Mockup)..." -ForegroundColor Yellow
+$dashboardHtml = @'
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Property Manager - Admin Cockpit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
       <div>
-        <h3 class="text-lg font-extrabold text-white">Autentikasi Admin Diperlukan</h3>
-        <p id="guard-error-msg" class="text-xs text-slate-400 mt-1">${message || "Masukkan Passcode Admin Trose Property untuk membuka area pengelolaan."}</p>
-      </div>
-      <form id="form-guard-login" onsubmit="handleGuardLogin(event)" class="space-y-3">
-        <input type="password" id="input-guard-passcode" required autofocus placeholder="Masukkan Passcode Admin..." class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none text-sm text-center text-slate-100 font-mono">
-        <div class="flex gap-2 pt-2">
-          <a href="index.html" class="flex-1 py-2.5 rounded-xl border border-slate-800 text-slate-400 font-bold text-xs hover:bg-slate-800 transition flex items-center justify-center">Ke Landing Page</a>
-          <button type="submit" id="btn-guard-submit" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg transition">Masuk Admin</button>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+          <div>
+            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <p class="text-xs text-rose-400 font-medium">Kalibata City Admin</p>
+          </div>
         </div>
-      </form>
-    </div>
-  `;
-}
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="dashboard.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Landing Page &rarr;</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Inspeksi Unit</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Laporan Keuangan</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Lease & Tenants</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Maintenance</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>CRM & Acquisition</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-2">
+        <div class="glass-card p-3 rounded-xl text-xs">
+          <p class="text-slate-400 font-medium">Kalibata City Engine:</p>
+          <p class="font-mono text-emerald-400 font-bold mt-0.5">Google Sheets Active</p>
+        </div>
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
+          Clear Passcode Session
+        </button>
+      </div>
+    </aside>
 
-async function handleGuardLogin(e) {
-  e.preventDefault();
-  const input = document.getElementById("input-guard-passcode");
-  const btn = document.getElementById("btn-guard-submit");
-  const errorMsg = document.getElementById("guard-error-msg");
-  const rawVal = input.value;
-  const cleanVal = rawVal ? rawVal.trim() : "";
-  
-  if (!cleanVal) return;
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-white">Kalibata City Cockpit</h2>
+            <p class="text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-sm font-bold rounded-xl transition">
+              Refresh Data
+            </button>
+            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold rounded-xl shadow-lg transition">
+              + New CRM Lead
+            </a>
+          </div>
+        </div>
 
-  btn.disabled = true;
-  btn.innerText = "Memverifikasi...";
+        <!-- Metrics Grid (Clean Initial Zero-State) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
+            <h3 id="stat-occupancy" class="text-2xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
+            <p id="stat-units" class="text-xs text-rose-400 mt-1 font-medium">0 Units</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Rent Due</span>
+            <h3 id="stat-due" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
+            <p id="stat-breakdown" class="text-xs text-slate-400 mt-1 truncate">Direct Landlord vs Mgmt Pool</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
+            <h3 id="stat-outstanding" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
+            <p class="text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+          </div>
+          <div class="glass-card p-5 rounded-3xl">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
+            <h3 id="stat-leads" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
+            <p id="stat-maintenance" class="text-xs text-slate-400 mt-1">0 Open Tickets</p>
+          </div>
+        </div>
 
-  // 1. Verifikasi Langsung Lokal (Instant Match: trose288)
-  if (cleanVal.toLowerCase() === DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
-    sessionStorage.setItem("trose_admin_passcode", cleanVal);
-    unlockAdminScreen();
-    btn.disabled = false;
-    btn.innerText = "Masuk Admin";
-    return;
-  }
+        <!-- PANEL AI KNOWLEDGE BASE & GUARDRAILS STUDIO -->
+        <div class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-rose-500/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-extrabold text-xl text-white flex items-center gap-2.5">
+                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
+                Rose AI Knowledge Base & Guardrails Studio
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Kelola pengetahuan sewa, fasilitas, rincian tower, atau kosongkan (clear) data usang agar AI selalu up-to-date.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl border border-slate-700 transition flex items-center gap-1.5">
+                <span>Unggah File Dokumen (.txt/.md)</span>
+                <input type="file" id="ai-file-upload" accept=".txt,.md,.json" onchange="handleAiFileUpload(event)" class="hidden">
+              </label>
+              <button type="button" onclick="handleClearAiConfig()" class="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-2xl border border-rose-800/80 transition flex items-center gap-1.5 shadow">
+                <span>Hapus / Clear All Context</span>
+              </button>
+            </div>
+          </div>
 
-  // 2. Verifikasi Online ke Backend GAS jika passcode kustom digunakan
-  try {
-    const res = await gasApiCall("verifyPasscode", { passcode: cleanVal }, "GET");
-    
-    if (res && res.success) {
-      sessionStorage.setItem("trose_admin_passcode", cleanVal);
-      unlockAdminScreen();
-    } else {
-      input.value = "";
-      input.focus();
-      errorMsg.innerText = (res && res.error) ? res.error : "Passcode salah! Akses ditolak.";
-      errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
-      showToast("Passcode salah! Akses ditolak.", "error");
-    }
-  } catch (err) {
-    input.value = "";
-    errorMsg.innerText = "Passcode salah! Akses ditolak.";
-    errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
-    showToast("Passcode salah! Akses ditolak.", "error");
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Masuk Admin";
-  }
-}
+          <form id="form-ai-config" onsubmit="handleSaveAiConfig(event)" class="space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <!-- Knowledge Base Editor -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa, Tower & Fasilitas)</label>
+                  <span class="text-[10px] text-slate-500 font-mono">Dinamis</span>
+                </div>
+                <textarea id="ai-kb-text" rows="8" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional, promo sewa, dan informasi apartemen..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
 
-function unlockAdminScreen() {
-  const guardModal = document.getElementById("modal-route-guard");
-  if (guardModal) guardModal.remove();
-  document.body.style.display = "";
-  showToast("Autentikasi admin berhasil!");
-  
-  if (typeof fetchDashboard === "function") fetchDashboard();
-  if (typeof loadUnitsTable === "function") loadUnitsTable();
-  if (typeof loadLeasesTable === "function") loadLeasesTable();
-  if (typeof loadBillingTable === "function") loadBillingTable();
-  if (typeof loadMaintenanceTable === "function") loadMaintenanceTable();
-  if (typeof loadCrmData === "function") loadCrmData();
-  if (typeof loadFinancialData === "function") loadFinancialData();
-  if (typeof loadAiConfig === "function") loadAiConfig();
-}
+              <!-- Guardrails Editor -->
+              <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                  <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider">Guardrails & Batasan Kebijakan (Aturan AI)</label>
+                  <span class="text-[10px] text-rose-400/80 font-mono">Strict Policy</span>
+                </div>
+                <textarea id="ai-guardrail-text" rows="8" placeholder="1. NO DAILY RENT: Tolak dengan sopan pertanyaan sewa harian...&#10;2. PRIVASI: Dilarang membeberkan rekening landlord..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+            </div>
 
-function ensureAdminPasscode(onSuccessCallback) {
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode");
-  if (currentPasscode) {
-    if (typeof onSuccessCallback === "function") onSuccessCallback(currentPasscode);
-    return;
-  }
-  promptAdminLoginRequired();
-}
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+              <div class="flex items-center gap-4">
+                <button type="button" onclick="loadAiConfig()" class="text-xs text-slate-400 hover:text-slate-200 font-bold underline">
+                  Muat Ulang Data Server
+                </button>
+                <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline">
+                  Kembalikan Template Default Kalibata
+                </button>
+              </div>
+              <button type="submit" id="btn-save-ai" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-rose-600/30 transition flex items-center gap-2">
+                <span>Simpan Knowledge & Guardrails</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </form>
+        </div>
 
-function logoutAdminSession() {
-  sessionStorage.removeItem("trose_admin_passcode");
-  showToast("Sesi Admin telah dibersihkan");
-  window.location.href = "index.html";
-}
+        <!-- Panel Pengaturan WhatsApp Landing Page -->
+        <div class="glass-panel p-6 rounded-3xl space-y-4 border border-emerald-500/30">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div>
+              <h3 class="font-extrabold text-lg text-white flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                Pengaturan Nomor WhatsApp Landing Page
+              </h3>
+              <p class="text-xs text-slate-400">Nomor ini yang akan dihubungi oleh calon penyewa saat mengklik tombol WhatsApp di Landing Page & Widget AI.</p>
+            </div>
+            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/80">Real-Time Sync</span>
+          </div>
+
+          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-3 pt-2">
+            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-2xl text-sm font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <button type="button" onclick="testWaLink()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl transition border border-slate-700">
+              Tes Link WA
+            </button>
+            <button type="submit" id="btn-save-wa" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition">
+              Simpan Nomor WA
+            </button>
+          </form>
+        </div>
+
+        <!-- Tagihan & Rekonsiliasi Terkini -->
+        <div class="bg-white text-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-extrabold text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
+              <p class="text-xs text-slate-500">Mendukung Rute Transfer Langsung ke Landlord atau ke Management</p>
+            </div>
+            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan ke Sheets...</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">Invoice ID</th>
+                  <th class="py-3 px-4">Unit & Periode</th>
+                  <th class="py-3 px-4">Nominal (+Kode Unik)</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Rute Rekening</th>
+                  <th class="py-3 px-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-invoices-body">
+                <tr>
+                  <td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa terdaftar di Google Sheets.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
 '@
-[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/auth.js", $authJs, $Utf8NoBomEncoding)
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/dashboard.html", $dashboardHtml, $Utf8NoBomEncoding)
 
-Write-Host "`n[SUCCESS] Passcode verification resilience v7.2 applied successfully!" -ForegroundColor Green
+Write-Host "`n[SUCCESS] Baseline reset completed! Ready for Pitching!" -ForegroundColor Green
