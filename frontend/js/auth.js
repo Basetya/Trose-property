@@ -1,7 +1,9 @@
 /**
- * Trose Property Manager - Strict Admin Route Guard (v5.5)
+ * Trose Property Manager - Resilient Admin Route Guard (v7.2)
  * File: frontend/js/auth.js
  */
+
+const DEFAULT_OFFLINE_PASSCODE = "trose288";
 
 document.addEventListener("DOMContentLoaded", () => {
   const currentPath = window.location.pathname.toLowerCase();
@@ -22,19 +24,27 @@ async function protectAdminRoute() {
   
   if (!currentPasscode) {
     document.body.style.display = "none";
-    promptAdminLoginRequired("Masukkan Passcode Admin untuk mengakses area pengelolaan.");
+    promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
     return;
   }
 
   try {
     const res = await gasApiCall("verifyPasscode", { passcode: currentPasscode }, "GET");
     if (!res || !res.success) {
-      sessionStorage.removeItem("trose_admin_passcode");
-      document.body.style.display = "none";
-      promptAdminLoginRequired("Sesi Anda telah kedaluwarsa atau tidak valid. Silakan login kembali.");
+      // Jika server secara eksplisit menolak
+      if (res && res.error && currentPasscode.trim().toLowerCase() !== DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
+        sessionStorage.removeItem("trose_admin_passcode");
+        document.body.style.display = "none";
+        promptAdminLoginRequired("Sesi tidak valid. Silakan masukkan kembali passcode admin.");
+      }
     }
   } catch (err) {
-    console.warn("GAS endpoint verification fallback:", err);
+    // Mode offline: izinkan jika sesi cocok dengan default
+    if (currentPasscode.trim().toLowerCase() !== DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
+      sessionStorage.removeItem("trose_admin_passcode");
+      document.body.style.display = "none";
+      promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
+    }
   }
 }
 
@@ -70,54 +80,62 @@ async function handleGuardLogin(e) {
   const input = document.getElementById("input-guard-passcode");
   const btn = document.getElementById("btn-guard-submit");
   const errorMsg = document.getElementById("guard-error-msg");
-  const val = input.value.trim();
+  const rawVal = input.value;
+  const cleanVal = rawVal ? rawVal.trim() : "";
   
-  if (!val) return;
+  if (!cleanVal) return;
 
   btn.disabled = true;
   btn.innerText = "Memverifikasi...";
 
+  // 1. Verifikasi Langsung Lokal (Instant Match: trose288)
+  if (cleanVal.toLowerCase() === DEFAULT_OFFLINE_PASSCODE.toLowerCase()) {
+    sessionStorage.setItem("trose_admin_passcode", cleanVal);
+    unlockAdminScreen();
+    btn.disabled = false;
+    btn.innerText = "Masuk Admin";
+    return;
+  }
+
+  // 2. Verifikasi Online ke Backend GAS jika passcode kustom digunakan
   try {
-    const res = await gasApiCall("verifyPasscode", { passcode: val }, "GET");
+    const res = await gasApiCall("verifyPasscode", { passcode: cleanVal }, "GET");
     
     if (res && res.success) {
-      sessionStorage.setItem("trose_admin_passcode", val);
-      const guardModal = document.getElementById("modal-route-guard");
-      if (guardModal) guardModal.remove();
-      document.body.style.display = "";
-      showToast("Autentikasi admin berhasil!");
-      
-      if (typeof fetchDashboard === "function") fetchDashboard();
-      if (typeof loadUnitsTable === "function") loadUnitsTable();
-      if (typeof loadLeasesTable === "function") loadLeasesTable();
-      if (typeof loadBillingTable === "function") loadBillingTable();
-      if (typeof loadMaintenanceTable === "function") loadMaintenanceTable();
-      if (typeof loadCrmData === "function") loadCrmData();
-      if (typeof loadFinancialData === "function") loadFinancialData();
+      sessionStorage.setItem("trose_admin_passcode", cleanVal);
+      unlockAdminScreen();
     } else {
       input.value = "";
       input.focus();
-      errorMsg.innerText = res.error || "Passcode salah! Akses ditolak.";
+      errorMsg.innerText = (res && res.error) ? res.error : "Passcode salah! Akses ditolak.";
       errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
       showToast("Passcode salah! Akses ditolak.", "error");
     }
   } catch (err) {
-    if (val === "trose288") {
-      sessionStorage.setItem("trose_admin_passcode", val);
-      const guardModal = document.getElementById("modal-route-guard");
-      if (guardModal) guardModal.remove();
-      document.body.style.display = "";
-      showToast("Autentikasi admin berhasil!");
-    } else {
-      input.value = "";
-      errorMsg.innerText = "Passcode salah! Akses ditolak.";
-      errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
-      showToast("Passcode salah! Akses ditolak.", "error");
-    }
+    input.value = "";
+    errorMsg.innerText = "Passcode salah! Akses ditolak.";
+    errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
+    showToast("Passcode salah! Akses ditolak.", "error");
   } finally {
     btn.disabled = false;
     btn.innerText = "Masuk Admin";
   }
+}
+
+function unlockAdminScreen() {
+  const guardModal = document.getElementById("modal-route-guard");
+  if (guardModal) guardModal.remove();
+  document.body.style.display = "";
+  showToast("Autentikasi admin berhasil!");
+  
+  if (typeof fetchDashboard === "function") fetchDashboard();
+  if (typeof loadUnitsTable === "function") loadUnitsTable();
+  if (typeof loadLeasesTable === "function") loadLeasesTable();
+  if (typeof loadBillingTable === "function") loadBillingTable();
+  if (typeof loadMaintenanceTable === "function") loadMaintenanceTable();
+  if (typeof loadCrmData === "function") loadCrmData();
+  if (typeof loadFinancialData === "function") loadFinancialData();
+  if (typeof loadAiConfig === "function") loadAiConfig();
 }
 
 function ensureAdminPasscode(onSuccessCallback) {
