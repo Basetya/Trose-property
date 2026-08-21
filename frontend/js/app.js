@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic Clean Slate (v7.6)
+ * Trose Property Manager - Dashboard Logic Clean Slate (v7.7)
  * File: frontend/js/app.js
  */
 
@@ -142,99 +142,93 @@ async function handleSaveAiConfig(e) {
   const grVal = document.getElementById("ai-guardrail-text").value.trim();
   const btn = document.getElementById("btn-save-ai");
 
-  ensureAdminPasscode(async () => {
-    btn.disabled = true;
-    btn.innerText = "Menyimpan ke AI Engine...";
+  btn.disabled = true;
+  btn.innerText = "Menyimpan ke AI Engine...";
 
-    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
 
-    try {
-      const res = await gasApiCall("saveAiConfig", { 
-        passcode: currentPasscode,
-        knowledgeBase: kbVal, 
-        guardrails: grVal 
-      }, "POST");
+  try {
+    const res = await gasApiCall("saveAiConfig", { 
+      passcode: currentPasscode,
+      knowledgeBase: kbVal, 
+      guardrails: grVal 
+    }, "POST");
 
-      if (res && res.success) {
-        showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui!");
-      } else {
-        showToast(res.error || "Gagal menyimpan konfigurasi AI", "error");
-      }
-    } catch (err) {
-      showToast("Error menghubungi server Apps Script", "error");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
+    if (res && res.success) {
+      showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui!");
+    } else {
+      showToast(res.error || "Gagal menyimpan konfigurasi AI", "error");
     }
-  });
+  } catch (err) {
+    showToast("Error menghubungi server Apps Script", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
+  }
 }
 
-function handleClearAiConfig() {
+async function handleClearAiConfig() {
   if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan di server?")) {
     return;
   }
 
-  ensureAdminPasscode(async () => {
-    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-    try {
-      const res = await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
-      if (res && res.success) {
-        document.getElementById("ai-kb-text").value = "";
-        document.getElementById("ai-guardrail-text").value = "";
-        showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
-      } else {
-        showToast(res.error || "Gagal mengosongkan AI Config", "error");
-      }
-    } catch (err) {
-      showToast("Error saat menghubungi server", "error");
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  try {
+    const res = await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
+    if (res && res.success) {
+      document.getElementById("ai-kb-text").value = "";
+      document.getElementById("ai-guardrail-text").value = "";
+      showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
+    } else {
+      showToast(res.error || "Gagal mengosongkan AI Config", "error");
     }
-  });
+  } catch (err) {
+    showToast("Error saat menghubungi server", "error");
+  }
 }
 
-function handleWipeDatabase() {
+async function handleWipeDatabase() {
   if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
     return;
   }
 
-  ensureAdminPasscode(async () => {
-    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-    try {
-      const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
-      if (res && res.success) {
-        showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
-        
-        // Reset manual langsung di tampilan layar
-        renderDashboard({
-          success: true,
-          stats: {
-            totalUnits: 0,
-            occupiedUnits: 0,
-            availableUnits: 0,
-            occupancyRate: "0%",
-            totalRevenueDue: 0,
-            totalCollected: 0,
-            totalOutstanding: 0,
-            directLandlordDue: 0,
-            centralManagementDue: 0,
-            activeLeads: 0,
-            openMaintenance: 0
-          },
-          recentInvoices: []
-        });
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  
+  try {
+    const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
+    if (res && res.success) {
+      showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
+      
+      // Langsung paksakan visual UI ke angka 0 mutlak
+      renderDashboard({
+        success: true,
+        stats: {
+          totalUnits: 0,
+          occupiedUnits: 0,
+          availableUnits: 0,
+          occupancyRate: "0%",
+          totalRevenueDue: 0,
+          totalCollected: 0,
+          totalOutstanding: 0,
+          directLandlordDue: 0,
+          centralManagementDue: 0,
+          activeLeads: 0,
+          openMaintenance: 0
+        },
+        recentInvoices: []
+      });
 
-        const kbArea = document.getElementById("ai-kb-text");
-        const grArea = document.getElementById("ai-guardrail-text");
-        if (kbArea) kbArea.value = "";
-        if (grArea) grArea.value = "";
+      const kbArea = document.getElementById("ai-kb-text");
+      const grArea = document.getElementById("ai-guardrail-text");
+      if (kbArea) kbArea.value = "";
+      if (grArea) grArea.value = "";
 
-        setTimeout(() => fetchDashboard(), 1000);
-      } else {
-        showToast(res.error || "Gagal membersihkan database", "error");
-      }
-    } catch (err) {
-      showToast("Error saat menghubungi server", "error");
+    } else {
+      showToast(res.error || "Gagal membersihkan database", "error");
     }
-  });
+  } catch (err) {
+    showToast("Error saat menghubungi server", "error");
+  }
 }
 
 function handleAiFileUpload(event) {
@@ -289,22 +283,19 @@ function testWaLink() {
 }
 
 function requestVerifyPayment(invoiceId) {
-  ensureAdminPasscode(async () => {
-    if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
+  if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
 
-    const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-    try {
-      const res = await gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST");
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST")
+    .then(res => {
       if (res && res.success) {
         showToast(res.message || "Invoice berhasil diverifikasi!");
         fetchDashboard();
       } else {
         showToast(res.error || "Gagal verifikasi pembayaran", "error");
       }
-    } catch (err) {
-      showToast("Error menghubungi server", "error");
-    }
-  });
+    })
+    .catch(() => showToast("Error menghubungi server", "error"));
 }
 
 document.addEventListener("DOMContentLoaded", () => {

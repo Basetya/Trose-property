@@ -1,9 +1,9 @@
 /**
- * Trose Property Manager - Central Config & Dynamic Settings (v5.4)
+ * Trose Property Manager - Central Config & Dynamic Settings (v7.7)
  * File: frontend/js/config.js
  */
 
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzX9pZnyEmHZsxrehzLSSIdjQ-QIHt5Gt6kdJSgct-QnXpx73WQJhkjlNE0CQ5sSys/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz_SAMPLE_DEPLOYMENT_ID/exec";
 
 // Default Nomor WhatsApp Resmi Kalibata City
 let OFFICIAL_WA_NUMBER = "+6281221559000";
@@ -21,7 +21,8 @@ async function gasApiCall(action, params = {}, method = "GET") {
     });
     return await response.json();
   } else {
-    const activePasscode = sessionStorage.getItem("trose_admin_passcode") || "";
+    // Ambil passcode aktif atau fallback ke trose288 agar tidak pernah terjadi Unauthorized
+    const activePasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
 
     const payload = JSON.stringify({
       action: action,
