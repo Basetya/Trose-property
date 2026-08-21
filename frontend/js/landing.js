@@ -1,16 +1,21 @@
 /**
- * Trose Property Manager - Rose AI Concierge Context Engine (v6.7)
+ * Trose Property Manager - Rose AI Concierge Context Engine (v7.9)
+ * Real-Time Knowledge Base Integration
  * File: frontend/js/landing.js
  */
 
 async function initLandingSettings() {
+  const localWa = localStorage.getItem("trose_official_wa");
+  if (localWa) OFFICIAL_WA_NUMBER = localWa;
+
   try {
     const res = await gasApiCall("getPublicSettings", {}, "GET");
     if (res && res.success && res.settings && res.settings.waNumber) {
       OFFICIAL_WA_NUMBER = res.settings.waNumber;
+      localStorage.setItem("trose_official_wa", OFFICIAL_WA_NUMBER);
     }
   } catch (e) {
-    console.warn("Using local fallback WA Number:", OFFICIAL_WA_NUMBER);
+    console.warn("Using active WA Number:", OFFICIAL_WA_NUMBER);
   }
 }
 
@@ -82,23 +87,51 @@ async function handleWidgetSend() {
 function generateSmartKnowledgeReply(userQuery) {
   const q = String(userQuery || '').toLowerCase();
   
+  // Baca Knowledge Base aktif dari Admin Studio (localStorage)
+  const dynamicKb = localStorage.getItem("trose_ai_kb") || "";
+
+  // 1. Cek Pertanyaan Jam Buka / Operasional Mall & Kantor
+  if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
+    if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
+      return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
+    }
+    if (q.includes("kantor") || q.includes("survei") || q.includes("viewing") || q.includes("admin")) {
+      return "Layanan konsultasi dan survei unit di kantor Trose Property buka setiap hari (Senin-Minggu) pukul 09.00 â€“ 18.00 WIB. Silakan hubungi kami via WhatsApp untuk membuat janji temu.";
+    }
+    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit sewa buka pukul 09.00 - 18.00 WIB.";
+  }
+
+  // 2. Cek Pertanyaan Sewa Harian (Strict Policy)
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
     return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal penghuni. Apakah Anda ingin melihat pilihan unit bulanan kami?";
   }
+
+  // 3. Cek Pertanyaan Harga / Tarif Sewa
   if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa")) {
     return "Pilihan sewa unit bulanan resmi di Kalibata City:\n- Studio Deluxe: Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard: Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace: Mulai Rp 5.500.000/bln\nSemua unit Full Furnished (AC, Springbed, Kitchen Set, TV). Tersedia juga opsi sewa tahunan lebih hemat.";
   }
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("mall") || q.includes("green palace")) {
+
+  // 4. Cek Pertanyaan Fasilitas
+  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("green palace")) {
     return "Fasilitas kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, Bioskop XXI, food court).\n- Kolam renang dewasa & anak, Gym, Lapangan Tenis/Futsal di Green Palace.\n- Keamanan kartu akses lift 24 jam & Masjid Raya Nurullah.";
   }
+
+  // 5. Cek Lokasi & Stasiun
   if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat")) {
     return "Lokasi di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit jalan kaki (200m) ke Stasiun KRL Duren Kalibata dan 10-15 menit ke kawasan bisnis Kuningan / Gatot Subroto.";
   }
+
+  // 6. Cek Jadwal Survei / Viewing
   if (q.includes("survei") || q.includes("viewing") || q.includes("lihat")) {
     return "Jadwal survei unit (viewing) buka setiap hari (09.00 - 18.00 WIB). Silakan klik tombol 'WA' di kanan atas untuk janjian waktu kunjungan bersama tim kami.";
   }
 
-  return "Halo! Saya Rose, asisten virtual Apartemen Kalibata City. Kami menyediakan unit Studio & 2BR siap huni (bulanan dan tahunan). Ada yang bisa saya bantu seputar harga, fasilitas, atau jadwal survei?";
+  // 7. Jika ada teks custom di Knowledge Base admin, sertakan intisarinya
+  if (dynamicKb && dynamicKb.length > 20) {
+    return "Halo! Berdasarkan informasi terkini Kalibata City:\n" + dynamicKb.substring(0, 250) + "...\n\nAda yang ingin Anda tanyakan lebih spesifik seputar sewa atau fasilitas?";
+  }
+
+  return "Halo! Saya Rose, asisten virtual Apartemen Kalibata City. Kami menyediakan unit Studio & 2BR siap huni (bulanan dan tahunan). Ada yang bisa saya bantu seputar harga, fasilitas, jam operasional, atau jadwal survei?";
 }
 
 function appendWidgetMessage(text, sender) {

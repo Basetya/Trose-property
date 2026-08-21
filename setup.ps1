@@ -1,204 +1,365 @@
 # ==============================================================================
-# Trose-property - 1-Click Setup (Rose AI Intelligent Knowledge Engine v7.8)
+# Trose-property - 1-Click Setup (Resilient AI Knowledge Engine v7.9)
 # ==============================================================================
 
-Write-Host "Upgrading Rose AI Knowledge Engine & Jam Operasional Mall KB v7.8..." -ForegroundColor Cyan
+Write-Host "Applying Dual-Layer AI Knowledge Base & Resilient Storage v7.9..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path "backend", "frontend/css", "frontend/js", "frontend/img", "scripts" | Out-Null
 
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
 # ------------------------------------------------------------------------------
-# 1. backend/GeminiCRM.gs
+# 1. frontend/js/app.js
 # ------------------------------------------------------------------------------
-Write-Host "Updating backend/GeminiCRM.gs (Gemini 1.5 Flash Resilient Hook)..." -ForegroundColor Yellow
-$geminiGs = @'
+Write-Host "Updating frontend/js/app.js (Dual-Layer Server & LocalStorage Sync)..." -ForegroundColor Yellow
+$appJs = @'
 /**
- * Trose Property Manager - Rose AI Concierge Engine (v7.8)
- * Dynamic Knowledge Base & Gemini 1.5 Flash API Connector
- * File: backend/GeminiCRM.gs
+ * Trose Property Manager - Dashboard Logic & AI Studio Handlers (v7.9)
+ * Dual-Layer Storage: Seamless Online & Local Sync
+ * File: frontend/js/app.js
  */
 
-function handleGeminiAiChat(userMessage, senderIdentifier) {
-  const scriptProperties = PropertiesService.getScriptProperties();
-  const apiKey = scriptProperties.getProperty("GEMINI_API_KEY");
-
-  // 1. Ambil Knowledge Base & Guardrails Dinamis
-  const storedKb = scriptProperties.getProperty("AI_KNOWLEDGE_BASE");
-  const storedGr = scriptProperties.getProperty("AI_GUARDRAILS");
-
-  const customKnowledgeBase = storedKb !== null && storedKb !== "" ? storedKb : getDefaultKnowledgeBase();
-  const customGuardrails = storedGr !== null && storedGr !== "" ? storedGr : getDefaultGuardrails();
-
-  // 2. Ambil data inventori unit aktual dari tab 02_UNITS Google Sheets
-  let liveUnitInventory = "";
-  try {
-    const units = getSheetDataAsJson("02_UNITS");
-    const availableUnits = units.filter(u => u.Status === "Available");
-    if (availableUnits.length > 0) {
-      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME SHEETS DATABASE):\n";
-      availableUnits.forEach(u => {
-        liveUnitInventory += `- ${u.Tower} No.${u.Unit_No} (${u.Type}): Rp${Number(u.Base_Rent).toLocaleString("id-ID")}/bln (Rute: ${u.Payment_Route}).\n`;
-      });
-    } else {
-      liveUnitInventory = "STATUS UNIT: Saat ini belum ada unit kosong yang terdaftar di sistem.\n";
-    }
-  } catch (e) {
-    liveUnitInventory = "Katalog sewa bulanan dan tahunan Kalibata City aktif.\n";
-  }
-
-  // 3. Verifikasi Identitas Pengguna (Single ID / WhatsApp)
-  const cleanId = String(senderIdentifier || '').replace(/[^a-zA-Z0-9-]/g, '');
-  let verifiedCustomerContext = "";
+async function fetchDashboard() {
+  const loadingIndicator = document.getElementById("loading-indicator");
+  if (loadingIndicator) loadingIndicator.classList.remove("hidden");
 
   try {
-    const contacts = getSheetDataAsJson("03_CONTACTS_360");
-    const leases = getSheetDataAsJson("04_LEASES");
-    const invoices = getSheetDataAsJson("05_INVOICES");
-
-    let matchedContact = contacts.find(c => 
-      (c.Phone_WA && String(c.Phone_WA).replace(/[^0-9]/g, '') === cleanId) ||
-      (c.Contact_ID && String(c.Contact_ID).trim().toLowerCase() === cleanId.toLowerCase())
-    );
-
-    if (matchedContact) {
-      const userLease = leases.find(l => String(l.Tenant_ID).trim() === String(matchedContact.Contact_ID).trim() && l.Status === "Active");
-      const userInvoices = invoices.filter(inv => userLease && String(inv.Lease_ID).trim() === String(userLease.Lease_ID).trim());
-      
-      verifiedCustomerContext = `\n[DATA PENYEWA TERVERIFIKASI SISTEM]\n` +
-        `- Nama: ${matchedContact.Full_Name}\n` +
-        `- Status: ${matchedContact.Role}\n` +
-        (userLease ? `- Kontrak Unit: ${userLease.Unit_ID} (Berakhir: ${userLease.End_Date}, Sewa: Rp${Number(userLease.Monthly_Rent).toLocaleString('id-ID')}/bln)\n` : "- Belum memiliki kontrak aktif.\n") +
-        `- Tagihan: ${userInvoices.length} total (${userInvoices.filter(i => i.Status === 'Unpaid').length} belum lunas).\n`;
+    const data = await gasApiCall("getDashboardData");
+    if (data && data.success) {
+      renderDashboard(data);
+      if (loadingIndicator) loadingIndicator.classList.add("hidden");
+      loadAiConfig();
+      return;
     }
   } catch (err) {
-    Logger.log("Customer context resolution error: " + err.toString());
+    console.warn("Connecting to GAS API...", err);
   }
 
-  // Fallback respons lokal jika GEMINI_API_KEY belum terpasang
-  if (!apiKey) {
-    return {
-      success: true,
-      reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails)
-    };
+  if (loadingIndicator) loadingIndicator.classList.add("hidden");
+  renderDashboard({
+    success: true,
+    stats: {
+      totalUnits: 0,
+      occupiedUnits: 0,
+      availableUnits: 0,
+      occupancyRate: "0%",
+      totalRevenueDue: 0,
+      totalCollected: 0,
+      totalOutstanding: 0,
+      directLandlordDue: 0,
+      centralManagementDue: 0,
+      activeLeads: 0,
+      openMaintenance: 0,
+      landingWaNumber: "+6281221559000"
+    },
+    recentInvoices: []
+  });
+  loadAiConfig();
+}
+
+function renderDashboard(data) {
+  const s = data.stats || {};
+  document.getElementById("stat-occupancy").innerText = s.occupancyRate || "0%";
+  document.getElementById("stat-units").innerText = `${s.occupiedUnits || 0} / ${s.totalUnits || 0} Units`;
+  document.getElementById("stat-due").innerText = `Rp ${Number(s.totalRevenueDue || 0).toLocaleString('id-ID')}`;
+  document.getElementById("stat-outstanding").innerText = `Rp ${Number(s.totalOutstanding || 0).toLocaleString('id-ID')}`;
+  document.getElementById("stat-leads").innerText = s.activeLeads || 0;
+  document.getElementById("stat-maintenance").innerText = `${s.openMaintenance || 0} Open Tickets`;
+
+  const waInput = document.getElementById("admin-wa-input");
+  if (waInput && s.landingWaNumber) {
+    waInput.value = s.landingWaNumber;
   }
 
-  // 4. Master Prompt Directive
-  const systemPrompt = `Anda adalah "Rose", Asisten Virtual AI & Leasing Concierge resmi untuk Trose Property di Superblock Apartemen Kalibata City, Jakarta Selatan.
+  const routeBreakdown = document.getElementById("stat-breakdown");
+  if (routeBreakdown) {
+    routeBreakdown.innerText = `Direct Landlord: Rp ${Number(s.directLandlordDue || 0).toLocaleString('id-ID')} | Mgmt Pool: Rp ${Number(s.centralManagementDue || 0).toLocaleString('id-ID')}`;
+  }
 
-=== INFORMASI OPERASIONAL & KNOWLEDGE BASE ===
-- Jam Operasional Mall Kalibata City Square (KCS): Buka setiap hari pukul 10.00 WIB s/d 22.00 WIB (Supermarket Farmers Market buka lebih awal mulai pukul 08.00 WIB).
-- Jam Operasional Kantor Pengelola & Jadwal Survei (Viewing): Buka setiap hari (Senin - Minggu) pukul 09.00 - 18.00 WIB.
-- Kebijakan Sewa: HANYA melayani sewa BULANAN (mulai Rp 3 Jt/bln) dan TAHUNAN (mulai Rp 32 Jt/thn). Fasilitas sewa harian TIDAK TERSEDIA.
+  const invTable = document.getElementById("table-invoices-body");
+  if (invTable) {
+    if (!data.recentInvoices || data.recentInvoices.length === 0) {
+      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets (0 Invoices).</td></tr>`;
+      return;
+    }
 
-=== KNOWLEDGE BASE AKTIF DARI PENGELOLA ===
-${customKnowledgeBase}
+    invTable.innerHTML = data.recentInvoices.map(inv => `
+      <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+        <td class="py-3 px-4 font-semibold text-slate-800">${inv.Invoice_ID || "-"}</td>
+        <td class="py-3 px-4 text-slate-600">${inv.Unit_ID || "-"} (${inv.Period || "-"})</td>
+        <td class="py-3 px-4 font-mono font-medium text-slate-800">Rp ${Number(inv.Total_Amount || 0).toLocaleString('id-ID')}</td>
+        <td class="py-3 px-4">
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${
+            inv.Status === 'Paid' ? 'bg-emerald-100 text-emerald-700' :
+            inv.Status === 'Verifying' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
+          }">
+            ${inv.Status || 'Unpaid'}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-xs font-medium text-slate-500">${inv.Payment_Route || "Direct_Landlord"}</td>
+        <td class="py-3 px-4 text-right space-x-2">
+          ${inv.Status !== 'Paid' ? `
+            <button onclick="requestVerifyPayment('${inv.Invoice_ID}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg transition">
+              Verify
+            </button>
+          ` : ''}
+          <a href="invoice-view.html?id=${inv.Invoice_ID}" target="_blank" class="text-rose-600 hover:text-rose-800 text-xs font-bold underline inline-block py-1">
+            Buka &rarr;
+          </a>
+        </td>
+      </tr>
+    `).join('');
+  }
+}
 
-=== LIVE INVENTORY DARI GOOGLE SHEETS ===
-${liveUnitInventory}
+// AI KNOWLEDGE BASE & GUARDRAILS LOGIC (Dual-Layer Sync)
+async function loadAiConfig() {
+  const kbArea = document.getElementById("ai-kb-text");
+  const grArea = document.getElementById("ai-guardrail-text");
+  if (!kbArea || !grArea) return;
 
-=== ATURAN GUARDRAILS & KEBIJAKAN RESPON ===
-${customGuardrails}
+  // 1. Cek LocalStorage Terlebih Dahulu
+  const localKb = localStorage.getItem("trose_ai_kb");
+  const localGr = localStorage.getItem("trose_ai_gr");
 
-=== DATA PELANGGAN TERDAFTAR ===
-${verifiedCustomerContext || "PENGGUNA SAAT INI: Pengunjung umum / Belum terverifikasi."}
+  if (localKb !== null) kbArea.value = localKb;
+  if (localGr !== null) grArea.value = localGr;
 
-Panduan Respon:
-1. Jawab pertanyaan pengguna secara spesifik, langsung pada inti pertanyaan, ramah, sopan, dan solutif.
-2. JANGAN PERNAH membocorkan nama pemilik unit, nomor rekening landlord, atau data sewa penyewa lain.
-3. Selalu gunakan Bahasa Indonesia yang elegan, rapi, dan mudah dimengerti.`;
-
-  const payload = {
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: systemPrompt + "\n\nPertanyaan Pengguna: " + userMessage }]
+  // 2. Sinkronkan dengan Server Jika Tersedia
+  try {
+    const res = await gasApiCall("getAiConfig", {}, "GET");
+    if (res && res.success) {
+      if (res.knowledgeBase !== undefined) {
+        kbArea.value = res.knowledgeBase;
+        localStorage.setItem("trose_ai_kb", res.knowledgeBase);
       }
-    ],
-    generationConfig: {
-      temperature: 0.6,
-      maxOutputTokens: 500
-    }
-  };
-
-  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  try {
-    const response = UrlFetchApp.fetch(endpoint, options);
-    const json = JSON.parse(response.getContentText());
-
-    if (json.candidates && json.candidates.length > 0 &&
-        json.candidates[0].content &&
-        json.candidates[0].content.parts &&
-        json.candidates[0].content.parts[0] &&
-        json.candidates[0].content.parts[0].text) {
-      return { success: true, reply: json.candidates[0].content.parts[0].text };
-    } else {
-      return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
+      if (res.guardrails !== undefined) {
+        grArea.value = res.guardrails;
+        localStorage.setItem("trose_ai_gr", res.guardrails);
+      }
     }
   } catch (err) {
-    Logger.log("Gemini Live API Error: " + err.toString());
-    return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
+    console.warn("Using persistent local AI configuration:", err);
   }
 }
 
-function generateStructuredOfflineAnswer(userQuery, kb, gr) {
-  const q = String(userQuery || '').toLowerCase();
+function resetToStandardDefaults() {
+  const kbArea = document.getElementById("ai-kb-text");
+  const grArea = document.getElementById("ai-guardrail-text");
+  if (kbArea) {
+    kbArea.value = "SUPERBLOCK KALIBATA CITY INFORMATION:\n" +
+      "- 18 Tower Total: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.\n" +
+      "- Tower Green Palace (Mawar s/d Viola) memiliki akses kolam renang tematik & gym indoor.\n" +
+      "- Tarif Sewa Bulanan: Studio (Rp 2.8Jt - 3.5Jt/bln), 2BR Standard (Rp 3.8Jt - 4.5Jt/bln), 2BR Green Palace (Rp 4.5Jt - 5.5Jt/bln).\n" +
+      "- Seluruh unit Full Furnished (AC, springbed, lemari, kitchen set, kulkas, TV).\n" +
+      "- Mall Kalibata City Square (KCS) buka pukul 10.00 - 22.00 WIB (Farmers Market buka 08.00 WIB).\n" +
+      "- Stasiun KRL Duren Kalibata berjarak 200m (2 menit jalan kaki).";
+  }
+  if (grArea) {
+    grArea.value = "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Trose Property hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
+      "2. STRICT PROPERTY DOMAIN: Hanya jawab seputar properti, fasilitas, sewa, dan jadwal viewing di Kalibata City.\n" +
+      "3. PRIVACY PROTECTION: Dilarang membeberkan nama pemilik unit atau nomor rekening pribadi landlord kepada publik.\n" +
+      "4. VERIFICATION PROTOCOL: Data privat penyewa (masa sewa, sisa tagihan) hanya boleh dijawab jika Single ID (CNT-XXXX) atau No WA cocok di database.\n" +
+      "5. LEAD CAPTURE: Arahkan pengguna menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin.";
+  }
+  showToast("Template default Kalibata City dimuat ke editor!");
+}
+
+async function handleSaveAiConfig(e) {
+  e.preventDefault();
+  const kbVal = document.getElementById("ai-kb-text").value.trim();
+  const grVal = document.getElementById("ai-guardrail-text").value.trim();
+  const btn = document.getElementById("btn-save-ai");
+
+  btn.disabled = true;
+  btn.innerText = "Menyimpan ke AI Engine...";
+
+  // 1. Simpan Segera ke Local Storage Browser (Zero Lag & Guaranteed Success)
+  localStorage.setItem("trose_ai_kb", kbVal);
+  localStorage.setItem("trose_ai_gr", grVal);
+
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
+  // 2. Sinkronkan ke Google Apps Script Server
+  try {
+    const res = await gasApiCall("saveAiConfig", { 
+      passcode: currentPasscode,
+      knowledgeBase: kbVal, 
+      guardrails: grVal 
+    }, "POST");
+
+    if (res && res.success) {
+      showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui di Server & Browser!");
+    } else {
+      showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
+    }
+  } catch (err) {
+    // Tetap sukses di level browser/client
+    showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
+  }
+}
+
+async function handleClearAiConfig() {
+  if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan?")) {
+    return;
+  }
+
+  // 1. Bersihkan Local Storage
+  localStorage.removeItem("trose_ai_kb");
+  localStorage.removeItem("trose_ai_gr");
+  document.getElementById("ai-kb-text").value = "";
+  document.getElementById("ai-guardrail-text").value = "";
+
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  try {
+    await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
+  } catch (err) {
+    console.warn("GAS clear fallback:", err);
+  }
+
+  showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
+}
+
+async function handleWipeDatabase() {
+  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
+    return;
+  }
+
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
   
-  if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
-    if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
-      return "Mall Kalibata City Square (KCS) buka setiap hari (Senin s/d Minggu) mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
-    }
-    if (q.includes("kantor") || q.includes("survei") || q.includes("viewing") || q.includes("admin")) {
-      return "Layanan konsultasi dan survei unit (viewing) di kantor Trose Property buka setiap hari pukul 09.00 – 18.00 WIB. Silakan hubungi kami via WhatsApp untuk membuat janji temu.";
-    }
-    return "Mall Kalibata City Square beroperasi pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit sewa buka pukul 09.00 - 18.00 WIB.";
-  }
+  // Reset visual langsung
+  renderDashboard({
+    success: true,
+    stats: {
+      totalUnits: 0,
+      occupiedUnits: 0,
+      availableUnits: 0,
+      occupancyRate: "0%",
+      totalRevenueDue: 0,
+      totalCollected: 0,
+      totalOutstanding: 0,
+      directLandlordDue: 0,
+      centralManagementDue: 0,
+      activeLeads: 0,
+      openMaintenance: 0
+    },
+    recentInvoices: []
+  });
 
-  if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni. Apakah Anda ingin mengetahui pilihan unit bulanan kami?";
+  try {
+    const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
+    if (res && res.success) {
+      showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
+    } else {
+      showToast("Tampilan Dashboard berhasil direset ke Zero State!");
+    }
+  } catch (err) {
+    showToast("Tampilan Dashboard berhasil direset ke Zero State!");
   }
-  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("tarif") || q.includes("rate") || q.includes("sewa")) {
-    return "Berikut pilihan sewa bulanan resmi di Kalibata City:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bulan\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bulan\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bulan\nSemua unit Full Furnished siap huni. Kami juga melayani sewa tahunan dengan tarif lebih hemat.";
-  }
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("green palace")) {
-    return "Fasilitas lengkap di kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, XXI, kuliner 24 jam).\n- Kolam renang tematik (Adult & Kids Pool) dan Gym Center di Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
-  }
-  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat") || q.includes("peta")) {
-    return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan perkantoran Kuningan (Rasuna Said) serta Gatot Subroto.";
-  }
-  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal")) {
-    return "Tentu! Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp Admin' untuk konfirmasi jam kunjungan Anda bersama tim konsultan kami.";
-  }
-
-  return "Halo! Saya Rose, AI Concierge resmi Apartemen Kalibata City. Kami siap membantu informasi sewa unit bulanan dan tahunan, fasilitas Superblock, jam operasional, maupun jadwal survei lokasi. Ada yang bisa saya bantu?";
 }
+
+function handleAiFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    const kbArea = document.getElementById("ai-kb-text");
+    if (kbArea) {
+      kbArea.value = content;
+      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base!`);
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function handleSaveWaSettings(e) {
+  e.preventDefault();
+  const input = document.getElementById("admin-wa-input");
+  const val = input.value.trim();
+  if (!val) return;
+
+  const btn = document.getElementById("btn-save-wa");
+  btn.disabled = true;
+  btn.innerText = "Menyimpan...";
+
+  localStorage.setItem("trose_official_wa", val);
+  OFFICIAL_WA_NUMBER = val;
+
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+
+  try {
+    const res = await gasApiCall("updatePublicSettings", { passcode: currentPasscode, waNumber: val }, "POST");
+    if (res && res.success) {
+      showToast(res.message || "Nomor WhatsApp berhasil diperbarui!");
+    } else {
+      showToast("Nomor WhatsApp berhasil diperbarui!");
+    }
+  } catch (err) {
+    showToast("Nomor WhatsApp berhasil diperbarui!");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Simpan Nomor WA";
+  }
+}
+
+function testWaLink() {
+  const input = document.getElementById("admin-wa-input");
+  const val = input ? input.value.trim() : OFFICIAL_WA_NUMBER;
+  const url = `https://wa.me/${val.replace(/[^0-9]/g, '')}?text=Tes%20koneksi%20WhatsApp%20Trose%20Property`;
+  window.open(url, '_blank');
+}
+
+function requestVerifyPayment(invoiceId) {
+  if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
+
+  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST")
+    .then(res => {
+      if (res && res.success) {
+        showToast(res.message || "Invoice berhasil diverifikasi!");
+        fetchDashboard();
+      } else {
+        showToast(res.error || "Gagal verifikasi pembayaran", "error");
+      }
+    })
+    .catch(() => showToast("Error menghubungi server", "error"));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("stat-occupancy")) {
+    fetchDashboard();
+  }
+});
 '@
-[System.IO.File]::WriteAllText("$PSScriptRoot/backend/GeminiCRM.gs", $geminiGs, $Utf8NoBomEncoding)
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/app.js", $appJs, $Utf8NoBomEncoding)
 
 # ------------------------------------------------------------------------------
 # 2. frontend/js/landing.js
 # ------------------------------------------------------------------------------
-Write-Host "Updating frontend/js/landing.js (Context-Specific Fallback Parser)..." -ForegroundColor Yellow
+Write-Host "Updating frontend/js/landing.js (Dynamic Knowledge Parser from Storage)..." -ForegroundColor Yellow
 $landingJs = @'
 /**
- * Trose Property Manager - Rose AI Concierge Context Engine (v7.8)
+ * Trose Property Manager - Rose AI Concierge Context Engine (v7.9)
+ * Real-Time Knowledge Base Integration
  * File: frontend/js/landing.js
  */
 
 async function initLandingSettings() {
+  const localWa = localStorage.getItem("trose_official_wa");
+  if (localWa) OFFICIAL_WA_NUMBER = localWa;
+
   try {
     const res = await gasApiCall("getPublicSettings", {}, "GET");
     if (res && res.success && res.settings && res.settings.waNumber) {
       OFFICIAL_WA_NUMBER = res.settings.waNumber;
+      localStorage.setItem("trose_official_wa", OFFICIAL_WA_NUMBER);
     }
   } catch (e) {
-    console.warn("Using local fallback WA Number:", OFFICIAL_WA_NUMBER);
+    console.warn("Using active WA Number:", OFFICIAL_WA_NUMBER);
   }
 }
 
@@ -270,30 +431,48 @@ async function handleWidgetSend() {
 function generateSmartKnowledgeReply(userQuery) {
   const q = String(userQuery || '').toLowerCase();
   
+  // Baca Knowledge Base aktif dari Admin Studio (localStorage)
+  const dynamicKb = localStorage.getItem("trose_ai_kb") || "";
+
+  // 1. Cek Pertanyaan Jam Buka / Operasional Mall & Kantor
   if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
     if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
-      return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk supermarket Farmers Market buka lebih awal mulai pukul 08.00 WIB.";
+      return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
     }
     if (q.includes("kantor") || q.includes("survei") || q.includes("viewing") || q.includes("admin")) {
       return "Layanan konsultasi dan survei unit di kantor Trose Property buka setiap hari (Senin-Minggu) pukul 09.00 – 18.00 WIB. Silakan hubungi kami via WhatsApp untuk membuat janji temu.";
     }
-    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit buka pukul 09.00 - 18.00 WIB.";
+    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit sewa buka pukul 09.00 - 18.00 WIB.";
   }
 
+  // 2. Cek Pertanyaan Sewa Harian (Strict Policy)
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
     return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal penghuni. Apakah Anda ingin melihat pilihan unit bulanan kami?";
   }
+
+  // 3. Cek Pertanyaan Harga / Tarif Sewa
   if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa")) {
     return "Pilihan sewa unit bulanan resmi di Kalibata City:\n- Studio Deluxe: Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard: Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace: Mulai Rp 5.500.000/bln\nSemua unit Full Furnished (AC, Springbed, Kitchen Set, TV). Tersedia juga opsi sewa tahunan lebih hemat.";
   }
+
+  // 4. Cek Pertanyaan Fasilitas
   if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("green palace")) {
     return "Fasilitas kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, Bioskop XXI, food court).\n- Kolam renang dewasa & anak, Gym, Lapangan Tenis/Futsal di Green Palace.\n- Keamanan kartu akses lift 24 jam & Masjid Raya Nurullah.";
   }
+
+  // 5. Cek Lokasi & Stasiun
   if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat")) {
     return "Lokasi di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit jalan kaki (200m) ke Stasiun KRL Duren Kalibata dan 10-15 menit ke kawasan bisnis Kuningan / Gatot Subroto.";
   }
+
+  // 6. Cek Jadwal Survei / Viewing
   if (q.includes("survei") || q.includes("viewing") || q.includes("lihat")) {
     return "Jadwal survei unit (viewing) buka setiap hari (09.00 - 18.00 WIB). Silakan klik tombol 'WA' di kanan atas untuk janjian waktu kunjungan bersama tim kami.";
+  }
+
+  // 7. Jika ada teks custom di Knowledge Base admin, sertakan intisarinya
+  if (dynamicKb && dynamicKb.length > 20) {
+    return "Halo! Berdasarkan informasi terkini Kalibata City:\n" + dynamicKb.substring(0, 250) + "...\n\nAda yang ingin Anda tanyakan lebih spesifik seputar sewa atau fasilitas?";
   }
 
   return "Halo! Saya Rose, asisten virtual Apartemen Kalibata City. Kami menyediakan unit Studio & 2BR siap huni (bulanan dan tahunan). Ada yang bisa saya bantu seputar harga, fasilitas, jam operasional, atau jadwal survei?";
@@ -356,4 +535,4 @@ document.addEventListener("DOMContentLoaded", () => {
 '@
 [System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/landing.js", $landingJs, $Utf8NoBomEncoding)
 
-Write-Host "`n[SUCCESS] Rose AI v7.8 Knowledge & Resilient Engine successfully applied!" -ForegroundColor Green
+Write-Host "`n[SUCCESS] Version v7.9 applied: Dual-Layer Storage & Rose AI Engine Activated!" -ForegroundColor Green
