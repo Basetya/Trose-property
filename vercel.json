@@ -1,26 +1,29 @@
 {
-  "version": 2,
-  "public": false,
-  "routes": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "/img/(.*)",
-      "dest": "/frontend/img/$1"
+      "source": "/img/:match*",
+      "destination": "/frontend/img/:match*"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "/frontend/css/$1"
+      "source": "/css/:match*",
+      "destination": "/frontend/css/:match*"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/frontend/js/$1"
+      "source": "/js/:match*",
+      "destination": "/frontend/js/:match*"
     },
     {
-      "src": "/(.*).html",
-      "dest": "/frontend/$1.html"
+      "source": "/:page.html",
+      "destination": "/frontend/:page.html"
     },
     {
-      "src": "/",
-      "dest": "/frontend/index.html"
+      "source": "/:page",
+      "destination": "/frontend/:page.html"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
     }
   ]
 }
