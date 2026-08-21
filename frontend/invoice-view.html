@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Property Manager - Invoice Pembayaran Sewa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen py-10 px-4">
+  <div class="max-w-xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+    <div class="bg-slate-900 p-8 text-white">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-rose-400 font-bold">Official Invoice: <span id="inv-id-display">-</span></span>
+          <h1 id="inv-property-title" class="text-2xl font-black mt-1">Trose Residence</h1>
+          <p id="inv-unit-period" class="text-xs text-slate-400">Memuat rincian unit...</p>
+        </div>
+        <span id="inv-status-badge" class="px-3 py-1 bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-black rounded-full uppercase">
+          Unpaid
+        </span>
+      </div>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <div class="space-y-3 border-b border-slate-100 pb-6 text-sm">
+        <div class="flex justify-between text-slate-600">
+          <span>Biaya Sewa Unit (Monthly)</span>
+          <span id="inv-rent-fee" class="font-semibold text-slate-800">Rp 0</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Estimasi Utilitas (Listrik & Air)</span>
+          <span id="inv-utility-fee" class="font-semibold text-slate-800">Rp 0</span>
+        </div>
+        <div class="flex justify-between text-rose-600 font-medium">
+          <span>Kode Unik Verifikasi Otomatis</span>
+          <span id="inv-unique-code">+ Rp 0</span>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
+        <span class="text-sm font-bold text-slate-600">Total Transfer Tepat:</span>
+        <span id="inv-total-amount" class="text-2xl font-black text-rose-600 font-mono">Rp 0</span>
+      </div>
+
+      <div class="border border-rose-100 bg-rose-50/50 p-5 rounded-2xl space-y-2 text-center">
+        <p id="inv-route-title" class="text-xs font-bold text-rose-900 uppercase tracking-wider">Tujuan Transfer Bank</p>
+        <h3 id="inv-account-no" class="text-2xl font-extrabold text-slate-900 font-mono tracking-wider">----------</h3>
+        <p id="inv-bank-holder" class="text-xs text-slate-600 font-medium">Memuat bank dan nama pemilik...</p>
+        <button type="button" id="btn-copy-account" class="mt-2 text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl shadow transition">
+          Salin Nomor Rekening
+        </button>
+      </div>
+
+      <div id="proof-submission-card" class="pt-4 border-t border-slate-100 space-y-3">
+        <form id="form-proof" class="space-y-3">
+          <label class="block text-xs font-bold text-slate-700 uppercase">Konfirmasi Bukti Transfer</label>
+          <input type="url" id="proof-input" required placeholder="Tempel URL foto bukti transfer (Link Google Drive / Cloudinary)..." class="w-full px-4 py-3 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          <button type="submit" id="btn-submit-proof" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-3.5 rounded-xl shadow-lg transition">
+            Kirim Bukti Pembayaran
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/invoice.js"></script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+/**
+ * Trose Property Manager - Controller with Strict Passcode trose288 (v5.5)
+ * File: backend/Code.gs
+ */
+
+function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "getDashboardData";
+  let responseData = {};
+
+  try {
+    if (action === "verifyPasscode") {
+      const inputPasscode = e.parameter.passcode || "";
+      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
+      if (inputPasscode === expectedPasscode) {
+        responseData = { success: true, message: "Authentication successful." };
+      } else {
+        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
+      }
+    } else if (action === "getPublicSettings") {
+      const sp = PropertiesService.getScriptProperties();
+      const waNumber = sp.getProperty("LANDING_WA_NUMBER") || "+6281221559000";
+      responseData = { success: true, settings: { waNumber: waNumber } };
+    } else if (action === "getDashboardData") {
+      responseData = fetchDashboardOverview();
+    } else if (action === "getFinancials") {
+      responseData = generateFinancialStatements();
+    } else if (action === "getUnits") {
+      responseData = { success: true, units: getSheetDataAsJson("02_UNITS") };
+    } else if (action === "getLeases") {
+      responseData = fetchLeasesList();
+    } else if (action === "getInvoices") {
+      responseData = { success: true, invoices: getSheetDataAsJson("05_INVOICES") };
+    } else if (action === "getInvoiceDetail") {
+      const invId = e.parameter.invoiceId;
+      responseData = fetchInvoiceById(invId);
+    } else if (action === "getOwnerStatement") {
+      const ownerName = e.parameter.ownerName;
+      responseData = fetchOwnerStatementDetails(ownerName);
+    } else if (action === "getLeads") {
+      responseData = fetchCrmPipeline();
+    } else if (action === "getMaintenance") {
+      responseData = fetchMaintenanceTickets();
+    } else if (action === "getInspections") {
+      responseData = { success: true, inspections: getSheetDataAsJson("09_INSPECTIONS") };
+    } else {
+      responseData = { success: false, error: "Invalid GET action: " + action };
+    }
+  } catch (err) {
+    responseData = { success: false, error: err.toString() };
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(responseData))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  let responseData = {};
+
+  try {
+    let postData;
+    if (e.postData && e.postData.contents) {
+      postData = JSON.parse(e.postData.contents);
+    } else if (e.parameter) {
+      postData = e.parameter;
+    } else {
+      throw new Error("No payload found");
+    }
+
+    const action = postData.action;
+    const publicActions = ["submitProof", "whatsappWebhook", "aiChatbot", "verifyPasscode", "getPublicSettings"];
+
+    if (!publicActions.includes(action)) {
+      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
+      if (expectedPasscode && postData.passcode !== expectedPasscode) {
+        return ContentService.createTextOutput(JSON.stringify({
+          success: false,
+          error: "Unauthorized: Invalid or missing Admin Passcode"
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+
+    if (action === "verifyPasscode") {
+      const expectedPasscode = PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288";
+      if (postData.passcode === expectedPasscode) {
+        responseData = { success: true, message: "Authentication successful." };
+      } else {
+        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
+      }
+    } else if (action === "updatePublicSettings") {
+      const sp = PropertiesService.getScriptProperties();
+      if (postData.waNumber) {
+        sp.setProperty("LANDING_WA_NUMBER", String(postData.waNumber).trim());
+      }
+      responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
+    } else if (action === "createUnit") {
+      responseData = handleCreateUnit(postData.data);
+    } else if (action === "updateUnitStatus") {
+      responseData = handleUpdateUnitStatus(postData.unitId, postData.status);
+    } else if (action === "createLease") {
+      responseData = handleCreateLease(postData.data);
+    } else if (action === "createInvoice") {
+      responseData = handleCreateInvoice(postData.data);
+    } else if (action === "verifyPayment") {
+      responseData = handleVerifyPayment(postData.invoiceId);
+    } else if (action === "submitProof") {
+      responseData = handleSubmitProof(postData.invoiceId, postData.proofUrl);
+    } else if (action === "createMaintenance") {
+      responseData = handleCreateMaintenance(postData.data);
+    } else if (action === "updateMaintenanceStatus") {
+      responseData = handleUpdateMaintenanceStatus(postData.ticketId, postData.status);
+    } else if (action === "createInspection") {
+      responseData = handleCreateInspection(postData.data);
+    } else if (action === "triggerDunning") {
+      responseData = runDailyDunningScheduler();
+    } else if (action === "createLead") {
+      responseData = handleCreateLead(postData.data);
+    } else if (action === "updateLeadStage") {
+      responseData = handleUpdateLeadStage(postData.leadId, postData.stage, postData.notes);
+    } else if (action === "whatsappWebhook") {
+      responseData = handleIncomingWhatsAppWebhook(postData);
+    } else if (action === "aiChatbot") {
+      responseData = handleGeminiAiChat(postData.message, postData.senderPhone);
+    } else {
+      responseData = { success: false, error: "Invalid POST action: " + action };
+    }
+  } catch (err) {
+    responseData = { success: false, error: err.toString() };
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(responseData))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getColumnMap(sheet) {
+  const lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return {};
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  const map = {};
+  headers.forEach((h, idx) => {
+    map[String(h).trim()] = idx + 1;
+  });
+  return map;
+}
+
+function getSheetDataAsJson(sheetName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return [];
+  
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) return [];
+
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0];
+  const results = [];
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const obj = {};
+    for (let j = 0; j < headers.length; j++) {
+      obj[headers[j]] = row[j];
+    }
+    results.push(obj);
+  }
+  return results;
+}
+
+function fetchDashboardOverview() {
+  const units = getSheetDataAsJson("02_UNITS");
+  const invoices = getSheetDataAsJson("05_INVOICES");
+  const leases = getSheetDataAsJson("04_LEASES");
+  const leads = getSheetDataAsJson("07_CRM_PIPELINE");
+  const maintenance = getSheetDataAsJson("06_MAINTENANCE");
+
+  let occupied = 0;
+  let available = 0;
+  units.forEach(u => {
+    if (u.Status === "Occupied") occupied++;
+    if (u.Status === "Available") available++;
+  });
+
+  let totalDue = 0;
+  let totalCollected = 0;
+  let totalPending = 0;
+  let directLandlordTotal = 0;
+  let centralMgmtTotal = 0;
+
+  invoices.forEach(inv => {
+    const amt = Number(inv.Total_Amount) || 0;
+    totalDue += amt;
+    if (inv.Status === "Paid") {
+      totalCollected += amt;
+    } else {
+      totalPending += amt;
+    }
+
+    if (inv.Payment_Route === "Direct_Landlord") {
+      directLandlordTotal += amt;
+    } else {
+      centralMgmtTotal += amt;
+    }
+  });
+
+  const sp = PropertiesService.getScriptProperties();
+  const waNumber = sp.getProperty("LANDING_WA_NUMBER") || "+6281221559000";
+
+  return {
+    success: true,
+    stats: {
+      totalUnits: units.length,
+      occupiedUnits: occupied,
+      availableUnits: available,
+      occupancyRate: units.length > 0 ? ((occupied / units.length) * 100).toFixed(1) + "%" : "0%",
+      activeLeases: leases.filter(l => l.Status === "Active").length,
+      totalRevenueDue: totalDue,
+      totalCollected: totalCollected,
+      totalOutstanding: totalPending,
+      directLandlordDue: directLandlordTotal,
+      centralManagementDue: centralMgmtTotal,
+      activeLeads: leads.length,
+      openMaintenance: maintenance.filter(m => m.Status !== "Resolved").length,
+      landingWaNumber: waNumber
+    },
+    recentInvoices: invoices.slice(-8).reverse(),
+    recentLeads: leads.slice(-5).reverse(),
+    recentMaintenance: maintenance.slice(-5).reverse()
+  };
+}
+
+function handleCreateUnit(data) {
+  if (!data || !data.unitNo || !data.tower) {
+    return { success: false, error: "Tower dan Nomor Unit wajib diisi." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("02_UNITS");
+  const unitId = "UNT-" + String(data.tower).substring(0, 3).toUpperCase() + "-" + String(data.unitNo);
+
+  sheet.appendRow([
+    unitId,
+    "PROP-001",
+    data.tower,
+    data.floor || "-",
+    data.unitNo,
+    data.type || "Studio Deluxe",
+    "Available",
+    Number(data.baseRent) || 0,
+    Number(data.iplFee) || 0,
+    Number(data.mgmtPercent) || 10,
+    data.landlordName || "Management Pool",
+    data.landlordPhone || "-",
+    data.paymentRoute || "Central_Management",
+    data.bankName || "BCA",
+    data.bankAccountNo || "-",
+    data.bankHolderName || "-"
+  ]);
+
+  return { success: true, message: "Unit baru berhasil ditambahkan!", unitId: unitId };
+}
+
+function handleUpdateUnitStatus(unitId, status) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("02_UNITS");
+  const colMap = getColumnMap(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const idCol = colMap["Unit_ID"] || 1;
+  const statusCol = colMap["Status"] || 7;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol - 1]).trim() === String(unitId).trim()) {
+      sheet.getRange(i + 1, statusCol).setValue(status);
+      return { success: true, message: "Status unit " + unitId + " diubah menjadi " + status };
+    }
+  }
+  return { success: false, error: "Unit tidak ditemukan" };
+}
+
+function fetchLeasesList() {
+  const leases = getSheetDataAsJson("04_LEASES");
+  const contacts = getSheetDataAsJson("03_CONTACTS_360");
+  const units = getSheetDataAsJson("02_UNITS");
+
+  const results = leases.map(l => {
+    const contact = contacts.find(c => String(c.Contact_ID).trim() === String(l.Tenant_ID).trim()) || {};
+    const unit = units.find(u => String(u.Unit_ID).trim() === String(l.Unit_ID).trim()) || {};
+    return {
+      ...l,
+      tenantName: contact.Full_Name || "Tenant",
+      tenantPhone: contact.Phone_WA || "-",
+      unitDisplay: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : l.Unit_ID
+    };
+  });
+
+  return { success: true, leases: results };
+}
+
+function handleCreateLease(data) {
+  if (!data || !data.unitId || !data.tenantName || !data.tenantPhone) {
+    return { success: false, error: "Unit, Nama Penyewa, dan WhatsApp wajib diisi." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const contactSheet = ss.getSheetByName("03_CONTACTS_360");
+  const leaseSheet = ss.getSheetByName("04_LEASES");
+  const unitSheet = ss.getSheetByName("02_UNITS");
+
+  const cleanPhone = String(data.tenantPhone).replace(/[^0-9]/g, '');
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  
+  const contactId = "CNT-" + timestamp + "-" + randomSuffix;
+  const leaseId = "LS-" + new Date().getFullYear() + "-" + randomSuffix;
+
+  contactSheet.appendRow([
+    contactId,
+    String(data.tenantName).trim(),
+    cleanPhone,
+    data.tenantEmail || "",
+    "Tenant",
+    100,
+    "Active Lease for unit " + data.unitId,
+    new Date().toISOString()
+  ]);
+
+  leaseSheet.appendRow([
+    leaseId,
+    data.unitId,
+    contactId,
+    data.startDate || "",
+    data.endDate || "",
+    Number(data.depositAmount) || 0,
+    Number(data.monthlyRent) || 0,
+    Number(data.commissionFee) || (Number(data.monthlyRent) || 0),
+    data.paymentRoute || "Direct_Landlord",
+    "Active",
+    new Date().toISOString()
+  ]);
+
+  const unitColMap = getColumnMap(unitSheet);
+  const unitData = unitSheet.getDataRange().getValues();
+  const uIdCol = unitColMap["Unit_ID"] || 1;
+  const uStatusCol = unitColMap["Status"] || 7;
+
+  for (let i = 1; i < unitData.length; i++) {
+    if (String(unitData[i][uIdCol - 1]).trim() === String(data.unitId).trim()) {
+      unitSheet.getRange(i + 1, uStatusCol).setValue("Occupied");
+      break;
+    }
+  }
+
+  return { success: true, message: "Kontrak sewa berhasil dibuat!", leaseId: leaseId };
+}
+
+function handleCreateInvoice(data) {
+  if (!data || !data.unitId || !data.rentFee) {
+    return { success: false, error: "Unit ID dan Biaya Sewa wajib diisi." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const invSheet = ss.getSheetByName("05_INVOICES");
+
+  const units = getSheetDataAsJson("02_UNITS");
+  const targetUnit = units.find(u => String(u.Unit_ID).trim() === String(data.unitId).trim()) || {};
+
+  const rentFee = Number(data.rentFee) || 0;
+  const utilityFee = Number(data.utilityFee) || 0;
+  const iplFee = Number(data.iplFee || targetUnit.IPL_Fee || 0);
+  const uniqueCode = Math.floor(100 + Math.random() * 899);
+  const totalAmount = rentFee + utilityFee + iplFee + uniqueCode;
+
+  const invSuffix = Math.floor(1000 + Math.random() * 9000);
+  const invoiceId = "INV-" + new Date().getFullYear() + "-" + invSuffix;
+
+  invSheet.appendRow([
+    invoiceId,
+    data.leaseId || "-",
+    data.unitId,
+    data.period || "Periode Berjalan",
+    rentFee,
+    utilityFee,
+    iplFee,
+    uniqueCode,
+    totalAmount,
+    "Unpaid",
+    targetUnit.Payment_Route || "Direct_Landlord",
+    targetUnit.Bank_Name || "BCA",
+    targetUnit.Bank_Account_No || "-",
+    targetUnit.Bank_Holder_Name || "-",
+    "",
+    new Date().toISOString(),
+    ""
+  ]);
+
+  return { success: true, message: "Tagihan invoice berhasil diterbitkan!", invoiceId: invoiceId };
+}
+
+function fetchInvoiceById(invoiceId) {
+  if (!invoiceId) return { success: false, error: "Missing invoice ID" };
+
+  const invoices = getSheetDataAsJson("05_INVOICES");
+  const inv = invoices.find(i => String(i.Invoice_ID).trim() === String(invoiceId).trim());
+  if (!inv) return { success: false, error: "Invoice not found: " + invoiceId };
+
+  const units = getSheetDataAsJson("02_UNITS");
+  const unit = units.find(u => String(u.Unit_ID).trim() === String(inv.Unit_ID).trim()) || {};
+
+  return { success: true, invoice: inv, unit: unit };
+}
+
+function handleVerifyPayment(invoiceId) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("05_INVOICES");
+  const colMap = getColumnMap(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const idCol = colMap["Invoice_ID"] || 1;
+  const statusCol = colMap["Status"] || 10;
+  const paidDateCol = colMap["Paid_Date"] || 17;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol - 1]).trim() === String(invoiceId).trim()) {
+      sheet.getRange(i + 1, statusCol).setValue("Paid");
+      sheet.getRange(i + 1, paidDateCol).setValue(new Date().toISOString());
+      return { success: true, message: "Invoice " + invoiceId + " berhasil diverifikasi sebagai LUNAS." };
+    }
+  }
+  return { success: false, error: "Invoice tidak ditemukan" };
+}
+
+function handleSubmitProof(invoiceId, proofUrl) {
+  if (!invoiceId || !proofUrl) {
+    return { success: false, error: "Missing invoice ID or proof URL" };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("05_INVOICES");
+  const colMap = getColumnMap(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const idCol = colMap["Invoice_ID"] || 1;
+  const statusCol = colMap["Status"] || 10;
+  const proofCol = colMap["Proof_URL"] || 15;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol - 1]).trim() === String(invoiceId).trim()) {
+      sheet.getRange(i + 1, statusCol).setValue("Verifying");
+      sheet.getRange(i + 1, proofCol).setValue(String(proofUrl).trim());
+      return { success: true, message: "Bukti transfer berhasil dikirim. Menunggu verifikasi pengelola." };
+    }
+  }
+  return { success: false, error: "Invoice tidak ditemukan" };
+}
+
+function fetchMaintenanceTickets() {
+  const tickets = getSheetDataAsJson("06_MAINTENANCE");
+  const units = getSheetDataAsJson("02_UNITS");
+
+  const results = tickets.map(t => {
+    const unit = units.find(u => String(u.Unit_ID).trim() === String(t.Unit_ID).trim()) || {};
+    return {
+      ...t,
+      unitDisplay: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : t.Unit_ID
+    };
+  });
+
+  return { success: true, maintenance: results };
+}
+
+function handleCreateMaintenance(data) {
+  if (!data || !data.unitId || !data.issueDescription) {
+    return { success: false, error: "Unit dan Deskripsi Kendala wajib diisi." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("06_MAINTENANCE");
+  const ticketId = "MNT-" + Math.floor(1000 + Math.random() * 9000);
+
+  sheet.appendRow([
+    ticketId,
+    data.unitId,
+    data.tenantId || "Tenant",
+    data.issueDescription,
+    data.photoUrl || "",
+    data.priority || "Medium",
+    "In_Progress",
+    Number(data.estimatedCost) || 0,
+    data.assignedVendor || "Tim Teknisi In-House",
+    new Date().toISOString(),
+    ""
+  ]);
+
+  return { success: true, message: "Tiket maintenance berhasil dibuat!", ticketId: ticketId };
+}
+
+function handleUpdateMaintenanceStatus(ticketId, status) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("06_MAINTENANCE");
+  const colMap = getColumnMap(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const idCol = colMap["Ticket_ID"] || 1;
+  const statusCol = colMap["Status"] || 7;
+  const resolvedCol = colMap["Resolved_At"] || 11;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol - 1]).trim() === String(ticketId).trim()) {
+      sheet.getRange(i + 1, statusCol).setValue(status);
+      if (status === "Resolved") {
+        sheet.getRange(i + 1, resolvedCol).setValue(new Date().toISOString());
+      }
+      return { success: true, message: "Tiket " + ticketId + " diubah menjadi " + status };
+    }
+  }
+  return { success: false, error: "Tiket tidak ditemukan" };
+}
+
+function handleCreateInspection(data) {
+  if (!data || !data.unitId || !data.type) {
+    return { success: false, error: "Unit dan Tipe Inspeksi wajib diisi." };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("09_INSPECTIONS");
+  const inspectionId = "INSP-" + Math.floor(1000 + Math.random() * 9000);
+
+  sheet.appendRow([
+    inspectionId,
+    data.unitId,
+    data.leaseId || "-",
+    data.type,
+    data.livingRoom || "Good",
+    data.bedroom || "Good",
+    data.bathroom || "Good",
+    data.ac || "Good",
+    data.photoUrls || "",
+    Number(data.depositDeduction) || 0,
+    data.notes || "-",
+    new Date().toISOString()
+  ]);
+
+  return { success: true, message: "Data inspeksi unit berhasil disimpan!", inspectionId: inspectionId };
+}
+
+function fetchOwnerStatementDetails(ownerName) {
+  const fin = generateFinancialStatements();
+  const statements = fin.data.landlordStatements || [];
+  const found = statements.find(s => String(s.ownerName).toLowerCase().trim() === String(ownerName).toLowerCase().trim());
+
+  if (!found) {
+    return { success: false, error: "Statement untuk pemilik tersebut tidak ditemukan." };
+  }
+
+  return { success: true, statement: found };
+}
+
+function fetchCrmPipeline() {
+  const leads = getSheetDataAsJson("07_CRM_PIPELINE");
+  const contacts = getSheetDataAsJson("03_CONTACTS_360");
+  const units = getSheetDataAsJson("02_UNITS");
+
+  const fullPipeline = leads.map(lead => {
+    const contact = contacts.find(c => String(c.Contact_ID).trim() === String(lead.Contact_ID).trim()) || {};
+    const unit = units.find(u => String(u.Unit_ID).trim() === String(lead.Target_Unit).trim()) || {};
+    return {
+      ...lead,
+      contactName: contact.Full_Name || "Lead",
+      phone: contact.Phone_WA || "-",
+      leadScore: Number(contact.Lead_Score) || 50,
+      unitDetails: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : (lead.Target_Unit || "-")
+    };
+  });
+
+  return { success: true, pipeline: fullPipeline };
+}
+
+function handleUpdateLeadStage(leadId, stage, notes) {
+  if (!leadId || !stage) return { success: false, error: "Missing leadId or stage" };
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("07_CRM_PIPELINE");
+  const colMap = getColumnMap(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const idCol = colMap["Lead_ID"] || 1;
+  const stageCol = colMap["Stage"] || 4;
+  const notesCol = colMap["Interaction_Notes"] || 7;
+  const updateCol = colMap["Updated_At"] || 8;
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][idCol - 1]).trim() === String(leadId).trim()) {
+      sheet.getRange(i + 1, stageCol).setValue(stage);
+      if (notes) {
+        const existing = data[i][notesCol - 1] ? data[i][notesCol - 1] + " | " : "";
+        sheet.getRange(i + 1, notesCol).setValue(existing + notes);
+      }
+      sheet.getRange(i + 1, updateCol).setValue(new Date().toISOString());
+      return { success: true, message: "Lead " + leadId + " stage updated to " + stage };
+    }
+  }
+  return { success: false, error: "Lead ID not found: " + leadId };
+}
+
+function handleCreateLead(data) {
+  if (!data || !data.fullName || !data.phone) {
+    return { success: false, error: "Full Name and WhatsApp Phone are required" };
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const contactSheet = ss.getSheetByName("03_CONTACTS_360");
+  const pipelineSheet = ss.getSheetByName("07_CRM_PIPELINE");
+
+  const cleanPhone = String(data.phone).replace(/[^0-9]/g, '');
+  const timestamp = Date.now().toString(36).toUpperCase();
+  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  
+  const contactId = "CNT-" + timestamp + "-" + randomSuffix;
+  const leadId = "LEAD-" + timestamp + "-" + randomSuffix;
+
+  contactSheet.appendRow([
+    contactId,
+    String(data.fullName).trim(),
+    cleanPhone,
+    data.email ? String(data.email).trim() : "",
+    "Lead",
+    Number(data.leadScore) || 60,
+    data.notes ? String(data.notes).trim() : "Created via Web Dashboard",
+    new Date().toISOString()
+  ]);
+
+  pipelineSheet.appendRow([
+    leadId,
+    contactId,
+    data.targetUnit || "UNT-101",
+    data.stage || "Inquiry",
+    Number(data.budget) || 0,
+    data.viewingSchedule || "",
+    data.notes || "Initial lead submission",
+    new Date().toISOString()
+  ]);
+
+  return { success: true, message: "Lead successfully created", leadId: leadId, contactId: contactId };
+}

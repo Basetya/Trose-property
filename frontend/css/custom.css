@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.kanban-col {
+  min-height: 520px;
+}
+
+.modal-backdrop {
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Local Background Image with Optimized Contrast Overlay */
+.bg-kalibata {
+  background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.94)), url('../img/bg-kalibata.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+.glass-panel {
+  background: rgba(15, 23, 42, 0.80);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.glass-card {
+  background: rgba(30, 41, 59, 0.70);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}

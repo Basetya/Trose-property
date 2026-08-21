@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Residence - Owner Payout Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen py-10 px-4">
+  <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+    <div class="bg-slate-900 p-8 text-white">
+      <div class="flex justify-between items-start">
+        <div>
+          <span class="text-xs uppercase tracking-widest text-rose-400 font-bold">Landlord Statement Portal</span>
+          <h1 id="owner-name-title" class="text-2xl font-black mt-1">Laporan Pemilik Unit</h1>
+          <p id="owner-phone-sub" class="text-xs text-slate-400">Trose Residence Portfolio</p>
+        </div>
+        <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-black rounded-full uppercase">
+          Verified
+        </span>
+      </div>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <span class="text-xs text-slate-500 font-medium">Total Unit Dimiliki</span>
+          <h3 id="owner-total-units" class="text-xl font-black text-slate-900 mt-1">0 Unit</h3>
+        </div>
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <span class="text-xs text-slate-500 font-medium">Sewa Kotor Masuk (+)</span>
+          <h3 id="owner-gross-rent" class="text-xl font-black text-slate-900 mt-1">Rp 0</h3>
+        </div>
+      </div>
+
+      <div class="space-y-3 border-t border-b border-slate-100 py-4 text-sm">
+        <div class="flex justify-between text-slate-600">
+          <span>Potongan Management Fee (10%)</span>
+          <span id="owner-deduct-mgmt" class="font-semibold text-rose-600">- Rp 0</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Potongan Biaya Maintenance Unit</span>
+          <span id="owner-deduct-maint" class="font-semibold text-rose-600">- Rp 0</span>
+        </div>
+        <div class="flex justify-between text-slate-600">
+          <span>Potongan Biaya IPL Gedung</span>
+          <span id="owner-deduct-ipl" class="font-semibold text-rose-600">- Rp 0</span>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center bg-emerald-50 border border-emerald-200 p-5 rounded-2xl">
+        <div>
+          <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block">Net Payout Transfer ke Owner</span>
+          <span class="text-xs text-emerald-600">Total bersih yang ditransfer pengelola</span>
+        </div>
+        <span id="owner-net-payout" class="text-2xl font-black text-emerald-700 font-mono">Rp 0</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/owner-portal.js"></script>
+</body>
+</html>

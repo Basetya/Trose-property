@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Property Manager - 3-Tier Financial Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar Navigation (Full Master Synced) -->
+    <aside class="w-64 bg-slate-950 border-r border-slate-800 p-5 flex flex-col justify-between hidden md:flex">
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center font-black text-xl text-white">T</div>
+          <div>
+            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <p class="text-xs text-rose-400 font-medium">Property Manager</p>
+          </div>
+        </div>
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Inspeksi Unit</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
+            <span>Laporan Keuangan</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Lease & Tenants</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Maintenance</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>CRM & Acquisition</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-2">
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
+          Clear Passcode Session
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-slate-900 p-6 md:p-10">
+      <div class="max-w-7xl mx-auto space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-white">3-Tier Financial Cockpit</h2>
+            <p class="text-sm text-slate-400">Laporan Keuangan Property Manager, Landlord Statement, dan Konsolidasi Korporasi</p>
+          </div>
+          <!-- Role Switcher Tabs -->
+          <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+            <button onclick="switchFinancialRole('pm')" id="tab-btn-pm" class="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 text-white transition">
+              1. Property Manager
+            </button>
+            <button onclick="switchFinancialRole('landlord')" id="tab-btn-landlord" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-white transition">
+              2. Landlord Statements
+            </button>
+            <button onclick="switchFinancialRole('corporate')" id="tab-btn-corporate" class="px-4 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-white transition">
+              3. Corporate NOI
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. VIEW PROPERTY MANAGER -->
+        <div id="view-pm" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Leasing Success Fees</span>
+              <h3 id="pm-leasing-fee" class="text-2xl font-extrabold text-emerald-400 mt-1">Rp 0</h3>
+              <p class="text-xs text-slate-500 mt-1">Komisi Pencarian Penyewa Baru</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Monthly Management Fees</span>
+              <h3 id="pm-mgmt-fee" class="text-2xl font-extrabold text-emerald-400 mt-1">Rp 0</h3>
+              <p class="text-xs text-slate-500 mt-1">Fee % Pengelolaan Unit Berjalan</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Total PM Operating Income</span>
+              <h3 id="pm-total-revenue" class="text-2xl font-extrabold text-white mt-1">Rp 0</h3>
+              <p class="text-xs text-rose-400 mt-1">Laba Kotor Pengelola</p>
+            </div>
+          </div>
+          <div class="bg-white text-slate-900 rounded-2xl p-6 shadow-xl">
+            <h3 class="font-extrabold text-lg">Skema Pendapatan Pengelola</h3>
+            <p class="text-xs text-slate-500 mt-1">Fee pencarian penyewa (1 bulan sewa/kontrak) + Management Fee (10% dari sewa masuk bulanan).</p>
+          </div>
+        </div>
+
+        <!-- 2. VIEW LANDLORD STATEMENTS -->
+        <div id="view-landlord" class="space-y-6 hidden">
+          <div class="bg-white text-slate-900 rounded-2xl p-6 shadow-xl">
+            <h3 class="font-extrabold text-lg mb-4">Owner Statement & Net Payout Breakdown</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Nama Landlord / Pemilik</th>
+                    <th class="py-3 px-4">Total Unit</th>
+                    <th class="py-3 px-4">Sewa Kotor (+)</th>
+                    <th class="py-3 px-4">Potongan Mgmt Fee (-)</th>
+                    <th class="py-3 px-4">Maintenance (-)</th>
+                    <th class="py-3 px-4">IPL Gedung (-)</th>
+                    <th class="py-3 px-4 font-bold text-emerald-700">Net Payout (Bersih)</th>
+                  </tr>
+                </thead>
+                <tbody id="table-landlords-body">
+                  <tr>
+                    <td colspan="7" class="py-8 text-center text-slate-400 font-medium">Memuat statement pemilik unit...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. VIEW CORPORATE MULTI-ASSET -->
+        <div id="view-corporate" class="space-y-6 hidden">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Gross Revenue</span>
+              <h3 id="corp-gross" class="text-2xl font-extrabold text-white mt-1">Rp 0</h3>
+              <p class="text-xs text-slate-500 mt-1">Sewa + Utilitas + IPL</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Total Expenses</span>
+              <h3 id="corp-expenses" class="text-2xl font-extrabold text-rose-400 mt-1">Rp 0</h3>
+              <p class="text-xs text-slate-500 mt-1">Maintenance + IPL Overhead</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Corporate NOI</span>
+              <h3 id="corp-noi" class="text-2xl font-extrabold text-emerald-400 mt-1">Rp 0</h3>
+              <p class="text-xs text-emerald-500/80 mt-1">Net Operating Income</p>
+            </div>
+            <div class="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+              <span class="text-xs font-bold text-slate-400 uppercase">Estimated Cap Rate</span>
+              <h3 id="corp-cap-rate" class="text-2xl font-extrabold text-indigo-400 mt-1">0.00%</h3>
+              <p class="text-xs text-slate-500 mt-1">Annualized Return on Asset</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/finance.js"></script>
+</body>
+</html>

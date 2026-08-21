@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Residence - AI Property Concierge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen flex flex-col justify-between">
+  <!-- Header Navbar -->
+  <header class="border-b border-slate-800/80 glass-panel sticky top-0 z-20 px-6 py-4">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+        <div>
+          <h1 class="font-extrabold text-base text-white leading-tight">Trose Residence</h1>
+          <p class="text-xs text-rose-400 font-medium flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Rose AI Concierge Online (24/7)
+          </p>
+        </div>
+      </div>
+      <a href="dashboard.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold px-3.5 py-2 rounded-xl border border-slate-700 transition">
+        Login Admin &rarr;
+      </a>
+    </div>
+  </header>
+
+  <!-- Chat Body -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 flex flex-col justify-between overflow-hidden">
+    <div id="chat-messages" class="space-y-4 overflow-y-auto pr-2 flex-1 max-h-[68vh] mb-4">
+      <div class="flex items-start gap-3">
+        <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-sm text-white shrink-0 shadow">R</div>
+        <div class="glass-card p-4 rounded-2xl rounded-tl-none max-w-lg text-sm leading-relaxed text-slate-200 shadow-md">
+          <p>Halo! Saya <strong>Rose</strong>, Asisten Virtual Trose Residence.</p>
+          <p class="mt-2">Ada yang bisa saya bantu seputar informasi ketersediaan unit, jadwal survei (viewing), atau pengecekan status masa sewa & tagihan Anda?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Prompt Pills -->
+    <div class="flex gap-2 overflow-x-auto pb-2 text-xs mb-2">
+      <button onclick="sendQuickPrompt('Unit apa saja yang masih available dan berapa harganya?')" class="glass-card hover:border-rose-500/50 hover:bg-slate-800 px-3.5 py-2 rounded-xl text-slate-300 whitespace-nowrap transition">
+        Cek Unit Available
+      </button>
+      <button onclick="sendQuickPrompt('Bagaimana cara menjadwalkan survei / viewing unit?')" class="glass-card hover:border-rose-500/50 hover:bg-slate-800 px-3.5 py-2 rounded-xl text-slate-300 whitespace-nowrap transition">
+        Jadwal Viewing
+      </button>
+      <button onclick="sendQuickPrompt('Saya penyewa aktif, ingin cek sisa masa sewa kontrak saya')" class="glass-card hover:border-rose-500/50 hover:bg-slate-800 px-3.5 py-2 rounded-xl text-slate-300 whitespace-nowrap transition">
+        Cek Masa Sewa (Tenant)
+      </button>
+    </div>
+
+    <!-- Input Form -->
+    <div class="glass-panel p-3 rounded-2xl shadow-xl flex flex-col md:flex-row gap-2">
+      <input type="text" id="user-identifier" placeholder="No. WA / Single ID (Opsional jika ingin cek data sewa)" class="px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none md:w-56 text-slate-200">
+      <div class="flex-1 flex gap-2">
+        <input type="text" id="user-chat-input" placeholder="Ketik pertanyaan Anda di sini..." class="flex-1 px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none text-slate-100">
+        <button onclick="handleUserSendMessage()" id="btn-send-chat" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold rounded-xl shadow-lg transition flex items-center gap-1 shrink-0">
+          Kirim &rarr;
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/concierge.js"></script>
+</body>
+</html>

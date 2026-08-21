@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trose Property Manager - Unit Inventory</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-slate-950 border-r border-slate-800 p-5 flex flex-col justify-between hidden md:flex">
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-xl bg-rose-600 flex items-center justify-center font-black text-xl text-white">T</div>
+          <div>
+            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <p class="text-xs text-rose-400 font-medium">Property Manager</p>
+          </div>
+        </div>
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="index.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Inspeksi Unit</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Laporan Keuangan</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Lease & Tenants</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Maintenance</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>CRM & Acquisition</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-2">
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
+          Clear Passcode Session
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto bg-slate-900 p-6 md:p-10">
+      <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-white">Unit Inventory Management</h2>
+            <p class="text-sm text-slate-400">Kelola unit apartemen, rute pembayaran, dan ketersediaan sewa</p>
+          </div>
+          <button onclick="openNewUnitModal()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold rounded-xl shadow-lg transition">
+            + Tambah Unit Baru
+          </button>
+        </div>
+
+        <div class="bg-white text-slate-900 rounded-2xl p-6 shadow-xl">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
+                <tr>
+                  <th class="py-3 px-4">Unit ID</th>
+                  <th class="py-3 px-4">Tower & No</th>
+                  <th class="py-3 px-4">Tipe</th>
+                  <th class="py-3 px-4">Harga Sewa / Bln</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">Rute Rekening</th>
+                  <th class="py-3 px-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-units-body">
+                <tr>
+                  <td colspan="7" class="py-8 text-center text-slate-400 font-medium">Memuat inventori unit...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Tambah Unit -->
+  <div id="modal-new-unit" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop hidden">
+    <div class="bg-white text-slate-900 rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xl font-extrabold text-slate-900">Tambah Unit Apartemen</h3>
+        <button onclick="closeNewUnitModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
+      </div>
+      <form id="form-new-unit" class="space-y-3 text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Tower *</label>
+            <input type="text" id="unit-tower" required placeholder="Tower Rose" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Nomor Unit *</label>
+            <input type="text" id="unit-number" required placeholder="1001" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Lantai</label>
+            <input type="text" id="unit-floor" placeholder="10" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Tipe Unit</label>
+            <select id="unit-type" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+              <option value="Studio Deluxe">Studio Deluxe</option>
+              <option value="1BR Furnished">1BR Furnished</option>
+              <option value="2BR Furnished">2BR Furnished</option>
+              <option value="3BR Suite">3BR Suite</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block font-bold text-xs text-slate-700 mb-1">Harga Sewa Dasar (Rp/Bulan) *</label>
+          <input type="number" id="unit-rent" required placeholder="5000000" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+        <div class="border-t border-slate-100 pt-3">
+          <label class="block font-bold text-xs text-slate-700 mb-1">Rute Pembayaran Sewa</label>
+          <select id="unit-route" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+            <option value="Direct_Landlord">Direct Landlord (Transfer ke Pemilik Unit)</option>
+            <option value="Central_Management">Central Management (Masuk ke Kas Pengelola)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Bank</label>
+            <input type="text" id="unit-bank" placeholder="BCA" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">No Rekening</label>
+            <input type="text" id="unit-account-no" placeholder="5220394812" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block font-bold text-xs text-slate-700 mb-1">Nama Pemilik</label>
+            <input type="text" id="unit-holder" placeholder="Budi Santoso" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs">
+          </div>
+        </div>
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" onclick="closeNewUnitModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50">Batal</button>
+          <button type="submit" id="btn-submit-unit" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold shadow-lg transition">Simpan Unit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/units.js"></script>
+</body>
+</html>
