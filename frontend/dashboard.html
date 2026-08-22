@@ -2,14 +2,90 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Trose Property Manager - Admin Cockpit</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen">
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen pb-20 md:pb-0">
+  
+  <!-- Mobile Header Bar (Hanya muncul di Layar HP) -->
+  <header class="md:hidden sticky top-0 z-40 glass-panel border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileDrawer()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white focus:outline-none" aria-label="Buka Menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+      <div>
+        <h1 class="font-extrabold text-xs text-white leading-tight">Trose Admin</h1>
+        <p class="text-[10px] text-rose-400 font-medium">Kalibata City Cockpit</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="index.html" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-300">Landing &rarr;</a>
+      <button onclick="fetchDashboard()" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300" title="Refresh">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Slide-Over Navigation Drawer (Menu Lengkap untuk HP) -->
+  <div id="mobile-drawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-300">
+    <div class="fixed inset-y-0 left-0 max-w-[280px] w-full bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shadow-2xl overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+            <h2 class="font-bold text-sm text-white">Menu Navigasi</h2>
+          </div>
+          <button onclick="toggleMobileDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <nav class="space-y-1 text-xs font-semibold">
+          <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-rose-600 text-white shadow">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Lihat Landing Page &rarr;</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>CRM & Acquisition (Pipeline)</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Lease & Tenants (Kontrak)</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Laporan Keuangan (3-Peran)</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Inspeksi Unit (Audit Fisik)</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Maintenance (Tiket Teknisi)</span>
+          </a>
+          <a href="concierge.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Fullscreen AI Concierge</span>
+          </a>
+          <a href="owner-portal.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Portal Pemilik (Landlord)</span>
+          </a>
+        </nav>
+      </div>
+      <div class="pt-4 border-t border-slate-800 space-y-2">
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-rose-400 p-2 text-center rounded-lg bg-rose-950/40 border border-rose-900/60 font-semibold">
+          Keluar Sesi Admin
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar Navigation -->
+    <!-- Desktop Sidebar Navigation (Layar Laptop / PC) -->
     <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
       <div>
         <div class="flex items-center gap-3 mb-6">
@@ -60,103 +136,103 @@
       </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-8">
-      <div class="max-w-7xl mx-auto space-y-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 md:space-y-8">
+      <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+        
+        <!-- Header & Action Buttons -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 class="text-2xl font-black text-white">Kalibata City Cockpit</h2>
-            <p class="text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
+            <h2 class="text-xl md:text-2xl font-black text-white">Kalibata City Cockpit</h2>
+            <p class="text-xs md:text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
           </div>
-          <div class="flex items-center gap-2">
-            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3.5 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
-              Wipe Mockup Data (Zero State)
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
+              Wipe Mockup Data
             </button>
-            <button onclick="fetchDashboard()" class="px-3.5 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
-              Refresh Data
+            <button onclick="fetchDashboard()" class="px-3 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
+              Refresh
             </button>
-            <a href="crm.html" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
-              + New CRM Lead
+            <a href="crm.html" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
+              + New Lead
             </a>
           </div>
         </div>
 
-        <!-- Metrics Grid (Clean Zero-State Initial) -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy Rate</span>
-            <h3 id="stat-occupancy" class="text-2xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
-            <p id="stat-units" class="text-xs text-rose-400 mt-1 font-medium">0 Units</p>
+        <!-- Metrics Grid (Responsive 2-Col Mobile / 4-Col Desktop) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy</span>
+            <h3 id="stat-occupancy" class="text-xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
+            <p id="stat-units" class="text-[10px] md:text-xs text-rose-400 mt-1 font-medium">0 Units</p>
           </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Rent Due</span>
-            <h3 id="stat-due" class="text-2xl md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
-            <p id="stat-breakdown" class="text-xs text-slate-400 mt-1 truncate">Direct Landlord vs Mgmt Pool</p>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Rent Due</span>
+            <h3 id="stat-due" class="text-lg md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
+            <p id="stat-breakdown" class="text-[10px] md:text-xs text-slate-400 mt-1 truncate">Direct vs Mgmt</p>
           </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
-            <h3 id="stat-outstanding" class="text-2xl md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
-            <p class="text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
+            <h3 id="stat-outstanding" class="text-lg md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
+            <p class="text-[10px] md:text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
           </div>
-          <div class="glass-card p-5 rounded-3xl">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
-            <h3 id="stat-leads" class="text-2xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
-            <p id="stat-maintenance" class="text-xs text-slate-400 mt-1">0 Open Tickets</p>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
+            <h3 id="stat-leads" class="text-xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
+            <p id="stat-maintenance" class="text-[10px] md:text-xs text-slate-400 mt-1">0 Open Tickets</p>
           </div>
         </div>
 
         <!-- PANEL AI KNOWLEDGE BASE & GUARDRAILS STUDIO -->
-        <div class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-rose-500/30">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="glass-panel p-4 md:p-8 rounded-2xl md:rounded-3xl space-y-4 md:space-y-6 border border-rose-500/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="font-extrabold text-xl text-white flex items-center gap-2.5">
-                <span class="w-3 h-3 rounded-full bg-rose-500 animate-pulse"></span>
+              <h3 class="font-extrabold text-base md:text-xl text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                 Rose AI Knowledge Base & Guardrails Studio
               </h3>
-              <p class="text-xs text-slate-400 mt-1">Kelola pengetahuan sewa, fasilitas, rincian tower, atau kosongkan (clear) data usang agar AI selalu up-to-date.</p>
+              <p class="text-[11px] md:text-xs text-slate-400 mt-0.5">Kelola pengetahuan sewa & batasan aturan Rose AI secara real-time.</p>
             </div>
-            <div class="flex items-center gap-2">
-              <label class="cursor-pointer px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl border border-slate-700 transition flex items-center gap-1.5">
-                <span>Unggah File Dokumen (.txt/.md)</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="cursor-pointer px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                <span>Unggah File (.txt)</span>
                 <input type="file" id="ai-file-upload" accept=".txt,.md,.json" onchange="handleAiFileUpload(event)" class="hidden">
               </label>
-              <button type="button" onclick="handleClearAiConfig()" class="px-4 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-2xl border border-rose-800/80 transition flex items-center gap-1.5 shadow">
-                <span>Hapus / Clear All Context</span>
+              <button type="button" onclick="handleClearAiConfig()" class="px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl border border-rose-800/80 transition">
+                <span>Hapus / Clear</span>
               </button>
             </div>
           </div>
 
           <form id="form-ai-config" onsubmit="handleSaveAiConfig(event)" class="space-y-4">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <!-- Knowledge Base Editor -->
-              <div class="space-y-2">
+              <div class="space-y-1.5">
                 <div class="flex justify-between items-center">
-                  <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa, Tower & Fasilitas)</label>
+                  <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa & Fasilitas)</label>
                   <span class="text-[10px] text-slate-500 font-mono">Dinamis</span>
                 </div>
-                <textarea id="ai-kb-text" rows="8" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional, promo sewa, dan informasi apartemen..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+                <textarea id="ai-kb-text" rows="6" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional mall, promo..." class="w-full px-3.5 py-2.5 bg-slate-950/90 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
               </div>
 
-              <!-- Guardrails Editor -->
-              <div class="space-y-2">
+              <div class="space-y-1.5">
                 <div class="flex justify-between items-center">
-                  <label class="block text-xs font-bold text-rose-400 uppercase tracking-wider">Guardrails & Batasan Kebijakan (Aturan AI)</label>
+                  <label class="block text-[11px] font-bold text-rose-400 uppercase tracking-wider">Guardrails (Aturan Batasan AI)</label>
                   <span class="text-[10px] text-rose-400/80 font-mono">Strict Policy</span>
                 </div>
-                <textarea id="ai-guardrail-text" rows="8" placeholder="1. NO DAILY RENT: Tolak dengan sopan pertanyaan sewa harian...&#10;2. PRIVASI: Dilarang membeberkan rekening landlord..." class="w-full px-4 py-3 bg-slate-950/90 border border-slate-700 rounded-2xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+                <textarea id="ai-guardrail-text" rows="6" placeholder="1. NO DAILY RENT: Tolak dengan sopan sewa harian...&#10;2. PRIVASI: Dilarang bocorkan data pemilik..." class="w-full px-3.5 py-2.5 bg-slate-950/90 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
               </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
-              <div class="flex items-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
+              <div class="flex flex-wrap items-center gap-3">
                 <button type="button" onclick="loadAiConfig()" class="text-xs text-slate-400 hover:text-slate-200 font-bold underline">
-                  Muat Ulang Data Server
+                  Muat Ulang
                 </button>
                 <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline">
-                  Kembalikan Template Default Kalibata
+                  Template Default Kalibata
                 </button>
               </div>
-              <button type="submit" id="btn-save-ai" class="px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-rose-600/30 transition flex items-center gap-2">
+              <button type="submit" id="btn-save-ai" class="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                 <span>Simpan Knowledge & Guardrails</span>
                 <span>&rarr;</span>
               </button>
@@ -165,61 +241,87 @@
         </div>
 
         <!-- Panel Pengaturan WhatsApp Landing Page -->
-        <div class="glass-panel p-6 rounded-3xl space-y-4 border border-emerald-500/30">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div class="glass-panel p-4 md:p-6 rounded-2xl md:rounded-3xl space-y-3 border border-emerald-500/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
             <div>
-              <h3 class="font-extrabold text-lg text-white flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
-                Pengaturan Nomor WhatsApp Landing Page
+              <h3 class="font-extrabold text-sm md:text-base text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Nomor WhatsApp Landing Page
               </h3>
-              <p class="text-xs text-slate-400">Nomor ini yang akan dihubungi oleh calon penyewa saat mengklik tombol WhatsApp di Landing Page & Widget AI.</p>
+              <p class="text-[11px] text-slate-400">Nomor kontak resmi yang dibuka saat pengunjung klik tombol WA.</p>
             </div>
-            <span class="text-xs font-mono text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/80">Real-Time Sync</span>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/80 w-fit">Live Sync</span>
           </div>
 
-          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-3 pt-2">
-            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-4 py-3 bg-slate-950 border border-slate-700 rounded-2xl text-sm font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
-            <button type="button" onclick="testWaLink()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-2xl transition border border-slate-700">
-              Tes Link WA
-            </button>
-            <button type="submit" id="btn-save-wa" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition">
-              Simpan Nomor WA
-            </button>
+          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-2 pt-1">
+            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <div class="flex gap-2">
+              <button type="button" onclick="testWaLink()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition border border-slate-700">
+                Tes WA
+              </button>
+              <button type="submit" id="btn-save-wa" class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
+                Simpan WA
+              </button>
+            </div>
           </form>
         </div>
 
         <!-- Tagihan & Rekonsiliasi Terkini -->
-        <div class="bg-white text-slate-900 rounded-3xl p-6 md:p-8 shadow-2xl">
+        <div class="bg-white text-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="font-extrabold text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
-              <p class="text-xs text-slate-500">Mendukung Rute Transfer Langsung ke Landlord atau ke Management</p>
+              <h3 class="font-extrabold text-base md:text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
+              <p class="text-xs text-slate-500">Mendukung Rute Transfer Direct Landlord & Management Pool</p>
             </div>
-            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan ke Sheets...</div>
+            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan...</div>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="text-xs text-slate-400 uppercase border-b border-slate-200">
+            <table class="w-full text-left text-xs md:text-sm">
+              <thead class="text-[11px] text-slate-400 uppercase border-b border-slate-200">
                 <tr>
-                  <th class="py-3 px-4">Invoice ID</th>
-                  <th class="py-3 px-4">Unit & Periode</th>
-                  <th class="py-3 px-4">Nominal (+Kode Unik)</th>
-                  <th class="py-3 px-4">Status</th>
-                  <th class="py-3 px-4">Rute Rekening</th>
-                  <th class="py-3 px-4 text-right">Aksi</th>
+                  <th class="py-2.5 px-3">Invoice ID</th>
+                  <th class="py-2.5 px-3">Unit</th>
+                  <th class="py-2.5 px-3">Nominal</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody id="table-invoices-body">
                 <tr>
-                  <td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa terdaftar di Google Sheets.</td>
+                  <td colspan="5" class="py-6 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database (0 Invoices).</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+
       </div>
     </main>
   </div>
+
+  <!-- Quick Mobile Bottom Navigation (Akses 1-Tap Khusus HP) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-800 px-3 py-2 flex justify-around items-center text-[10px] font-bold">
+    <a href="dashboard.html" class="flex flex-col items-center text-rose-500">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span>Cockpit</span>
+    </a>
+    <a href="crm.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span>CRM</span>
+    </a>
+    <a href="units.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+      <span>Units</span>
+    </a>
+    <a href="finance.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>Keuangan</span>
+    </a>
+    <button onclick="toggleMobileDrawer()" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <span>Lainnya</span>
+    </button>
+  </nav>
 
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>

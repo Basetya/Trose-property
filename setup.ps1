@@ -1,538 +1,763 @@
 # ==============================================================================
-# Trose-property - 1-Click Setup (Resilient AI Knowledge Engine v7.9)
+# Trose-property - 1-Click Setup (Mobile Responsive Overhaul v8.0)
 # ==============================================================================
 
-Write-Host "Applying Dual-Layer AI Knowledge Base & Resilient Storage v7.9..." -ForegroundColor Cyan
+Write-Host "Upgrading Trose Property to 100% Mobile Responsive v8.0..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Force -Path "backend", "frontend/css", "frontend/js", "frontend/img", "scripts" | Out-Null
 
 $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
 # ------------------------------------------------------------------------------
-# 1. frontend/js/app.js
+# 1. frontend/css/custom.css
 # ------------------------------------------------------------------------------
-Write-Host "Updating frontend/js/app.js (Dual-Layer Server & LocalStorage Sync)..." -ForegroundColor Yellow
-$appJs = @'
-/**
- * Trose Property Manager - Dashboard Logic & AI Studio Handlers (v7.9)
- * Dual-Layer Storage: Seamless Online & Local Sync
- * File: frontend/js/app.js
- */
+Write-Host "Updating frontend/css/custom.css (Mobile Glassmorphism & Touch Targets)..." -ForegroundColor Yellow
+$customCss = @'
+/* Trose Property Manager - Mobile Responsive & Glassmorphism Styling (v8.0) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
-async function fetchDashboard() {
-  const loadingIndicator = document.getElementById("loading-indicator");
-  if (loadingIndicator) loadingIndicator.classList.remove("hidden");
-
-  try {
-    const data = await gasApiCall("getDashboardData");
-    if (data && data.success) {
-      renderDashboard(data);
-      if (loadingIndicator) loadingIndicator.classList.add("hidden");
-      loadAiConfig();
-      return;
-    }
-  } catch (err) {
-    console.warn("Connecting to GAS API...", err);
-  }
-
-  if (loadingIndicator) loadingIndicator.classList.add("hidden");
-  renderDashboard({
-    success: true,
-    stats: {
-      totalUnits: 0,
-      occupiedUnits: 0,
-      availableUnits: 0,
-      occupancyRate: "0%",
-      totalRevenueDue: 0,
-      totalCollected: 0,
-      totalOutstanding: 0,
-      directLandlordDue: 0,
-      centralManagementDue: 0,
-      activeLeads: 0,
-      openMaintenance: 0,
-      landingWaNumber: "+6281221559000"
-    },
-    recentInvoices: []
-  });
-  loadAiConfig();
+* {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-function renderDashboard(data) {
-  const s = data.stats || {};
-  document.getElementById("stat-occupancy").innerText = s.occupancyRate || "0%";
-  document.getElementById("stat-units").innerText = `${s.occupiedUnits || 0} / ${s.totalUnits || 0} Units`;
-  document.getElementById("stat-due").innerText = `Rp ${Number(s.totalRevenueDue || 0).toLocaleString('id-ID')}`;
-  document.getElementById("stat-outstanding").innerText = `Rp ${Number(s.totalOutstanding || 0).toLocaleString('id-ID')}`;
-  document.getElementById("stat-leads").innerText = s.activeLeads || 0;
-  document.getElementById("stat-maintenance").innerText = `${s.openMaintenance || 0} Open Tickets`;
-
-  const waInput = document.getElementById("admin-wa-input");
-  if (waInput && s.landingWaNumber) {
-    waInput.value = s.landingWaNumber;
-  }
-
-  const routeBreakdown = document.getElementById("stat-breakdown");
-  if (routeBreakdown) {
-    routeBreakdown.innerText = `Direct Landlord: Rp ${Number(s.directLandlordDue || 0).toLocaleString('id-ID')} | Mgmt Pool: Rp ${Number(s.centralManagementDue || 0).toLocaleString('id-ID')}`;
-  }
-
-  const invTable = document.getElementById("table-invoices-body");
-  if (invTable) {
-    if (!data.recentInvoices || data.recentInvoices.length === 0) {
-      invTable.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database Google Sheets (0 Invoices).</td></tr>`;
-      return;
-    }
-
-    invTable.innerHTML = data.recentInvoices.map(inv => `
-      <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
-        <td class="py-3 px-4 font-semibold text-slate-800">${inv.Invoice_ID || "-"}</td>
-        <td class="py-3 px-4 text-slate-600">${inv.Unit_ID || "-"} (${inv.Period || "-"})</td>
-        <td class="py-3 px-4 font-mono font-medium text-slate-800">Rp ${Number(inv.Total_Amount || 0).toLocaleString('id-ID')}</td>
-        <td class="py-3 px-4">
-          <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${
-            inv.Status === 'Paid' ? 'bg-emerald-100 text-emerald-700' :
-            inv.Status === 'Verifying' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
-          }">
-            ${inv.Status || 'Unpaid'}
-          </span>
-        </td>
-        <td class="py-3 px-4 text-xs font-medium text-slate-500">${inv.Payment_Route || "Direct_Landlord"}</td>
-        <td class="py-3 px-4 text-right space-x-2">
-          ${inv.Status !== 'Paid' ? `
-            <button onclick="requestVerifyPayment('${inv.Invoice_ID}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded-lg transition">
-              Verify
-            </button>
-          ` : ''}
-          <a href="invoice-view.html?id=${inv.Invoice_ID}" target="_blank" class="text-rose-600 hover:text-rose-800 text-xs font-bold underline inline-block py-1">
-            Buka &rarr;
-          </a>
-        </td>
-      </tr>
-    `).join('');
-  }
+body {
+  margin: 0;
+  padding: 0;
 }
 
-// AI KNOWLEDGE BASE & GUARDRAILS LOGIC (Dual-Layer Sync)
-async function loadAiConfig() {
-  const kbArea = document.getElementById("ai-kb-text");
-  const grArea = document.getElementById("ai-guardrail-text");
-  if (!kbArea || !grArea) return;
-
-  // 1. Cek LocalStorage Terlebih Dahulu
-  const localKb = localStorage.getItem("trose_ai_kb");
-  const localGr = localStorage.getItem("trose_ai_gr");
-
-  if (localKb !== null) kbArea.value = localKb;
-  if (localGr !== null) grArea.value = localGr;
-
-  // 2. Sinkronkan dengan Server Jika Tersedia
-  try {
-    const res = await gasApiCall("getAiConfig", {}, "GET");
-    if (res && res.success) {
-      if (res.knowledgeBase !== undefined) {
-        kbArea.value = res.knowledgeBase;
-        localStorage.setItem("trose_ai_kb", res.knowledgeBase);
-      }
-      if (res.guardrails !== undefined) {
-        grArea.value = res.guardrails;
-        localStorage.setItem("trose_ai_gr", res.guardrails);
-      }
-    }
-  } catch (err) {
-    console.warn("Using persistent local AI configuration:", err);
-  }
+.bg-kalibata {
+  background-color: #020617;
+  background-image: 
+    linear-gradient(to bottom, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.96)),
+    url('../img/bg-kalibata.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
-function resetToStandardDefaults() {
-  const kbArea = document.getElementById("ai-kb-text");
-  const grArea = document.getElementById("ai-guardrail-text");
-  if (kbArea) {
-    kbArea.value = "SUPERBLOCK KALIBATA CITY INFORMATION:\n" +
-      "- 18 Tower Total: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.\n" +
-      "- Tower Green Palace (Mawar s/d Viola) memiliki akses kolam renang tematik & gym indoor.\n" +
-      "- Tarif Sewa Bulanan: Studio (Rp 2.8Jt - 3.5Jt/bln), 2BR Standard (Rp 3.8Jt - 4.5Jt/bln), 2BR Green Palace (Rp 4.5Jt - 5.5Jt/bln).\n" +
-      "- Seluruh unit Full Furnished (AC, springbed, lemari, kitchen set, kulkas, TV).\n" +
-      "- Mall Kalibata City Square (KCS) buka pukul 10.00 - 22.00 WIB (Farmers Market buka 08.00 WIB).\n" +
-      "- Stasiun KRL Duren Kalibata berjarak 200m (2 menit jalan kaki).";
-  }
-  if (grArea) {
-    grArea.value = "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Trose Property hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
-      "2. STRICT PROPERTY DOMAIN: Hanya jawab seputar properti, fasilitas, sewa, dan jadwal viewing di Kalibata City.\n" +
-      "3. PRIVACY PROTECTION: Dilarang membeberkan nama pemilik unit atau nomor rekening pribadi landlord kepada publik.\n" +
-      "4. VERIFICATION PROTOCOL: Data privat penyewa (masa sewa, sisa tagihan) hanya boleh dijawab jika Single ID (CNT-XXXX) atau No WA cocok di database.\n" +
-      "5. LEAD CAPTURE: Arahkan pengguna menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin.";
-  }
-  showToast("Template default Kalibata City dimuat ke editor!");
+.glass-panel {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-async function handleSaveAiConfig(e) {
-  e.preventDefault();
-  const kbVal = document.getElementById("ai-kb-text").value.trim();
-  const grVal = document.getElementById("ai-guardrail-text").value.trim();
-  const btn = document.getElementById("btn-save-ai");
-
-  btn.disabled = true;
-  btn.innerText = "Menyimpan ke AI Engine...";
-
-  // 1. Simpan Segera ke Local Storage Browser (Zero Lag & Guaranteed Success)
-  localStorage.setItem("trose_ai_kb", kbVal);
-  localStorage.setItem("trose_ai_gr", grVal);
-
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-
-  // 2. Sinkronkan ke Google Apps Script Server
-  try {
-    const res = await gasApiCall("saveAiConfig", { 
-      passcode: currentPasscode,
-      knowledgeBase: kbVal, 
-      guardrails: grVal 
-    }, "POST");
-
-    if (res && res.success) {
-      showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui di Server & Browser!");
-    } else {
-      showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
-    }
-  } catch (err) {
-    // Tetap sukses di level browser/client
-    showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
-  }
+.glass-card {
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-async function handleClearAiConfig() {
-  if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan?")) {
-    return;
-  }
-
-  // 1. Bersihkan Local Storage
-  localStorage.removeItem("trose_ai_kb");
-  localStorage.removeItem("trose_ai_gr");
-  document.getElementById("ai-kb-text").value = "";
-  document.getElementById("ai-guardrail-text").value = "";
-
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-  try {
-    await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
-  } catch (err) {
-    console.warn("GAS clear fallback:", err);
-  }
-
-  showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-async function handleWipeDatabase() {
-  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
-    return;
-  }
-
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-  
-  // Reset visual langsung
-  renderDashboard({
-    success: true,
-    stats: {
-      totalUnits: 0,
-      occupiedUnits: 0,
-      availableUnits: 0,
-      occupancyRate: "0%",
-      totalRevenueDue: 0,
-      totalCollected: 0,
-      totalOutstanding: 0,
-      directLandlordDue: 0,
-      centralManagementDue: 0,
-      activeLeads: 0,
-      openMaintenance: 0
-    },
-    recentInvoices: []
-  });
-
-  try {
-    const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
-    if (res && res.success) {
-      showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
-    } else {
-      showToast("Tampilan Dashboard berhasil direset ke Zero State!");
-    }
-  } catch (err) {
-    showToast("Tampilan Dashboard berhasil direset ke Zero State!");
-  }
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
 }
-
-function handleAiFileUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const content = e.target.result;
-    const kbArea = document.getElementById("ai-kb-text");
-    if (kbArea) {
-      kbArea.value = content;
-      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base!`);
-    }
-  };
-  reader.readAsText(file);
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 63, 94, 0.4);
+  border-radius: 4px;
 }
-
-async function handleSaveWaSettings(e) {
-  e.preventDefault();
-  const input = document.getElementById("admin-wa-input");
-  const val = input.value.trim();
-  if (!val) return;
-
-  const btn = document.getElementById("btn-save-wa");
-  btn.disabled = true;
-  btn.innerText = "Menyimpan...";
-
-  localStorage.setItem("trose_official_wa", val);
-  OFFICIAL_WA_NUMBER = val;
-
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-
-  try {
-    const res = await gasApiCall("updatePublicSettings", { passcode: currentPasscode, waNumber: val }, "POST");
-    if (res && res.success) {
-      showToast(res.message || "Nomor WhatsApp berhasil diperbarui!");
-    } else {
-      showToast("Nomor WhatsApp berhasil diperbarui!");
-    }
-  } catch (err) {
-    showToast("Nomor WhatsApp berhasil diperbarui!");
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Simpan Nomor WA";
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 63, 94, 0.7);
 }
-
-function testWaLink() {
-  const input = document.getElementById("admin-wa-input");
-  const val = input ? input.value.trim() : OFFICIAL_WA_NUMBER;
-  const url = `https://wa.me/${val.replace(/[^0-9]/g, '')}?text=Tes%20koneksi%20WhatsApp%20Trose%20Property`;
-  window.open(url, '_blank');
-}
-
-function requestVerifyPayment(invoiceId) {
-  if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
-
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
-  gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST")
-    .then(res => {
-      if (res && res.success) {
-        showToast(res.message || "Invoice berhasil diverifikasi!");
-        fetchDashboard();
-      } else {
-        showToast(res.error || "Gagal verifikasi pembayaran", "error");
-      }
-    })
-    .catch(() => showToast("Error menghubungi server", "error"));
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("stat-occupancy")) {
-    fetchDashboard();
-  }
-});
 '@
-[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/app.js", $appJs, $Utf8NoBomEncoding)
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/css/custom.css", $customCss, $Utf8NoBomEncoding)
 
 # ------------------------------------------------------------------------------
-# 2. frontend/js/landing.js
+# 2. frontend/dashboard.html
 # ------------------------------------------------------------------------------
-Write-Host "Updating frontend/js/landing.js (Dynamic Knowledge Parser from Storage)..." -ForegroundColor Yellow
-$landingJs = @'
-/**
- * Trose Property Manager - Rose AI Concierge Context Engine (v7.9)
- * Real-Time Knowledge Base Integration
- * File: frontend/js/landing.js
- */
-
-async function initLandingSettings() {
-  const localWa = localStorage.getItem("trose_official_wa");
-  if (localWa) OFFICIAL_WA_NUMBER = localWa;
-
-  try {
-    const res = await gasApiCall("getPublicSettings", {}, "GET");
-    if (res && res.success && res.settings && res.settings.waNumber) {
-      OFFICIAL_WA_NUMBER = res.settings.waNumber;
-      localStorage.setItem("trose_official_wa", OFFICIAL_WA_NUMBER);
-    }
-  } catch (e) {
-    console.warn("Using active WA Number:", OFFICIAL_WA_NUMBER);
-  }
-}
-
-function toggleFloatingChat() {
-  const popup = document.getElementById("chat-popup");
-  if (popup.classList.contains("hidden")) {
-    popup.classList.remove("hidden");
-    document.getElementById("widget-input").focus();
-  } else {
-    popup.classList.add("hidden");
-  }
-}
-
-function openWhatsAppDirect(customMessage) {
-  const phone = (typeof OFFICIAL_WA_NUMBER !== "undefined") ? OFFICIAL_WA_NUMBER : "+6281221559000";
-  const text = customMessage || ((typeof OFFICIAL_WA_GREETING !== "undefined") ? OFFICIAL_WA_GREETING : "Halo Admin Trose Kalibata City, saya ingin konsultasi sewa unit.");
-  const url = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
-}
-
-function bookViewingUnit(unitType) {
-  const msg = `Halo Admin Trose, saya ingin jadwalkan survei untuk unit ${unitType} di Kalibata City.`;
-  if (confirm(`Hubungi WhatsApp Pengelola untuk survei unit ${unitType}?`)) {
-    openWhatsAppDirect(msg);
-  } else {
-    toggleFloatingChat();
-    document.getElementById("widget-input").value = msg;
-    handleWidgetSend();
-  }
-}
-
-function sendWidgetQuickPrompt(text) {
-  document.getElementById("widget-input").value = text;
-  handleWidgetSend();
-}
-
-async function handleWidgetSend() {
-  const input = document.getElementById("widget-input");
-  const message = input.value.trim();
-  if (!message) return;
-
-  appendWidgetMessage(message, "user");
-  input.value = "";
-
-  const btn = document.getElementById("btn-widget-send");
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-pulse">...</span>`;
-
-  const typing = appendWidgetTyping();
-
-  try {
-    const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "POST");
-    typing.remove();
-
-    if (res && res.reply) {
-      appendWidgetMessage(res.reply, "ai");
-    } else {
-      appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
-    }
-  } catch (err) {
-    typing.remove();
-    appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
-  }
-}
-
-function generateSmartKnowledgeReply(userQuery) {
-  const q = String(userQuery || '').toLowerCase();
+Write-Host "Updating frontend/dashboard.html (Mobile Drawer, Header & Quick Bar)..." -ForegroundColor Yellow
+$dashboardHtml = @'
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trose Property Manager - Admin Cockpit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen pb-20 md:pb-0">
   
-  // Baca Knowledge Base aktif dari Admin Studio (localStorage)
-  const dynamicKb = localStorage.getItem("trose_ai_kb") || "";
-
-  // 1. Cek Pertanyaan Jam Buka / Operasional Mall & Kantor
-  if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
-    if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
-      return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
-    }
-    if (q.includes("kantor") || q.includes("survei") || q.includes("viewing") || q.includes("admin")) {
-      return "Layanan konsultasi dan survei unit di kantor Trose Property buka setiap hari (Senin-Minggu) pukul 09.00 – 18.00 WIB. Silakan hubungi kami via WhatsApp untuk membuat janji temu.";
-    }
-    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit sewa buka pukul 09.00 - 18.00 WIB.";
-  }
-
-  // 2. Cek Pertanyaan Sewa Harian (Strict Policy)
-  if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal penghuni. Apakah Anda ingin melihat pilihan unit bulanan kami?";
-  }
-
-  // 3. Cek Pertanyaan Harga / Tarif Sewa
-  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa")) {
-    return "Pilihan sewa unit bulanan resmi di Kalibata City:\n- Studio Deluxe: Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard: Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace: Mulai Rp 5.500.000/bln\nSemua unit Full Furnished (AC, Springbed, Kitchen Set, TV). Tersedia juga opsi sewa tahunan lebih hemat.";
-  }
-
-  // 4. Cek Pertanyaan Fasilitas
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("green palace")) {
-    return "Fasilitas kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, Bioskop XXI, food court).\n- Kolam renang dewasa & anak, Gym, Lapangan Tenis/Futsal di Green Palace.\n- Keamanan kartu akses lift 24 jam & Masjid Raya Nurullah.";
-  }
-
-  // 5. Cek Lokasi & Stasiun
-  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat")) {
-    return "Lokasi di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit jalan kaki (200m) ke Stasiun KRL Duren Kalibata dan 10-15 menit ke kawasan bisnis Kuningan / Gatot Subroto.";
-  }
-
-  // 6. Cek Jadwal Survei / Viewing
-  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat")) {
-    return "Jadwal survei unit (viewing) buka setiap hari (09.00 - 18.00 WIB). Silakan klik tombol 'WA' di kanan atas untuk janjian waktu kunjungan bersama tim kami.";
-  }
-
-  // 7. Jika ada teks custom di Knowledge Base admin, sertakan intisarinya
-  if (dynamicKb && dynamicKb.length > 20) {
-    return "Halo! Berdasarkan informasi terkini Kalibata City:\n" + dynamicKb.substring(0, 250) + "...\n\nAda yang ingin Anda tanyakan lebih spesifik seputar sewa atau fasilitas?";
-  }
-
-  return "Halo! Saya Rose, asisten virtual Apartemen Kalibata City. Kami menyediakan unit Studio & 2BR siap huni (bulanan dan tahunan). Ada yang bisa saya bantu seputar harga, fasilitas, jam operasional, atau jadwal survei?";
-}
-
-function appendWidgetMessage(text, sender) {
-  const container = document.getElementById("widget-messages");
-  const wrapper = document.createElement("div");
-  wrapper.className = sender === "user" ? "flex justify-end" : "flex items-start gap-2";
-
-  if (sender === "user") {
-    wrapper.innerHTML = `
-      <div class="bg-rose-600 text-white p-2.5 rounded-2xl rounded-tr-none max-w-[85%] leading-relaxed text-xs">
-        ${escapeHtml(text)}
+  <!-- Mobile Header Bar (Hanya muncul di Layar HP) -->
+  <header class="md:hidden sticky top-0 z-40 glass-panel border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <button onclick="toggleMobileDrawer()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white focus:outline-none" aria-label="Buka Menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+      <div>
+        <h1 class="font-extrabold text-xs text-white leading-tight">Trose Admin</h1>
+        <p class="text-[10px] text-rose-400 font-medium">Kalibata City Cockpit</p>
       </div>
-    `;
-  } else {
-    wrapper.innerHTML = `
-      <div class="w-6 h-6 rounded-lg bg-rose-600 flex items-center justify-center font-bold text-white text-[10px] shrink-0">R</div>
-      <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl rounded-tl-none text-slate-200 leading-relaxed text-xs whitespace-pre-line">
-        ${escapeHtml(text)}
-      </div>
-    `;
-  }
-
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
-}
-
-function appendWidgetTyping() {
-  const container = document.getElementById("widget-messages");
-  const wrapper = document.createElement("div");
-  wrapper.className = "flex items-start gap-2";
-  wrapper.innerHTML = `
-    <div class="w-6 h-6 rounded-lg bg-rose-600 flex items-center justify-center font-bold text-white text-[10px] shrink-0">R</div>
-    <div class="bg-slate-900 border border-slate-800 px-3 py-2 rounded-2xl rounded-tl-none text-[10px] text-slate-400 animate-pulse">
-      Rose sedang mengetik...
     </div>
-  `;
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
-  return wrapper;
-}
+    <div class="flex items-center gap-2">
+      <a href="index.html" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-bold text-slate-300">Landing &rarr;</a>
+      <button onclick="fetchDashboard()" class="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300" title="Refresh">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </button>
+    </div>
+  </header>
 
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
+  <!-- Mobile Slide-Over Navigation Drawer (Menu Lengkap untuk HP) -->
+  <div id="mobile-drawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-300">
+    <div class="fixed inset-y-0 left-0 max-w-[280px] w-full bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shadow-2xl overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+            <h2 class="font-bold text-sm text-white">Menu Navigasi</h2>
+          </div>
+          <button onclick="toggleMobileDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:text-white">&times;</button>
+        </div>
+        <nav class="space-y-1 text-xs font-semibold">
+          <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-rose-600 text-white shadow">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Lihat Landing Page &rarr;</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>CRM & Acquisition (Pipeline)</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Lease & Tenants (Kontrak)</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Laporan Keuangan (3-Peran)</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Inspeksi Unit (Audit Fisik)</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Maintenance (Tiket Teknisi)</span>
+          </a>
+          <a href="concierge.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Fullscreen AI Concierge</span>
+          </a>
+          <a href="owner-portal.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
+            <span>Portal Pemilik (Landlord)</span>
+          </a>
+        </nav>
+      </div>
+      <div class="pt-4 border-t border-slate-800 space-y-2">
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-rose-400 p-2 text-center rounded-lg bg-rose-950/40 border border-rose-900/60 font-semibold">
+          Keluar Sesi Admin
+        </button>
+      </div>
+    </div>
+  </div>
 
-document.addEventListener("DOMContentLoaded", () => {
-  initLandingSettings();
-  const input = document.getElementById("widget-input");
-  if (input) {
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") handleWidgetSend();
-    });
-  }
-});
+  <div class="flex h-screen overflow-hidden">
+    <!-- Desktop Sidebar Navigation (Layar Laptop / PC) -->
+    <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
+      <div>
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+          <div>
+            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <p class="text-xs text-rose-400 font-medium">Kalibata City Admin</p>
+          </div>
+        </div>
+        <nav class="space-y-1 text-sm font-medium">
+          <a href="dashboard.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 text-white font-semibold shadow-md shadow-rose-600/20">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Landing Page &rarr;</span>
+          </a>
+          <a href="inspections.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Inspeksi Unit</span>
+          </a>
+          <a href="finance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Laporan Keuangan</span>
+          </a>
+          <a href="units.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Unit Inventory</span>
+          </a>
+          <a href="leases.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Lease & Tenants</span>
+          </a>
+          <a href="billing.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Billing & Invoices</span>
+          </a>
+          <a href="maintenance.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>Maintenance</span>
+          </a>
+          <a href="crm.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-slate-900 hover:text-white transition">
+            <span>CRM & Acquisition</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-2">
+        <div class="glass-card p-3 rounded-xl text-xs">
+          <p class="text-slate-400 font-medium">Kalibata City Engine:</p>
+          <p class="font-mono text-emerald-400 font-bold mt-0.5">Google Sheets Active</p>
+        </div>
+        <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
+          Clear Passcode Session
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 md:space-y-8">
+      <div class="max-w-7xl mx-auto space-y-6 md:space-y-8">
+        
+        <!-- Header & Action Buttons -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl md:text-2xl font-black text-white">Kalibata City Cockpit</h2>
+            <p class="text-xs md:text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
+              Wipe Mockup Data
+            </button>
+            <button onclick="fetchDashboard()" class="px-3 py-2 glass-card hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl transition">
+              Refresh
+            </button>
+            <a href="crm.html" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
+              + New Lead
+            </a>
+          </div>
+        </div>
+
+        <!-- Metrics Grid (Responsive 2-Col Mobile / 4-Col Desktop) -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy</span>
+            <h3 id="stat-occupancy" class="text-xl md:text-3xl font-extrabold text-white mt-1">0%</h3>
+            <p id="stat-units" class="text-[10px] md:text-xs text-rose-400 mt-1 font-medium">0 Units</p>
+          </div>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Rent Due</span>
+            <h3 id="stat-due" class="text-lg md:text-3xl font-extrabold text-white mt-1">Rp 0</h3>
+            <p id="stat-breakdown" class="text-[10px] md:text-xs text-slate-400 mt-1 truncate">Direct vs Mgmt</p>
+          </div>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding</span>
+            <h3 id="stat-outstanding" class="text-lg md:text-3xl font-extrabold text-amber-400 mt-1">Rp 0</h3>
+            <p class="text-[10px] md:text-xs text-amber-500/80 mt-1">Menunggu Verifikasi</p>
+          </div>
+          <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
+            <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Active Pipeline</span>
+            <h3 id="stat-leads" class="text-xl md:text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
+            <p id="stat-maintenance" class="text-[10px] md:text-xs text-slate-400 mt-1">0 Open Tickets</p>
+          </div>
+        </div>
+
+        <!-- PANEL AI KNOWLEDGE BASE & GUARDRAILS STUDIO -->
+        <div class="glass-panel p-4 md:p-8 rounded-2xl md:rounded-3xl space-y-4 md:space-y-6 border border-rose-500/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="font-extrabold text-base md:text-xl text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                Rose AI Knowledge Base & Guardrails Studio
+              </h3>
+              <p class="text-[11px] md:text-xs text-slate-400 mt-0.5">Kelola pengetahuan sewa & batasan aturan Rose AI secara real-time.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="cursor-pointer px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                <span>Unggah File (.txt)</span>
+                <input type="file" id="ai-file-upload" accept=".txt,.md,.json" onchange="handleAiFileUpload(event)" class="hidden">
+              </label>
+              <button type="button" onclick="handleClearAiConfig()" class="px-3 py-1.5 bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-bold rounded-xl border border-rose-800/80 transition">
+                <span>Hapus / Clear</span>
+              </button>
+            </div>
+          </div>
+
+          <form id="form-ai-config" onsubmit="handleSaveAiConfig(event)" class="space-y-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <label class="block text-[11px] font-bold text-slate-300 uppercase tracking-wider">Knowledge Base (Informasi Sewa & Fasilitas)</label>
+                  <span class="text-[10px] text-slate-500 font-mono">Dinamis</span>
+                </div>
+                <textarea id="ai-kb-text" rows="6" placeholder="Tuliskan detail fasilitas, nama tower, jam operasional mall, promo..." class="w-full px-3.5 py-2.5 bg-slate-950/90 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+
+              <div class="space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <label class="block text-[11px] font-bold text-rose-400 uppercase tracking-wider">Guardrails (Aturan Batasan AI)</label>
+                  <span class="text-[10px] text-rose-400/80 font-mono">Strict Policy</span>
+                </div>
+                <textarea id="ai-guardrail-text" rows="6" placeholder="1. NO DAILY RENT: Tolak dengan sopan sewa harian...&#10;2. PRIVASI: Dilarang bocorkan data pemilik..." class="w-full px-3.5 py-2.5 bg-slate-950/90 border border-slate-700 rounded-xl text-xs font-mono text-slate-200 focus:ring-2 focus:ring-rose-500 focus:outline-none leading-relaxed"></textarea>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-1">
+              <div class="flex flex-wrap items-center gap-3">
+                <button type="button" onclick="loadAiConfig()" class="text-xs text-slate-400 hover:text-slate-200 font-bold underline">
+                  Muat Ulang
+                </button>
+                <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-amber-400 hover:text-amber-300 font-bold underline">
+                  Template Default Kalibata
+                </button>
+              </div>
+              <button type="submit" id="btn-save-ai" class="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                <span>Simpan Knowledge & Guardrails</span>
+                <span>&rarr;</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Panel Pengaturan WhatsApp Landing Page -->
+        <div class="glass-panel p-4 md:p-6 rounded-2xl md:rounded-3xl space-y-3 border border-emerald-500/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+            <div>
+              <h3 class="font-extrabold text-sm md:text-base text-white flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Nomor WhatsApp Landing Page
+              </h3>
+              <p class="text-[11px] text-slate-400">Nomor kontak resmi yang dibuka saat pengunjung klik tombol WA.</p>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-800/80 w-fit">Live Sync</span>
+          </div>
+
+          <form id="form-wa-settings" onsubmit="handleSaveWaSettings(event)" class="flex flex-col sm:flex-row gap-2 pt-1">
+            <input type="text" id="admin-wa-input" required placeholder="+6281221559000" class="flex-1 px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-mono text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <div class="flex gap-2">
+              <button type="button" onclick="testWaLink()" class="flex-1 sm:flex-none px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition border border-slate-700">
+                Tes WA
+              </button>
+              <button type="submit" id="btn-save-wa" class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg transition">
+                Simpan WA
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tagihan & Rekonsiliasi Terkini -->
+        <div class="bg-white text-slate-900 rounded-2xl md:rounded-3xl p-4 md:p-8 shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-extrabold text-base md:text-lg text-slate-900">Tagihan & Rekonsiliasi Terkini</h3>
+              <p class="text-xs text-slate-500">Mendukung Rute Transfer Direct Landlord & Management Pool</p>
+            </div>
+            <div id="loading-indicator" class="hidden text-xs text-slate-400 animate-pulse">Menghubungkan...</div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs md:text-sm">
+              <thead class="text-[11px] text-slate-400 uppercase border-b border-slate-200">
+                <tr>
+                  <th class="py-2.5 px-3">Invoice ID</th>
+                  <th class="py-2.5 px-3">Unit</th>
+                  <th class="py-2.5 px-3">Nominal</th>
+                  <th class="py-2.5 px-3">Status</th>
+                  <th class="py-2.5 px-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="table-invoices-body">
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-slate-400 font-medium">Belum ada tagihan sewa di database (0 Invoices).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Quick Mobile Bottom Navigation (Akses 1-Tap Khusus HP) -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-800 px-3 py-2 flex justify-around items-center text-[10px] font-bold">
+    <a href="dashboard.html" class="flex flex-col items-center text-rose-500">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+      <span>Cockpit</span>
+    </a>
+    <a href="crm.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <span>CRM</span>
+    </a>
+    <a href="units.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+      <span>Units</span>
+    </a>
+    <a href="finance.html" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>Keuangan</span>
+    </a>
+    <button onclick="toggleMobileDrawer()" class="flex flex-col items-center text-slate-400 hover:text-white">
+      <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <span>Lainnya</span>
+    </button>
+  </nav>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
 '@
-[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/js/landing.js", $landingJs, $Utf8NoBomEncoding)
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/dashboard.html", $dashboardHtml, $Utf8NoBomEncoding)
 
-Write-Host "`n[SUCCESS] Version v7.9 applied: Dual-Layer Storage & Rose AI Engine Activated!" -ForegroundColor Green
+# ------------------------------------------------------------------------------
+# 3. frontend/js/app.js
+# ------------------------------------------------------------------------------
+Write-Host "Updating frontend/js/app.js (Adding toggleMobileDrawer logic)..." -ForegroundColor Yellow
+$appJsContent = [System.IO.File]::ReadAllText("$PSScriptRoot/frontend/js/app.js")
+if (-not $appJsContent.Contains("toggleMobileDrawer")) {
+    $mobileDrawerJs = @'
+
+// Mobile Drawer Handler
+function toggleMobileDrawer() {
+  const drawer = document.getElementById("mobile-drawer");
+  if (drawer) {
+    if (drawer.classList.contains("hidden")) {
+      drawer.classList.remove("hidden");
+    } else {
+      drawer.classList.add("hidden");
+    }
+  }
+}
+'@
+    [System.IO.File]::AppendAllText("$PSScriptRoot/frontend/js/app.js", $mobileDrawerJs, $Utf8NoBomEncoding)
+}
+
+# ------------------------------------------------------------------------------
+# 4. frontend/index.html
+# ------------------------------------------------------------------------------
+Write-Host "Updating frontend/index.html (Mobile Optimized Pop-up AI & Navbar)..." -ForegroundColor Yellow
+$indexHtml = @'
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trose Property - Sewa Apartemen Kalibata City Nyaman & Strategis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen">
+  <!-- Navbar -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-4 md:px-6 py-3 md:py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 md:w-10 md:h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-lg md:text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+        <div>
+          <h1 class="font-extrabold text-sm md:text-base text-white leading-tight">Trose Property</h1>
+          <p class="text-[10px] md:text-xs text-rose-400 font-medium">Kalibata City Specialist</p>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#keunggulan" class="hover:text-rose-400 transition">Keunggulan</a>
+        <a href="#tipe-unit" class="hover:text-rose-400 transition">Pilihan Unit</a>
+        <a href="#fasilitas" class="hover:text-rose-400 transition">Fasilitas Lengkap</a>
+        <a href="#lokasi" class="hover:text-rose-400 transition">Peta & Akses</a>
+        <button onclick="openWhatsAppDirect()" class="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1.5 font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          WhatsApp Admin
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openWhatsAppDirect()" class="md:hidden px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
+          Chat WA
+        </button>
+        <a href="dashboard.html" class="px-3.5 py-1.5 md:px-4 md:py-2 bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl transition shadow-md flex items-center gap-1.5">
+          <span>Admin</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="max-w-7xl mx-auto px-4 md:px-6 pt-12 pb-16 md:pt-24 md:pb-28 text-center space-y-4 md:space-y-6">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[11px] md:text-xs font-bold tracking-wide uppercase">
+      Superblock Terintegrasi Terlengkap di Jakarta Selatan
+    </div>
+    <h2 class="text-3xl md:text-6xl font-black text-white tracking-tight leading-tight max-w-4xl mx-auto">
+      Tinggal Lebih Praktis, Nyaman, dan Bebas Macet di <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-pink-500">Apartemen Kalibata City</span>
+    </h2>
+    <p class="text-slate-300 text-sm md:text-lg max-w-2xl mx-auto leading-relaxed">
+      Sewa unit siap huni (Studio, 2BR, hingga Green Palace Executive). Nikmati kemudahan hidup dengan mall di dalam kawasan hunian, 2 menit ke Stasiun KRL, dan akses cepat ke pusat bisnis Jakarta.
+    </p>
+    <div class="pt-2 md:pt-4 flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
+      <button onclick="toggleFloatingChat()" class="w-full sm:w-auto px-6 py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-rose-600/30 transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <span>Konsultasi Sewa via AI Concierge</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      </button>
+      <button onclick="openWhatsAppDirect()" class="w-full sm:w-auto px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+        <span>Chat WhatsApp Langsung</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Keunggulan Section -->
+  <section id="keunggulan" class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
+    <div class="text-center space-y-2 mb-8 md:mb-12">
+      <h3 class="text-xs font-bold text-rose-400 uppercase tracking-widest">Mengapa Kalibata City?</h3>
+      <h4 class="text-2xl md:text-3xl font-extrabold text-white">Semua Kebutuhan Hidup Ada di Depan Pintu Anda</h4>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-bold">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+        </div>
+        <h5 class="text-base md:text-lg font-bold text-white">Mall Kalibata City Square (KCS)</h5>
+        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+          Pusat belanja, bioskop XXI, Farmers Market, food court kuliner Nusantara, kafe, apotek, dan ATM center lengkap langsung di bawah tower Anda.
+        </p>
+      </div>
+
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <h5 class="text-base md:text-lg font-bold text-white">2 Menit ke Stasiun KRL & Bus</h5>
+        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+          Hanya 200 meter ke Stasiun KRL Duren Kalibata. Bebas macet menuju koridor segitiga emas Sudirman, Kuningan, Tebet, dan Gatot Subroto.
+        </p>
+      </div>
+
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl font-bold">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h5 class="text-base md:text-lg font-bold text-white">Harga Terjangkau & Full Furnished</h5>
+        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+          Sewa bulanan dan tahunan hemat dengan fasilitas keamanan kartu akses lift 24 jam, CCTV, dan fasilitas olahraga lengkap.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pilihan Unit Section -->
+  <section id="tipe-unit" class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-slate-800/80">
+    <div class="text-center space-y-2 mb-8 md:mb-12">
+      <h3 class="text-xs font-bold text-rose-400 uppercase tracking-widest">Katalog Unit</h3>
+      <h4 class="text-2xl md:text-3xl font-extrabold text-white">Tipe Unit Populer Siap Huni</h4>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-4 flex flex-col justify-between">
+        <div>
+          <span class="px-3 py-1 bg-indigo-500/20 text-indigo-300 text-[11px] font-bold rounded-full">Favorit Single / Profesional</span>
+          <h5 class="text-lg md:text-xl font-bold text-white mt-3">Studio Deluxe (21 m2)</h5>
+          <p class="text-xs text-slate-300 mt-1">Full Furnished / AC / Kitchen Set / Spring Bed / TV</p>
+          <div class="mt-4 pt-4 border-t border-slate-700/80">
+            <span class="text-[11px] text-slate-400">Mulai dari</span>
+            <p class="text-xl md:text-2xl font-black text-rose-400 font-mono">Rp 3.000.000 <span class="text-xs text-slate-400 font-normal">/bulan</span></p>
+          </div>
+        </div>
+        <button onclick="bookViewingUnit('Studio Deluxe')" class="w-full py-2.5 bg-slate-800 hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition">
+          Jadwalkan Survei Unit
+        </button>
+      </div>
+
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-4 flex flex-col justify-between border-rose-500/50 shadow-xl shadow-rose-950/50">
+        <div>
+          <span class="px-3 py-1 bg-rose-500/20 text-rose-300 text-[11px] font-bold rounded-full">Paling Diminati</span>
+          <h5 class="text-lg md:text-xl font-bold text-white mt-3">2 Bedroom Standard (33 m2)</h5>
+          <p class="text-xs text-slate-300 mt-1">2 Kamar Tidur / Ruang Tamu / Kitchen Set / TV & AC</p>
+          <div class="mt-4 pt-4 border-t border-slate-700/80">
+            <span class="text-[11px] text-slate-400">Mulai dari</span>
+            <p class="text-xl md:text-2xl font-black text-rose-400 font-mono">Rp 4.200.000 <span class="text-xs text-slate-400 font-normal">/bulan</span></p>
+          </div>
+        </div>
+        <button onclick="bookViewingUnit('2 Bedroom Standard')" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition">
+          Jadwalkan Survei Unit
+        </button>
+      </div>
+
+      <div class="glass-card p-5 md:p-6 rounded-2xl md:rounded-3xl space-y-4 flex flex-col justify-between">
+        <div>
+          <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-[11px] font-bold rounded-full">Tower Green Palace (Premium)</span>
+          <h5 class="text-lg md:text-xl font-bold text-white mt-3">2 Bedroom Executive</h5>
+          <p class="text-xs text-slate-300 mt-1">Akses Kolam Renang / Gym / Tennis Court / Interior Mewah</p>
+          <div class="mt-4 pt-4 border-t border-slate-700/80">
+            <span class="text-[11px] text-slate-400">Mulai dari</span>
+            <p class="text-xl md:text-2xl font-black text-rose-400 font-mono">Rp 5.500.000 <span class="text-xs text-slate-400 font-normal">/bulan</span></p>
+          </div>
+        </div>
+        <button onclick="bookViewingUnit('2 Bedroom Executive')" class="w-full py-2.5 bg-slate-800 hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition">
+          Jadwalkan Survei Unit
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fasilitas Lengkap Superblock Section (Pure SVG Icons) -->
+  <section id="fasilitas" class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-slate-800/80">
+    <div class="text-center space-y-2 mb-8 md:mb-12">
+      <h3 class="text-xs font-bold text-rose-400 uppercase tracking-widest">Fasilitas Kawasan Superblock</h3>
+      <h4 class="text-2xl md:text-3xl font-extrabold text-white">Semua Kebutuhan Olahraga & Belanja Tersedia</h4>
+      <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">Fasilitas terintegrasi dalam area 12 hektar yang dirancang untuk kenyamanan keluarga.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div class="glass-card p-4 md:p-5 rounded-2xl text-center space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-blue-500/20 text-blue-400 mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M3 9a4 4 0 014-4h10a4 4 0 014 4M3 12h18"></path></svg>
+        </div>
+        <h6 class="font-bold text-xs md:text-sm text-white">Kolam Renang Tematik</h6>
+        <p class="text-[11px] text-slate-400">Adult Pool & Kids Pool di Green Palace.</p>
+      </div>
+
+      <div class="glass-card p-4 md:p-5 rounded-2xl text-center space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12"></path></svg>
+        </div>
+        <h6 class="font-bold text-xs md:text-sm text-white">Fitness Center & Gym</h6>
+        <p class="text-[11px] text-slate-400">Pusat kebugaran cardio & beban lengkap.</p>
+      </div>
+
+      <div class="glass-card p-4 md:p-5 rounded-2xl text-center space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h6 class="font-bold text-xs md:text-sm text-white">Sports Complex</h6>
+        <p class="text-[11px] text-slate-400">Lapangan tenis, basket, futsal, jogging track.</p>
+      </div>
+
+      <div class="glass-card p-4 md:p-5 rounded-2xl text-center space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+        </div>
+        <h6 class="font-bold text-xs md:text-sm text-white">Mall KCS & Farmers Market</h6>
+        <p class="text-[11px] text-slate-400">Pusat belanja & XXI tinggal turun lift.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Peta Lokasi Section -->
+  <section id="lokasi" class="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 border-t border-slate-800/80">
+    <div class="text-center space-y-2 mb-8 md:mb-12">
+      <h3 class="text-xs font-bold text-rose-400 uppercase tracking-widest">Akses & Lokasi Strategis</h3>
+      <h4 class="text-2xl md:text-3xl font-extrabold text-white">Jantung Mobilitas Jakarta Selatan</h4>
+      <p class="text-slate-400 text-xs md:text-sm max-w-xl mx-auto">Superblock Apartemen Kalibata City & Mall KCS tepat di seberang Stasiun KRL Duren Kalibata.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 items-start">
+      <div class="lg:col-span-2 glass-panel p-3 md:p-4 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl space-y-2.5">
+        <div class="flex justify-between items-center px-1">
+          <span class="text-xs font-bold text-slate-300">Peta Presisi Kawasan</span>
+          <a href="https://maps.google.com/?q=Apartemen+Kalibata+City+Jakarta+Selatan" target="_blank" class="text-xs text-rose-400 hover:text-rose-300 font-bold underline flex items-center gap-1">
+            <span>Buka Google Maps</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </a>
+        </div>
+        <div class="w-full h-[280px] md:h-[400px] rounded-xl md:rounded-2xl overflow-hidden border border-slate-700/80">
+          <iframe 
+            title="Peta Presisi Apartemen Kalibata City"
+            src="https://maps.google.com/maps?q=-6.2558,106.8552&hl=id&z=17&output=embed" 
+            width="100%" 
+            height="100%" 
+            style="border:0;" 
+            allowfullscreen="" 
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>
+
+      <div class="space-y-3 md:space-y-4">
+        <div class="glass-card p-4 md:p-5 rounded-2xl space-y-1 border-l-4 border-emerald-500">
+          <span class="text-[10px] md:text-xs font-bold text-emerald-400 uppercase tracking-wide">Transit Oriented (TOD)</span>
+          <h6 class="font-bold text-white text-sm md:text-base">Stasiun KRL Duren Kalibata (200m)</h6>
+          <p class="text-xs text-slate-300">2 menit jalan kaki ke stasiun. Akses cepat ke Sudirman, Manggarai, Juanda, dan Bogor.</p>
+        </div>
+
+        <div class="glass-card p-4 md:p-5 rounded-2xl space-y-1 border-l-4 border-rose-500">
+          <span class="text-[10px] md:text-xs font-bold text-rose-400 uppercase tracking-wide">Akses Bisnis & Tol</span>
+          <h6 class="font-bold text-white text-sm md:text-base">Kuningan & Gatot Subroto (10-15 Menit)</h6>
+          <p class="text-xs text-slate-300">Dekat koridor HR Rasuna Said, SCBD, MT Haryono, dan Tol Pancoran.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="glass-panel border-t border-slate-800 py-6 md:py-8 px-4 text-center text-xs text-slate-400 space-y-1.5">
+    <p class="font-bold text-slate-300">Trose Property Manager &copy; 2026 - Kalibata City Specialist</p>
+    <p>Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750</p>
+  </footer>
+
+  <!-- Floating Chatbot Widget (Rose AI Concierge - Mobile Bottom Adaptive) -->
+  <div id="floating-chat-widget" class="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end">
+    <!-- Chat Window Container -->
+    <div id="chat-popup" class="hidden glass-panel border border-slate-700 rounded-3xl shadow-2xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[460px] md:h-[500px]">
+      <div class="bg-slate-900/95 p-3.5 md:p-4 border-b border-slate-800 flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-white text-xs">R</div>
+          <div>
+            <h6 class="text-xs font-bold text-white">Rose - AI Concierge</h6>
+            <p class="text-[10px] text-emerald-400">Online | Kalibata City Assistant</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="openWhatsAppDirect()" title="Chat WhatsApp" class="text-emerald-400 hover:text-emerald-300 text-xs px-2 py-1 bg-emerald-950/60 rounded-lg border border-emerald-800/60 font-bold">
+            WA
+          </button>
+          <button onclick="toggleFloatingChat()" class="text-slate-400 hover:text-white text-lg font-bold px-1.5">&times;</button>
+        </div>
+      </div>
+
+      <div id="widget-messages" class="flex-1 p-3.5 md:p-4 overflow-y-auto space-y-3 text-xs">
+        <div class="flex items-start gap-2">
+          <div class="w-6 h-6 rounded-lg bg-rose-600 flex items-center justify-center font-bold text-white text-[10px] shrink-0">R</div>
+          <div class="bg-slate-900 border border-slate-800 p-2.5 md:p-3 rounded-2xl rounded-tl-none text-slate-200 leading-relaxed text-xs">
+            Halo! Saya Rose, asisten virtual Kalibata City. Mau tanya harga sewa, fasilitas, jam buka mall, atau jadwal survei lokasi?
+          </div>
+        </div>
+      </div>
+
+      <div class="px-3 py-2 bg-slate-950/80 border-t border-slate-800 flex gap-1.5 overflow-x-auto text-[10px]">
+        <button onclick="sendWidgetQuickPrompt('Berapa harga sewa unit Studio Kalibata City?')" class="bg-slate-900 px-2.5 py-1 rounded-lg text-slate-300 whitespace-nowrap hover:bg-slate-800">
+          Studio Rate
+        </button>
+        <button onclick="sendWidgetQuickPrompt('Jam berapa Mall Kalibata City Square buka?')" class="bg-slate-900 px-2.5 py-1 rounded-lg text-slate-300 whitespace-nowrap hover:bg-slate-800">
+          Jam Buka Mall
+        </button>
+        <button onclick="sendWidgetQuickPrompt('Jadwalkan survei unit 2BR')" class="bg-slate-900 px-2.5 py-1 rounded-lg text-slate-300 whitespace-nowrap hover:bg-slate-800">
+          Survei 2BR
+        </button>
+      </div>
+
+      <div class="p-3 bg-slate-900/95 border-t border-slate-800 flex gap-2">
+        <input type="text" id="widget-input" placeholder="Tanyakan seputar unit & mall..." class="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none text-slate-100">
+        <button onclick="handleWidgetSend()" id="btn-widget-send" class="px-3.5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow transition flex items-center justify-center">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toggle Floating Buttons -->
+    <div class="flex items-center gap-2">
+      <button onclick="openWhatsAppDirect()" title="Chat WhatsApp Pengelola" class="w-11 h-11 md:w-12 md:h-12 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-full shadow-2xl shadow-emerald-600/50 flex items-center justify-center transition transform hover:scale-105">
+        <span class="text-xs md:text-sm font-bold">WA</span>
+      </button>
+      <button onclick="toggleFloatingChat()" class="px-4 py-3 md:px-5 md:py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full shadow-2xl shadow-rose-600/50 flex items-center gap-2 transition transform hover:scale-105">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs md:text-sm">Tanya Rose AI</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/landing.js"></script>
+</body>
+</html>
+'@
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/index.html", $indexHtml, $Utf8NoBomEncoding)
+
+Write-Host "`n[SUCCESS] Mobile Responsive Engine v8.0 successfully applied!" -ForegroundColor Green

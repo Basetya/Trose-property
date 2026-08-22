@@ -320,3 +320,14 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchDashboard();
   }
 });
+// Mobile Drawer Handler
+function toggleMobileDrawer() {
+  const drawer = document.getElementById("mobile-drawer");
+  if (drawer) {
+    if (drawer.classList.contains("hidden")) {
+      drawer.classList.remove("hidden");
+    } else {
+      drawer.classList.add("hidden");
+    }
+  }
+}

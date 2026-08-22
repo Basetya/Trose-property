@@ -1,21 +1,22 @@
+/* Trose Property Manager - Mobile Responsive & Glassmorphism Styling (v8.0) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
-body {
+* {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.kanban-col {
-  min-height: 520px;
+body {
+  margin: 0;
+  padding: 0;
 }
 
-.modal-backdrop {
-  background-color: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-}
-
-/* Local Background Image with Optimized Contrast Overlay */
 .bg-kalibata {
-  background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.80), rgba(15, 23, 42, 0.94)), url('../img/bg-kalibata.webp');
+  background-color: #020617;
+  background-image: 
+    linear-gradient(to bottom, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.96)),
+    url('../img/bg-kalibata.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -23,13 +24,31 @@ body {
 }
 
 .glass-panel {
-  background: rgba(15, 23, 42, 0.80);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(30, 41, 59, 0.70);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(30, 41, 59, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 63, 94, 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 63, 94, 0.7);
 }
