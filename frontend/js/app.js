@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Dashboard Logic & AI Studio Handlers (v9.0)
+ * Kusuma Properti Manager - Dashboard Logic & Visual Controller (v11.2)
  * Dual-Layer Storage: Seamless Online & Local Sync
  * File: frontend/js/app.js
  */
@@ -97,7 +97,74 @@ function renderDashboard(data) {
   }
 }
 
-// AI KNOWLEDGE BASE & GUARDRAILS LOGIC (Dual-Layer Sync)
+// ==========================================
+// DYNAMIC VISUAL CONTROLLER (Live Reactive Preview)
+// ==========================================
+let currentVisualState = {
+  opacity: "90",
+  brightness: "100",
+  contrast: "100"
+};
+
+function initVisualSettings() {
+  currentVisualState.opacity = localStorage.getItem("kusuma_bg_opacity") || "90";
+  currentVisualState.brightness = localStorage.getItem("kusuma_bg_brightness") || "100";
+  currentVisualState.contrast = localStorage.getItem("kusuma_bg_contrast") || "100";
+
+  applyVisualThemeToDocument(currentVisualState.opacity, currentVisualState.brightness, currentVisualState.contrast);
+
+  const sliderOp = document.getElementById("slider-opacity");
+  const sliderBr = document.getElementById("slider-brightness");
+  const sliderCt = document.getElementById("slider-contrast");
+
+  if (sliderOp) { sliderOp.value = currentVisualState.opacity; document.getElementById("val-opacity").innerText = currentVisualState.opacity + "%"; }
+  if (sliderBr) { sliderBr.value = currentVisualState.brightness; document.getElementById("val-brightness").innerText = currentVisualState.brightness + "%"; }
+  if (sliderCt) { sliderCt.value = currentVisualState.contrast; document.getElementById("val-contrast").innerText = currentVisualState.contrast + "%"; }
+}
+
+function handleVisualSliderLive(type, value) {
+  if (type === 'opacity') {
+    currentVisualState.opacity = value;
+    const label = document.getElementById("val-opacity");
+    if (label) label.innerText = value + "%";
+  } else if (type === 'brightness') {
+    currentVisualState.brightness = value;
+    const label = document.getElementById("val-brightness");
+    if (label) label.innerText = value + "%";
+  } else if (type === 'contrast') {
+    currentVisualState.contrast = value;
+    const label = document.getElementById("val-contrast");
+    if (label) label.innerText = value + "%";
+  }
+
+  // Live Instant Preview pada dokumen
+  applyVisualThemeToDocument(currentVisualState.opacity, currentVisualState.brightness, currentVisualState.contrast);
+}
+
+function applyVisualThemeToDocument(op, br, ct) {
+  const root = document.documentElement;
+  root.style.setProperty("--bg-overlay-opacity", (Number(op) / 100).toString());
+  root.style.setProperty("--bg-brightness", br + "%");
+  root.style.setProperty("--bg-contrast", ct + "%");
+}
+
+function saveVisualSettingsManual() {
+  localStorage.setItem("kusuma_bg_opacity", currentVisualState.opacity);
+  localStorage.setItem("kusuma_bg_brightness", currentVisualState.brightness);
+  localStorage.setItem("kusuma_bg_contrast", currentVisualState.contrast);
+  showToast("Pengaturan visual latar belakang berhasil disimpan!");
+}
+
+function resetVisualSettings() {
+  currentVisualState = { opacity: "90", brightness: "100", contrast: "100" };
+  localStorage.setItem("kusuma_bg_opacity", "90");
+  localStorage.setItem("kusuma_bg_brightness", "100");
+  localStorage.setItem("kusuma_bg_contrast", "100");
+  initVisualSettings();
+  showToast("Pengaturan visual latar belakang direset ke default!");
+}
+
+// AI KNOWLEDGE BASE & GUARDRAILS LOGIC
 async function loadAiConfig() {
   const kbArea = document.getElementById("ai-kb-text");
   const grArea = document.getElementById("ai-guardrail-text");
@@ -155,7 +222,7 @@ async function handleSaveAiConfig(e) {
   const btn = document.getElementById("btn-save-ai");
 
   btn.disabled = true;
-  btn.innerText = "Menyimpan ke Kusuma AI...";
+  btn.innerText = "Menyimpan...";
 
   localStorage.setItem("kusuma_ai_kb", kbVal);
   localStorage.setItem("kusuma_ai_gr", grVal);
@@ -170,74 +237,15 @@ async function handleSaveAiConfig(e) {
     }, "POST");
 
     if (res && res.success) {
-      showToast(res.message || "Knowledge Base & Guardrails Kusuma AI berhasil diperbarui di Server & Browser!");
+      showToast(res.message || "Knowledge Base & Guardrails Kusuma AI berhasil disimpan!");
     } else {
-      showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser Kusuma AI Engine!");
+      showToast("Knowledge Base & Guardrails disimpan aktif di Browser!");
     }
   } catch (err) {
-    showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser Kusuma AI Engine!");
+    showToast("Knowledge Base & Guardrails disimpan aktif di Browser!");
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
-  }
-}
-
-async function handleClearAiConfig() {
-  if (!confirm("PERINGATAN: Kosongkan seluruh Knowledge Base dan Guardrails yang tersimpan?")) {
-    return;
-  }
-
-  localStorage.removeItem("kusuma_ai_kb");
-  localStorage.removeItem("kusuma_ai_gr");
-  localStorage.removeItem("trose_ai_kb");
-  localStorage.removeItem("trose_ai_gr");
-  document.getElementById("ai-kb-text").value = "";
-  document.getElementById("ai-guardrail-text").value = "";
-
-  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
-  try {
-    await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
-  } catch (err) {
-    console.warn("GAS clear fallback:", err);
-  }
-
-  showToast("Seluruh Knowledge Base & Guardrails berhasil dikosongkan!");
-}
-
-async function handleWipeDatabase() {
-  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets?")) {
-    return;
-  }
-
-  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
-  
-  renderDashboard({
-    success: true,
-    stats: {
-      totalUnits: 0,
-      occupiedUnits: 0,
-      availableUnits: 0,
-      occupancyRate: "0%",
-      totalRevenueDue: 0,
-      totalCollected: 0,
-      totalOutstanding: 0,
-      directLandlordDue: 0,
-      centralManagementDue: 0,
-      activeLeads: 0,
-      openMaintenance: 0
-    },
-    recentInvoices: []
-  });
-
-  try {
-    const res = await gasApiCall("wipeAllMockupData", { passcode: currentPasscode }, "POST");
-    if (res && res.success) {
-      showToast("Database Google Sheets berhasil di-wipe bersih ke Zero State!");
-    } else {
-      showToast("Tampilan Dashboard berhasil direset ke Zero State!");
-    }
-  } catch (err) {
-    showToast("Tampilan Dashboard berhasil direset ke Zero State!");
+    btn.innerText = "Simpan Knowledge";
   }
 }
 
@@ -251,7 +259,7 @@ function handleAiFileUpload(event) {
     const kbArea = document.getElementById("ai-kb-text");
     if (kbArea) {
       kbArea.value = content;
-      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base Kusuma AI!`);
+      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base!`);
     }
   };
   reader.readAsText(file);
@@ -283,7 +291,7 @@ async function handleSaveWaSettings(e) {
     showToast("Nomor WhatsApp berhasil diperbarui!");
   } finally {
     btn.disabled = false;
-    btn.innerText = "Simpan Nomor WA";
+    btn.innerText = "Simpan WA";
   }
 }
 
@@ -310,12 +318,6 @@ function requestVerifyPayment(invoiceId) {
     .catch(() => showToast("Error menghubungi server", "error"));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("stat-occupancy")) {
-    fetchDashboard();
-  }
-});
-
 function toggleMobileDrawer() {
   const drawer = document.getElementById("mobile-drawer");
   if (drawer) {
@@ -326,3 +328,10 @@ function toggleMobileDrawer() {
     }
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  initVisualSettings();
+  if (document.getElementById("stat-occupancy")) {
+    fetchDashboard();
+  }
+});
