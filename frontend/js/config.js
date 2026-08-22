@@ -7,7 +7,7 @@ const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzX9pZnyEmHZsxrehzL
 
 // Default Nomor WhatsApp Resmi Kalibata City
 let OFFICIAL_WA_NUMBER = "+6281221559000";
-const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti disini, ada yang bisa saya bantu?";
+const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti, saya ingin konsultasi mengenai sewa unit apartemen.";
 
 async function gasApiCall(action, params = {}, method = "GET") {
   if (method === "GET") {
