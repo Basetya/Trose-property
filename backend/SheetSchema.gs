@@ -1,6 +1,6 @@
 /**
- * Trose Property Manager - Clean Database Initializer (v7.4)
- * Header-only structure with ZERO dummy rows for a clean slate.
+ * Kusuma Properti Manager - Clean Database Initializer (v9.0)
+ * Header-only structure with ZERO dummy rows.
  * File: backend/SheetSchema.gs
  */
 
@@ -79,5 +79,5 @@ function initializeAllSheets() {
     sheet.setFrozenRows(1);
   });
 
-  return "Seluruh 9 Tab Database Berhasil Diinisialisasi Bersih (Clean Slate)!";
+  return "Seluruh 9 Tab Database Kusuma Properti Berhasil Diinisialisasi Bersih!";
 }

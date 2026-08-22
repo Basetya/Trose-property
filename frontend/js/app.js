@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Dashboard Logic & AI Studio Handlers (v7.9)
+ * Kusuma Properti Manager - Dashboard Logic & AI Studio Handlers (v9.0)
  * Dual-Layer Storage: Seamless Online & Local Sync
  * File: frontend/js/app.js
  */
@@ -103,24 +103,22 @@ async function loadAiConfig() {
   const grArea = document.getElementById("ai-guardrail-text");
   if (!kbArea || !grArea) return;
 
-  // 1. Cek LocalStorage Terlebih Dahulu
-  const localKb = localStorage.getItem("trose_ai_kb");
-  const localGr = localStorage.getItem("trose_ai_gr");
+  const localKb = localStorage.getItem("kusuma_ai_kb") || localStorage.getItem("trose_ai_kb");
+  const localGr = localStorage.getItem("kusuma_ai_gr") || localStorage.getItem("trose_ai_gr");
 
   if (localKb !== null) kbArea.value = localKb;
   if (localGr !== null) grArea.value = localGr;
 
-  // 2. Sinkronkan dengan Server Jika Tersedia
   try {
     const res = await gasApiCall("getAiConfig", {}, "GET");
     if (res && res.success) {
       if (res.knowledgeBase !== undefined) {
         kbArea.value = res.knowledgeBase;
-        localStorage.setItem("trose_ai_kb", res.knowledgeBase);
+        localStorage.setItem("kusuma_ai_kb", res.knowledgeBase);
       }
       if (res.guardrails !== undefined) {
         grArea.value = res.guardrails;
-        localStorage.setItem("trose_ai_gr", res.guardrails);
+        localStorage.setItem("kusuma_ai_gr", res.guardrails);
       }
     }
   } catch (err) {
@@ -132,7 +130,7 @@ function resetToStandardDefaults() {
   const kbArea = document.getElementById("ai-kb-text");
   const grArea = document.getElementById("ai-guardrail-text");
   if (kbArea) {
-    kbArea.value = "SUPERBLOCK KALIBATA CITY INFORMATION:\n" +
+    kbArea.value = "SUPERBLOCK KALIBATA CITY INFORMATION (KUSUMA PROPERTI):\n" +
       "- 18 Tower Total: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.\n" +
       "- Tower Green Palace (Mawar s/d Viola) memiliki akses kolam renang tematik & gym indoor.\n" +
       "- Tarif Sewa Bulanan: Studio (Rp 2.8Jt - 3.5Jt/bln), 2BR Standard (Rp 3.8Jt - 4.5Jt/bln), 2BR Green Palace (Rp 4.5Jt - 5.5Jt/bln).\n" +
@@ -141,13 +139,13 @@ function resetToStandardDefaults() {
       "- Stasiun KRL Duren Kalibata berjarak 200m (2 menit jalan kaki).";
   }
   if (grArea) {
-    grArea.value = "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Trose Property hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
+    grArea.value = "1. NO DAILY RENTALS: Tolak dengan sopan pertanyaan sewa harian/transit/per malam. Jelaskan bahwa Kusuma Properti hanya menyediakan sewa bulanan dan tahunan demi keamanan & kenyamanan.\n" +
       "2. STRICT PROPERTY DOMAIN: Hanya jawab seputar properti, fasilitas, sewa, dan jadwal viewing di Kalibata City.\n" +
       "3. PRIVACY PROTECTION: Dilarang membeberkan nama pemilik unit atau nomor rekening pribadi landlord kepada publik.\n" +
       "4. VERIFICATION PROTOCOL: Data privat penyewa (masa sewa, sisa tagihan) hanya boleh dijawab jika Single ID (CNT-XXXX) atau No WA cocok di database.\n" +
       "5. LEAD CAPTURE: Arahkan pengguna menjadwalkan survei unit (viewing) atau klik tombol WhatsApp Admin.";
   }
-  showToast("Template default Kalibata City dimuat ke editor!");
+  showToast("Template default Kusuma Properti dimuat ke editor!");
 }
 
 async function handleSaveAiConfig(e) {
@@ -157,15 +155,13 @@ async function handleSaveAiConfig(e) {
   const btn = document.getElementById("btn-save-ai");
 
   btn.disabled = true;
-  btn.innerText = "Menyimpan ke AI Engine...";
+  btn.innerText = "Menyimpan ke Kusuma AI...";
 
-  // 1. Simpan Segera ke Local Storage Browser (Zero Lag & Guaranteed Success)
-  localStorage.setItem("trose_ai_kb", kbVal);
-  localStorage.setItem("trose_ai_gr", grVal);
+  localStorage.setItem("kusuma_ai_kb", kbVal);
+  localStorage.setItem("kusuma_ai_gr", grVal);
 
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
 
-  // 2. Sinkronkan ke Google Apps Script Server
   try {
     const res = await gasApiCall("saveAiConfig", { 
       passcode: currentPasscode,
@@ -174,13 +170,12 @@ async function handleSaveAiConfig(e) {
     }, "POST");
 
     if (res && res.success) {
-      showToast(res.message || "Knowledge Base & Guardrails Rose AI berhasil diperbarui di Server & Browser!");
+      showToast(res.message || "Knowledge Base & Guardrails Kusuma AI berhasil diperbarui di Server & Browser!");
     } else {
-      showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
+      showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser Kusuma AI Engine!");
     }
   } catch (err) {
-    // Tetap sukses di level browser/client
-    showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser AI Engine!");
+    showToast("Knowledge Base & Guardrails berhasil disimpan aktif di Browser Kusuma AI Engine!");
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<span>Simpan Knowledge & Guardrails</span><span>&rarr;</span>`;
@@ -192,13 +187,14 @@ async function handleClearAiConfig() {
     return;
   }
 
-  // 1. Bersihkan Local Storage
+  localStorage.removeItem("kusuma_ai_kb");
+  localStorage.removeItem("kusuma_ai_gr");
   localStorage.removeItem("trose_ai_kb");
   localStorage.removeItem("trose_ai_gr");
   document.getElementById("ai-kb-text").value = "";
   document.getElementById("ai-guardrail-text").value = "";
 
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
   try {
     await gasApiCall("clearAiConfig", { passcode: currentPasscode }, "POST");
   } catch (err) {
@@ -209,13 +205,12 @@ async function handleClearAiConfig() {
 }
 
 async function handleWipeDatabase() {
-  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets? Angka di dashboard akan menjadi 0 permanen sampai Anda mengisi data riil baru.")) {
+  if (!confirm("KONFIRMASI WIPE: Apakah Anda yakin ingin MENGHAPUS SEMUA BARIS DATA DUMMY / MOCKUP di seluruh tab Google Sheets?")) {
     return;
   }
 
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
   
-  // Reset visual langsung
   renderDashboard({
     success: true,
     stats: {
@@ -256,7 +251,7 @@ function handleAiFileUpload(event) {
     const kbArea = document.getElementById("ai-kb-text");
     if (kbArea) {
       kbArea.value = content;
-      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base!`);
+      showToast(`File ${file.name} berhasil diunggah ke editor Knowledge Base Kusuma AI!`);
     }
   };
   reader.readAsText(file);
@@ -272,10 +267,10 @@ async function handleSaveWaSettings(e) {
   btn.disabled = true;
   btn.innerText = "Menyimpan...";
 
-  localStorage.setItem("trose_official_wa", val);
+  localStorage.setItem("kusuma_official_wa", val);
   OFFICIAL_WA_NUMBER = val;
 
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
 
   try {
     const res = await gasApiCall("updatePublicSettings", { passcode: currentPasscode, waNumber: val }, "POST");
@@ -295,14 +290,14 @@ async function handleSaveWaSettings(e) {
 function testWaLink() {
   const input = document.getElementById("admin-wa-input");
   const val = input ? input.value.trim() : OFFICIAL_WA_NUMBER;
-  const url = `https://wa.me/${val.replace(/[^0-9]/g, '')}?text=Tes%20koneksi%20WhatsApp%20Trose%20Property`;
+  const url = `https://wa.me/${val.replace(/[^0-9]/g, '')}?text=Tes%20koneksi%20WhatsApp%20Kusuma%20Properti`;
   window.open(url, '_blank');
 }
 
 function requestVerifyPayment(invoiceId) {
   if (!confirm(`Verifikasi pembayaran untuk invoice ${invoiceId} sebagai LUNAS?`)) return;
 
-  const currentPasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
   gasApiCall("verifyPayment", { passcode: currentPasscode, invoiceId: invoiceId }, "POST")
     .then(res => {
       if (res && res.success) {
@@ -320,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchDashboard();
   }
 });
-// Mobile Drawer Handler
+
 function toggleMobileDrawer() {
   const drawer = document.getElementById("mobile-drawer");
   if (drawer) {

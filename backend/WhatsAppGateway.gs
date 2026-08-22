@@ -1,5 +1,5 @@
-﻿/**
- * Trose Property Manager - Collision-Proof WhatsApp Gateway
+/**
+ * Kusuma Properti Manager - Collision-Proof WhatsApp Gateway (v9.0)
  * File: backend/WhatsAppGateway.gs
  */
 
@@ -41,7 +41,7 @@ function handleIncomingWhatsAppWebhook(payload) {
       "",
       "Lead",
       50,
-      "Inbound via Trose WA Auto-Registration",
+      "Inbound via Kusuma Properti WA Auto-Registration",
       new Date().toISOString()
     ]);
 
@@ -60,7 +60,7 @@ function handleIncomingWhatsAppWebhook(payload) {
   }
 
   const aiResult = handleGeminiAiChat(messageText, cleanPhone);
-  const replyMessage = aiResult.reply || "Terima kasih telah menghubungi Trose Property Manager. Tim kami akan segera membantu Anda.";
+  const replyMessage = aiResult.reply || "Terima kasih telah menghubungi Kusuma Properti. Tim konsultan kami akan segera membantu Anda.";
 
   sendWhatsAppMessage(cleanPhone, replyMessage);
 
@@ -76,7 +76,7 @@ function sendWhatsAppMessage(targetPhone, messageText) {
   const waApiToken = scriptProperties.getProperty("WA_GATEWAY_TOKEN");
 
   if (!waApiToken) {
-    Logger.log("[Trose WA Simulasi]: " + messageText + " ke " + targetPhone);
+    Logger.log("[Kusuma Properti WA Simulasi]: " + messageText + " ke " + targetPhone);
     return;
   }
 

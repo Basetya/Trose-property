@@ -1,13 +1,13 @@
 /**
- * Trose Property Manager - Central Config & Dynamic Settings (v7.7)
+ * Kusuma Properti Manager - Central Config & Dynamic Settings (v9.0)
  * File: frontend/js/config.js
  */
 
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzX9pZnyEmHZsxrehzLSSIdjQ-QIHt5Gt6kdJSgct-QnXpx73WQJhkjlNE0CQ5sSys/exec";
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz_SAMPLE_DEPLOYMENT_ID/exec";
 
 // Default Nomor WhatsApp Resmi Kalibata City
 let OFFICIAL_WA_NUMBER = "+6281221559000";
-const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti, saya ingin konsultasi mengenai sewa unit apartemen.";
+const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti Kalibata City, saya ingin konsultasi mengenai sewa unit apartemen.";
 
 async function gasApiCall(action, params = {}, method = "GET") {
   if (method === "GET") {
@@ -21,8 +21,7 @@ async function gasApiCall(action, params = {}, method = "GET") {
     });
     return await response.json();
   } else {
-    // Ambil passcode aktif atau fallback ke trose288 agar tidak pernah terjadi Unauthorized
-    const activePasscode = sessionStorage.getItem("trose_admin_passcode") || "trose288";
+    const activePasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
 
     const payload = JSON.stringify({
       action: action,

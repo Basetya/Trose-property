@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Trose Property Manager - Admin Cockpit</title>
+  <title>Kusuma Properti Manager - Admin Cockpit</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
 <body class="bg-slate-950 text-slate-100 bg-kalibata min-h-screen pb-20 md:pb-0">
   
-  <!-- Mobile Header Bar (Hanya muncul di Layar HP) -->
+  <!-- Mobile Header Bar -->
   <header class="md:hidden sticky top-0 z-40 glass-panel border-b border-slate-800 px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <button onclick="toggleMobileDrawer()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white focus:outline-none" aria-label="Buka Menu">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
-      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">K</div>
       <div>
-        <h1 class="font-extrabold text-xs text-white leading-tight">Trose Admin</h1>
+        <h1 class="font-extrabold text-xs text-white leading-tight">Kusuma Admin</h1>
         <p class="text-[10px] text-rose-400 font-medium">Kalibata City Cockpit</p>
       </div>
     </div>
@@ -29,13 +29,13 @@
     </div>
   </header>
 
-  <!-- Mobile Slide-Over Navigation Drawer (Menu Lengkap untuk HP) -->
+  <!-- Mobile Slide-Over Navigation Drawer -->
   <div id="mobile-drawer" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-300">
     <div class="fixed inset-y-0 left-0 max-w-[280px] w-full bg-slate-900 border-r border-slate-800 p-5 flex flex-col justify-between shadow-2xl overflow-y-auto">
       <div>
         <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">T</div>
+            <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-black text-sm text-white shadow">K</div>
             <h2 class="font-bold text-sm text-white">Menu Navigasi</h2>
           </div>
           <button onclick="toggleMobileDrawer()" class="p-1.5 rounded-lg text-slate-400 hover:text-white">&times;</button>
@@ -69,7 +69,7 @@
             <span>Maintenance (Tiket Teknisi)</span>
           </a>
           <a href="concierge.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
-            <span>Fullscreen AI Concierge</span>
+            <span>Fullscreen Kusuma AI</span>
           </a>
           <a href="owner-portal.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800">
             <span>Portal Pemilik (Landlord)</span>
@@ -85,13 +85,13 @@
   </div>
 
   <div class="flex h-screen overflow-hidden">
-    <!-- Desktop Sidebar Navigation (Layar Laptop / PC) -->
+    <!-- Desktop Sidebar Navigation -->
     <aside class="w-64 glass-panel border-r border-slate-800/80 p-5 flex flex-col justify-between hidden md:flex">
       <div>
         <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">T</div>
+          <div class="w-10 h-10 rounded-2xl bg-rose-600 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-rose-500/30">K</div>
           <div>
-            <h1 class="font-bold text-base text-white leading-tight">Trose</h1>
+            <h1 class="font-bold text-base text-white leading-tight">Kusuma</h1>
             <p class="text-xs text-rose-400 font-medium">Kalibata City Admin</p>
           </div>
         </div>
@@ -127,7 +127,7 @@
       </div>
       <div class="space-y-2">
         <div class="glass-card p-3 rounded-xl text-xs">
-          <p class="text-slate-400 font-medium">Kalibata City Engine:</p>
+          <p class="text-slate-400 font-medium">Kusuma Properti Engine:</p>
           <p class="font-mono text-emerald-400 font-bold mt-0.5">Google Sheets Active</p>
         </div>
         <button onclick="logoutAdminSession()" class="w-full text-xs text-slate-400 hover:text-rose-400 p-2 text-center rounded-lg hover:bg-slate-900 transition flex items-center justify-center gap-1.5 font-semibold">
@@ -144,7 +144,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 class="text-xl md:text-2xl font-black text-white">Kalibata City Cockpit</h2>
-            <p class="text-xs md:text-sm text-slate-300">Portofolio & Operasional Apartemen Kalibata City</p>
+            <p class="text-xs md:text-sm text-slate-300">Portofolio & Operasional Apartemen Kusuma Properti</p>
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <button onclick="handleWipeDatabase()" title="Hapus semua baris data mockup di Sheets" class="px-3 py-2 bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-800/80 text-xs font-bold rounded-xl transition shadow">
@@ -159,7 +159,7 @@
           </div>
         </div>
 
-        <!-- Metrics Grid (Responsive 2-Col Mobile / 4-Col Desktop) -->
+        <!-- Metrics Grid -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <div class="glass-card p-4 md:p-5 rounded-2xl md:rounded-3xl">
             <span class="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider">Occupancy</span>
@@ -189,9 +189,9 @@
             <div>
               <h3 class="font-extrabold text-base md:text-xl text-white flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                Rose AI Knowledge Base & Guardrails Studio
+                Kusuma AI Knowledge Base & Guardrails Studio
               </h3>
-              <p class="text-[11px] md:text-xs text-slate-400 mt-0.5">Kelola pengetahuan sewa & batasan aturan Rose AI secara real-time.</p>
+              <p class="text-[11px] md:text-xs text-slate-400 mt-0.5">Kelola pengetahuan sewa & batasan aturan Kusuma AI secara real-time.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <label class="cursor-pointer px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
@@ -299,7 +299,7 @@
     </main>
   </div>
 
-  <!-- Quick Mobile Bottom Navigation (Akses 1-Tap Khusus HP) -->
+  <!-- Quick Mobile Bottom Navigation -->
   <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-800 px-3 py-2 flex justify-around items-center text-[10px] font-bold">
     <a href="dashboard.html" class="flex flex-col items-center text-rose-500">
       <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>

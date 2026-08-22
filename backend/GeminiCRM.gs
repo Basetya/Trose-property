@@ -1,6 +1,6 @@
 /**
- * Trose Property Manager - Rose AI Concierge Engine (v7.1)
- * Dynamic Knowledge Base & Purge / Context Sanitization
+ * Kusuma Properti Manager - Kusuma AI Concierge Engine (v9.0)
+ * Dynamic Knowledge Base & Context Sanitization
  * File: backend/GeminiCRM.gs
  */
 
@@ -8,20 +8,18 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
   const scriptProperties = PropertiesService.getScriptProperties();
   const apiKey = scriptProperties.getProperty("GEMINI_API_KEY");
 
-  // 1. Ambil Knowledge Base & Guardrails Dinamis
   const storedKb = scriptProperties.getProperty("AI_KNOWLEDGE_BASE");
   const storedGr = scriptProperties.getProperty("AI_GUARDRAILS");
 
   const customKnowledgeBase = storedKb !== null ? storedKb : getDefaultKnowledgeBase();
   const customGuardrails = storedGr !== null ? storedGr : getDefaultGuardrails();
 
-  // 2. Ambil data inventori unit aktual dari tab 02_UNITS Google Sheets
   let liveUnitInventory = "";
   try {
     const units = getSheetDataAsJson("02_UNITS");
     const availableUnits = units.filter(u => u.Status === "Available");
     if (availableUnits.length > 0) {
-      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME SHEETS DATABASE):\n";
+      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME DATABASE KUSUMA PROPERTI):\n";
       availableUnits.forEach(u => {
         liveUnitInventory += `- ${u.Tower} No.${u.Unit_No} (${u.Type}): Rp${Number(u.Base_Rent).toLocaleString("id-ID")}/bln (Rute: ${u.Payment_Route}).\n`;
       });
@@ -32,7 +30,6 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
     liveUnitInventory = "Katalog sewa bulanan dan tahunan Kalibata City aktif.\n";
   }
 
-  // 3. Verifikasi Identitas Pengguna (Single ID / WhatsApp)
   const cleanId = String(senderIdentifier || '').replace(/[^a-zA-Z0-9-]/g, '');
   let verifiedCustomerContext = "";
 
@@ -60,7 +57,6 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
     Logger.log("Customer context resolution error: " + err.toString());
   }
 
-  // Fallback respons lokal jika GEMINI_API_KEY belum terpasang
   if (!apiKey) {
     return {
       success: true,
@@ -68,8 +64,7 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
     };
   }
 
-  // 4. Master Directive Prompt
-  const systemPrompt = `Anda adalah "Rose", Asisten Virtual AI & Leasing Concierge resmi untuk Trose Property di Superblock Apartemen Kalibata City, Jakarta Selatan.
+  const systemPrompt = `Anda adalah "Kusuma AI", Asisten Virtual AI & Leasing Concierge resmi untuk Kusuma Properti di Superblock Apartemen Kalibata City, Jakarta Selatan.
 
 ${customKnowledgeBase ? '=== KNOWLEDGE BASE AKTIF DARI PENGELOLA ===\n' + customKnowledgeBase : '=== KNOWLEDGE BASE: Default Clean Property Context ==='}
 
@@ -130,10 +125,10 @@ function generateStructuredOfflineAnswer(userQuery, kb, gr) {
   const q = String(userQuery || '').toLowerCase();
   
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Trose Property berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni. Apakah Anda ingin mengetahui pilihan unit bulanan kami?";
+    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni. Apakah Anda ingin mengetahui pilihan unit bulanan kami?";
   }
   if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("tarif") || q.includes("rate") || q.includes("sewa")) {
-    return "Berikut pilihan sewa bulanan resmi di Kalibata City:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bulan\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bulan\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bulan\nSemua unit Full Furnished siap huni. Kami juga melayani sewa tahunan dengan tarif lebih hemat.";
+    return "Berikut pilihan sewa bulanan resmi di Kalibata City bersama Kusuma Properti:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bulan\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bulan\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bulan\nSemua unit Full Furnished siap huni. Kami juga melayani sewa tahunan dengan tarif lebih hemat.";
   }
   if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("mall") || q.includes("green palace")) {
     return "Fasilitas lengkap di kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, XXI, kuliner 24 jam).\n- Kolam renang tematik (Adult & Kids Pool) dan Gym Center di Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
@@ -142,8 +137,8 @@ function generateStructuredOfflineAnswer(userQuery, kb, gr) {
     return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan perkantoran Kuningan (Rasuna Said) serta Gatot Subroto.";
   }
   if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal")) {
-    return "Tentu! Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp Admin' untuk konfirmasi jam kunjungan Anda bersama tim konsultan kami.";
+    return "Tentu! Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp Admin' untuk konfirmasi jam kunjungan Anda bersama tim konsultan Kusuma Properti.";
   }
 
-  return "Halo! Saya Rose, AI Concierge resmi Apartemen Kalibata City. Kami siap membantu informasi sewa unit bulanan dan tahunan, fasilitas Superblock, maupun jadwal survei lokasi. Ada yang bisa saya bantu?";
+  return "Halo! Saya Kusuma AI, Concierge resmi Apartemen Kalibata City dari Kusuma Properti. Kami siap membantu informasi sewa unit bulanan dan tahunan, fasilitas Superblock, maupun jadwal survei lokasi. Ada yang bisa saya bantu?";
 }

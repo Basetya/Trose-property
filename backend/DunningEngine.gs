@@ -1,5 +1,5 @@
-﻿/**
- * Trose Property Manager - Automated WhatsApp Dunning Engine (v8.1)
+/**
+ * Kusuma Properti Manager - Automated WhatsApp Dunning Engine (v9.0)
  * File: backend/DunningEngine.gs
  */
 
@@ -12,7 +12,6 @@ function runDailyDunningScheduler() {
   const unpaidInvoices = invoices.filter(inv => inv.Status === "Unpaid");
   let dispatchedCount = 0;
 
-  // Mengambil URL Web App aktif secara dinamis
   let webAppUrl = "";
   try {
     webAppUrl = ScriptApp.getService().getUrl();
@@ -30,20 +29,20 @@ function runDailyDunningScheduler() {
       const invoiceUrl = webAppUrl ? `${webAppUrl}?action=getInvoiceDetail&invoiceId=${inv.Invoice_ID}` : `ID Tagihan: ${inv.Invoice_ID}`;
       
       const msg = `Halo Bapak/Ibu ${tenant.Full_Name || 'Penyewa'},\n\n` +
-        `Berikut pengingat tagihan sewa apartemen Kalibata City untuk:\n` +
+        `Berikut pengingat tagihan sewa apartemen Kalibata City dari Kusuma Properti untuk:\n` +
         `Unit: ${unit.Tower || 'Tower'} #${unit.Unit_No || inv.Unit_ID}\n` +
         `Periode: ${inv.Period || 'Bulan Ini'}\n` +
         `Total Pembayaran: Rp ${Number(inv.Total_Amount || 0).toLocaleString('id-ID')} (termasuk 3 digit kode unik)\n\n` +
         `Rute Rekening Transfer:\n` +
         `${inv.Destination_Bank || inv.Bank_Name || 'BCA'} No. Rek: ${inv.Destination_Account_No || inv.Bank_Account_No || '-'} a.n. ${inv.Destination_Account_Holder || inv.Bank_Holder_Name || '-'}\n\n` +
-        `Tautan Konfirmasi Pembayaran:\n` +
+        `Tautan Konfirmasi Bukti Pembayaran:\n` +
         `${invoiceUrl}\n\n` +
-        `Terima kasih atas kerja sama Anda.\n- Manajemen Trose Property`;
+        `Terima kasih atas kerja sama Anda.\n- Tim Manajemen Kusuma Properti`;
 
       sendWhatsAppMessage(cleanPhone, msg);
       dispatchedCount++;
     }
   });
 
-  return { success: true, message: `Dunning berhasil dijalankan: ${dispatchedCount} pesan pengingat terkirim.` };
+  return { success: true, message: `Dunning Kusuma Properti berhasil dijalankan: ${dispatchedCount} reminder terkirim.` };
 }

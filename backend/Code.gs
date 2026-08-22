@@ -1,5 +1,5 @@
 /**
- * Trose Property Manager - Production Controller Clean Baseline (v7.7)
+ * Kusuma Properti Manager - Production Controller Clean Baseline (v9.0)
  * File: backend/Code.gs
  */
 
@@ -19,9 +19,9 @@ function doGet(e) {
       };
     } else if (action === "verifyPasscode") {
       const inputPasscode = String(e.parameter.passcode || "").trim().toLowerCase();
-      const spPasscode = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
-      if (inputPasscode === spPasscode || inputPasscode === "trose288" || inputPasscode === "trose2026") {
-        responseData = { success: true, message: "Authentication successful." };
+      const spPasscode = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
+      if (inputPasscode === spPasscode || inputPasscode === "kusuma288" || inputPasscode === "trose288") {
+        responseData = { success: true, message: "Autentikasi admin berhasil." };
       } else {
         responseData = { success: false, error: "Passcode salah! Akses ditolak." };
       }
@@ -80,10 +80,9 @@ function doPost(e) {
 
     if (!publicActions.includes(action)) {
       const inputPass = String(postData.passcode || "").trim().toLowerCase();
-      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
+      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
       
-      // Mengizinkan passcode yang cocok dengan Script Properties atau default resmi trose288
-      if (inputPass !== expectedPass && inputPass !== "trose288" && inputPass !== "trose2026") {
+      if (inputPass !== expectedPass && inputPass !== "kusuma288" && inputPass !== "trose288") {
         return ContentService.createTextOutput(JSON.stringify({
           success: false,
           error: "Unauthorized: Invalid or missing Admin Passcode"
@@ -97,7 +96,7 @@ function doPost(e) {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", String(postData.knowledgeBase || "").trim());
       sp.setProperty("AI_GUARDRAILS", String(postData.guardrails || "").trim());
-      responseData = { success: true, message: "Knowledge Base & Guardrails Rose AI berhasil diperbarui!" };
+      responseData = { success: true, message: "Knowledge Base & Guardrails Kusuma AI berhasil diperbarui!" };
     } else if (action === "clearAiConfig") {
       const sp = PropertiesService.getScriptProperties();
       sp.setProperty("AI_KNOWLEDGE_BASE", "");
@@ -111,8 +110,8 @@ function doPost(e) {
       responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
     } else if (action === "verifyPasscode") {
       const inputPass = String(postData.passcode || "").trim().toLowerCase();
-      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "trose288").trim().toLowerCase();
-      if (inputPass === expectedPass || inputPass === "trose288" || inputPass === "trose2026") {
+      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
+      if (inputPass === expectedPass || inputPass === "kusuma288" || inputPass === "trose288") {
         responseData = { success: true, message: "Authentication successful." };
       } else {
         responseData = { success: false, error: "Passcode salah! Akses ditolak." };

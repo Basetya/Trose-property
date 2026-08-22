@@ -1,5 +1,5 @@
-﻿/**
- * Trose Property Manager - AI Concierge Public Portal Logic
+/**
+ * Kusuma Properti Manager - Kusuma AI Concierge Public Portal Logic (v9.0)
  * File: frontend/js/concierge.js
  */
 
@@ -11,7 +11,6 @@ async function handleUserSendMessage() {
 
   if (!message) return;
 
-  // 1. Tampilkan bubble pesan user di UI
   appendChatMessage(message, "user");
   input.value = "";
 
@@ -19,7 +18,6 @@ async function handleUserSendMessage() {
   btn.disabled = true;
   btn.innerText = "...";
 
-  // 2. Tampilkan indikator mengetik
   const typingBubble = appendTypingIndicator();
 
   try {
@@ -29,7 +27,7 @@ async function handleUserSendMessage() {
     if (res && res.reply) {
       appendChatMessage(res.reply, "ai");
     } else {
-      appendChatMessage("Maaf, Rose sedang memproses banyak pesan. Silakan hubungi kantor pengelola.", "ai");
+      appendChatMessage("Maaf, Kusuma AI sedang memproses banyak pesan. Silakan hubungi kantor pengelola.", "ai");
     }
   } catch (err) {
     typingBubble.remove();
@@ -58,7 +56,7 @@ function appendChatMessage(text, sender) {
     `;
   } else {
     wrapper.innerHTML = `
-      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-sm text-white shrink-0 shadow">R</div>
+      <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-sm text-white shrink-0 shadow">K</div>
       <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl rounded-tl-none max-w-lg text-sm leading-relaxed text-slate-200 shadow-md whitespace-pre-line">
         ${escapeHtml(text)}
       </div>
@@ -75,9 +73,9 @@ function appendTypingIndicator() {
   wrapper.id = "typing-indicator";
   wrapper.className = "flex items-start gap-3";
   wrapper.innerHTML = `
-    <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-sm text-white shrink-0">R</div>
+    <div class="w-8 h-8 rounded-xl bg-rose-600 flex items-center justify-center font-bold text-sm text-white shrink-0">K</div>
     <div class="bg-slate-900 border border-slate-800 px-4 py-3 rounded-2xl rounded-tl-none text-xs text-slate-400 animate-pulse">
-      Rose sedang mengetik...
+      Kusuma AI sedang mengetik...
     </div>
   `;
   container.appendChild(wrapper);
