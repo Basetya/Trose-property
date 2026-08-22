@@ -1,4 +1,4 @@
-/* Kusuma Properti - Japandi Design System with Real-Time Reactive Filters (v11.2) */
+/* Kusuma Properti - Japandi Smart Adaptive Contrast Design System (v11.4) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 
 :root {
@@ -18,6 +18,12 @@
   --bg-overlay-opacity: 0.90;
   --bg-brightness: 100%;
   --bg-contrast: 100%;
+
+  /* Adaptive Dynamic Text Colors */
+  --hero-title-color: #2C2C2A;
+  --hero-desc-color: #595956;
+  --hero-text-shadow: none;
+  --hero-scrim-bg: transparent;
 }
 
 * {
@@ -61,6 +67,25 @@ body::after {
   background: linear-gradient(to bottom, rgba(250, 247, 242, var(--bg-overlay-opacity)), rgba(244, 239, 230, var(--bg-overlay-opacity)));
 }
 
+/* Adaptive Hero Typography & Scrim */
+.hero-title-adaptive {
+  color: var(--hero-title-color) !important;
+  text-shadow: var(--hero-text-shadow) !important;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.hero-desc-adaptive {
+  color: var(--hero-desc-color) !important;
+  text-shadow: var(--hero-text-shadow) !important;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.hero-scrim-box {
+  background: var(--hero-scrim-bg);
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+/* Kartu & Panel Japandi */
 .japandi-card {
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);

@@ -1,21 +1,34 @@
 /**
- * Kusuma Properti Manager - Kusuma AI Concierge & Dynamic Visual Engine (v11.3)
+ * Kusuma Properti Manager - Kusuma AI Concierge & Smart Contrast Engine (v11.4)
  * File: frontend/js/landing.js
  */
 
-// 1. Terapkan Pengaturan Visual Latar Belakang (Opacity, Brightness, Contrast) dari Admin
 function applyPublicVisualSettings() {
-  const op = localStorage.getItem("kusuma_bg_opacity") || "90";
+  const opVal = Number(localStorage.getItem("kusuma_bg_opacity") || 90);
   const br = localStorage.getItem("kusuma_bg_brightness") || "100";
   const ct = localStorage.getItem("kusuma_bg_contrast") || "100";
 
   const root = document.documentElement;
-  root.style.setProperty("--bg-overlay-opacity", (Number(op) / 100).toString());
+  root.style.setProperty("--bg-overlay-opacity", (opVal / 100).toString());
   root.style.setProperty("--bg-brightness", br + "%");
   root.style.setProperty("--bg-contrast", ct + "%");
+
+  // Logika Cerdas: Adaptasi Otomatis Kontras Font Sesuai Opacity
+  if (opVal <= 65) {
+    // Mode Background Foto Tajam: Berikan kontras solid & scrim proteksi agar selalu terbaca jelas
+    root.style.setProperty("--hero-title-color", "#1A1A18");
+    root.style.setProperty("--hero-desc-color", "#2B2B28");
+    root.style.setProperty("--hero-text-shadow", "0 2px 10px rgba(255, 255, 255, 0.85)");
+    root.style.setProperty("--hero-scrim-bg", "rgba(255, 255, 255, 0.72)");
+  } else {
+    // Mode Kanvas Japandi Krem Lembut
+    root.style.setProperty("--hero-title-color", "#2C2C2A");
+    root.style.setProperty("--hero-desc-color", "#595956");
+    root.style.setProperty("--hero-text-shadow", "none");
+    root.style.setProperty("--hero-scrim-bg", "transparent");
+  }
 }
 
-// Jalankan segera saat file JS dimuat agar tidak ada kedipan (flash of unstyled background)
 applyPublicVisualSettings();
 
 async function initLandingSettings() {
