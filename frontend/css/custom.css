@@ -1,17 +1,23 @@
-/* Kusuma Properti - Japandi Design System with Integrated Photo Backdrop (v10.1) */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
+/* Kusuma Properti - Japandi High-Contrast Design System (v11.1) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 
 :root {
   --japandi-bg: #FAF7F2;
   --japandi-surface: #FFFFFF;
   --japandi-panel: #F4EFE6;
   --japandi-wood: #8C5835;
-  --japandi-wood-light: #C28E5C;
+  --japandi-wood-hover: #704326;
   --japandi-clay: #B35436;
   --japandi-moss: #3A5A40;
   --japandi-charcoal: #2C2C2A;
+  --japandi-body-text: #3D3D3A;
   --japandi-muted: #737370;
   --japandi-border: #E8DFD3;
+  
+  /* Dynamic Background Controls */
+  --bg-overlay-opacity: 0.90;
+  --bg-brightness: 100%;
+  --bg-contrast: 100%;
 }
 
 * {
@@ -32,40 +38,57 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Background Foto Gedung dengan Lapisan Hangat Japandi */
+/* Background Foto Arsitektur dengan Dual Layer */
 .bg-japandi-canvas, .bg-kalibata {
+  position: relative;
   background-color: #FAF7F2;
-  background-image: 
-    linear-gradient(to bottom, rgba(250, 247, 242, 0.86), rgba(244, 239, 230, 0.94)),
-    url('../img/bg-kalibata.webp');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
+  min-height: 100vh;
 }
 
+.bg-japandi-canvas::before, .bg-kalibata::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: url('../img/bg-kalibata.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
+}
+
+.bg-japandi-canvas::after, .bg-kalibata::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgba(250, 247, 242, var(--bg-overlay-opacity)), rgba(244, 239, 230, var(--bg-overlay-opacity)));
+}
+
+/* Kartu & Panel Japandi Terbaca Jelas */
 .japandi-card {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--japandi-border);
-  box-shadow: 0 4px 24px -2px rgba(44, 44, 42, 0.05);
+  box-shadow: 0 4px 20px -2px rgba(44, 44, 42, 0.05);
 }
 
 .japandi-card-warm {
   background: rgba(244, 239, 230, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid #D4A373;
 }
 
 .japandi-panel {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--japandi-border);
 }
 
+/* Tombol Aksi */
 .japandi-btn-wood {
   background-color: #8C5835;
   color: #FFFFFF;
@@ -96,7 +119,7 @@ body {
   box-shadow: 0 4px 14px rgba(179, 84, 54, 0.25);
 }
 
-/* Scrollbar Minimalis */
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
