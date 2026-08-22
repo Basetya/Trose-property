@@ -1,6 +1,6 @@
 /**
- * Kusuma Properti Manager - Kusuma AI Concierge Context Engine (v9.0)
- * Real-Time Knowledge Base Integration
+ * Kusuma Properti Manager - Kusuma AI Concierge Context Engine (v9.1)
+ * Real-Time Knowledge Base & Smart NLP Fallback
  * File: frontend/js/landing.js
  */
 
@@ -70,12 +70,13 @@ async function handleWidgetSend() {
     const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "POST");
     typing.remove();
 
-    if (res && res.reply) {
+    if (res && res.reply && res.reply.trim() !== "") {
       appendWidgetMessage(res.reply, "ai");
     } else {
       appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
     }
   } catch (err) {
+    console.warn("GAS API Offline, using Smart Local Engine:", err);
     typing.remove();
     appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
   } finally {
@@ -86,43 +87,46 @@ async function handleWidgetSend() {
 
 function generateSmartKnowledgeReply(userQuery) {
   const q = String(userQuery || '').toLowerCase();
-  const dynamicKb = localStorage.getItem("kusuma_ai_kb") || localStorage.getItem("trose_ai_kb") || "";
 
+  // 1. Cek Pertanyaan Parkir & Kendaraan
+  if (q.includes("parkir") || q.includes("mobil") || q.includes("motor") || q.includes("kendaraan") || q.includes("slot")) {
+    return "Untuk area parkir di Apartemen Kalibata City:\n- Tersedia basement luas dan gedung parkir khusus penghuni maupun pengunjung.\n- Tarif parkir berlangganan (member bulanan) mobil dan motor dapat didaftarkan langsung ke kantor Badan Pengelola Kalibata City setelah kontrak sewa aktif.\n- Akses keluar-masuk menggunakan sistem kartu gate otomatis 24 jam.";
+  }
+
+  // 2. Cek Pertanyaan Jam Buka / Operasional Mall & Kantor
   if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
     if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
       return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
     }
-    if (q.includes("kantor") || q.includes("survei") || q.includes("viewing") || q.includes("admin")) {
-      return "Layanan konsultasi dan survei unit di kantor Kusuma Properti buka setiap hari (Senin-Minggu) pukul 09.00 â€“ 18.00 WIB. Silakan hubungi kami via WhatsApp untuk membuat janji temu.";
-    }
-    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan survei unit sewa buka pukul 09.00 - 18.00 WIB.";
+    return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan konsultasi & survei unit Kusuma Properti buka pukul 09.00 - 18.00 WIB.";
   }
 
+  // 3. Cek Pertanyaan Sewa Harian (Strict Policy)
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal penghuni. Apakah Anda ingin melihat pilihan unit bulanan kami?";
+    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni.";
   }
 
-  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa")) {
-    return "Pilihan sewa unit bulanan resmi di Kalibata City bersama Kusuma Properti:\n- Studio Deluxe: Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard: Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace: Mulai Rp 5.500.000/bln\nSemua unit Full Furnished (AC, Springbed, Kitchen Set, TV). Tersedia juga opsi sewa tahunan lebih hemat.";
+  // 4. Cek Pertanyaan Harga / Tipe Unit
+  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa") || q.includes("2br")) {
+    return "Pilihan sewa unit bulanan resmi di Kalibata City bersama Kusuma Properti:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bln\nSemua unit Full Furnished siap huni. Tersedia juga opsi diskon untuk sewa tahunan.";
   }
 
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("green palace")) {
-    return "Fasilitas kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, Bioskop XXI, food court).\n- Kolam renang dewasa & anak, Gym, Lapangan Tenis/Futsal di Green Palace.\n- Keamanan kartu akses lift 24 jam & Masjid Raya Nurullah.";
+  // 5. Cek Pertanyaan Fasilitas & Olahraga
+  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("renang") || q.includes("green palace")) {
+    return "Fasilitas lengkap di kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, XXI, kuliner 24 jam).\n- Kolam renang dewasa & anak serta Gym Center di Tower Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
   }
 
-  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat")) {
-    return "Lokasi di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit jalan kaki (200m) ke Stasiun KRL Duren Kalibata dan 10-15 menit ke kawasan bisnis Kuningan / Gatot Subroto.";
+  // 6. Cek Lokasi & Transportasi
+  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat") || q.includes("peta")) {
+    return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan bisnis Kuningan & Gatot Subroto.";
   }
 
-  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat")) {
-    return "Jadwal survei unit (viewing) buka setiap hari (09.00 - 18.00 WIB). Silakan klik tombol 'WA' di kanan atas untuk janjian waktu kunjungan bersama tim Kusuma Properti.";
+  // 7. Cek Jadwal Survei / Viewing
+  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal")) {
+    return "Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp' untuk konfirmasi jam kunjungan bersama tim konsultan kami.";
   }
 
-  if (dynamicKb && dynamicKb.length > 20) {
-    return "Halo! Berdasarkan informasi terkini Kalibata City dari Kusuma Properti:\n" + dynamicKb.substring(0, 250) + "...\n\nAda yang ingin Anda tanyakan lebih spesifik seputar sewa atau fasilitas?";
-  }
-
-  return "Halo! Saya Kusuma AI, asisten virtual resmi Apartemen Kalibata City. Kami menyediakan unit Studio & 2BR siap huni (bulanan dan tahunan). Ada yang bisa saya bantu seputar harga, fasilitas, jam operasional, atau jadwal survei?";
+  return "Halo! Saya Kusuma AI, asisten virtual resmi Apartemen Kalibata City. Kami menyediakan pilihan sewa unit Studio dan 2BR siap huni. Ada yang bisa saya bantu terkait tarif sewa, fasilitas, info parkir, atau jadwal survei unit?";
 }
 
 function appendWidgetMessage(text, sender) {
