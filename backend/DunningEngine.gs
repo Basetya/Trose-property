@@ -1,5 +1,5 @@
 ﻿/**
- * Trose Property Manager - Automated WhatsApp Dunning Engine
+ * Trose Property Manager - Automated WhatsApp Dunning Engine (v8.1)
  * File: backend/DunningEngine.gs
  */
 
@@ -12,6 +12,14 @@ function runDailyDunningScheduler() {
   const unpaidInvoices = invoices.filter(inv => inv.Status === "Unpaid");
   let dispatchedCount = 0;
 
+  // Mengambil URL Web App aktif secara dinamis
+  let webAppUrl = "";
+  try {
+    webAppUrl = ScriptApp.getService().getUrl();
+  } catch (e) {
+    webAppUrl = "";
+  }
+
   unpaidInvoices.forEach(inv => {
     const lease = leases.find(l => String(l.Lease_ID).trim() === String(inv.Lease_ID).trim()) || {};
     const tenant = contacts.find(c => String(c.Contact_ID).trim() === String(lease.Tenant_ID).trim()) || {};
@@ -19,20 +27,23 @@ function runDailyDunningScheduler() {
 
     if (tenant.Phone_WA) {
       const cleanPhone = String(tenant.Phone_WA).replace(/[^0-9]/g, '');
+      const invoiceUrl = webAppUrl ? `${webAppUrl}?action=getInvoiceDetail&invoiceId=${inv.Invoice_ID}` : `ID Tagihan: ${inv.Invoice_ID}`;
+      
       const msg = `Halo Bapak/Ibu ${tenant.Full_Name || 'Penyewa'},\n\n` +
-        `Berikut pengingat tagihan sewa apartemen Trose Residence untuk:\n` +
+        `Berikut pengingat tagihan sewa apartemen Kalibata City untuk:\n` +
         `Unit: ${unit.Tower || 'Tower'} #${unit.Unit_No || inv.Unit_ID}\n` +
         `Periode: ${inv.Period || 'Bulan Ini'}\n` +
-        `Total Pembayaran: Rp ${Number(inv.Total_Amount || 0).toLocaleString('id-ID')} (termasuk kode unik)\n\n` +
-        `Rute Pembayaran: ${inv.Bank_Name || 'BCA'} No. Rek: ${inv.Bank_Account_No || '-'} a.n. ${inv.Bank_Holder_Name || '-'}\n\n` +
-        `Mohon konfirmasikan bukti transfer Anda melalui tautan portal resmi:\n` +
-        `https://script.google.com/macros/s/.../exec?id=${inv.Invoice_ID}\n\n` +
-        `Terima kasih atas kerja sama Anda.\n- Tim Manajemen Trose`;
+        `Total Pembayaran: Rp ${Number(inv.Total_Amount || 0).toLocaleString('id-ID')} (termasuk 3 digit kode unik)\n\n` +
+        `Rute Rekening Transfer:\n` +
+        `${inv.Destination_Bank || inv.Bank_Name || 'BCA'} No. Rek: ${inv.Destination_Account_No || inv.Bank_Account_No || '-'} a.n. ${inv.Destination_Account_Holder || inv.Bank_Holder_Name || '-'}\n\n` +
+        `Tautan Konfirmasi Pembayaran:\n` +
+        `${invoiceUrl}\n\n` +
+        `Terima kasih atas kerja sama Anda.\n- Manajemen Trose Property`;
 
       sendWhatsAppMessage(cleanPhone, msg);
       dispatchedCount++;
     }
   });
 
-  return { success: true, message: `Dunning executed: ${dispatchedCount} reminders sent.` };
+  return { success: true, message: `Dunning berhasil dijalankan: ${dispatchedCount} pesan pengingat terkirim.` };
 }

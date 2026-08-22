@@ -1,5 +1,5 @@
 ﻿/**
- * Trose Property Manager - 3-Tier Financial Engine
+ * Trose Property Manager - 3-Tier Financial Engine (v8.1)
  * File: backend/FinanceEngine.gs
  */
 
@@ -15,14 +15,16 @@ function generateFinancialStatements() {
   let pmManagementFees = 0;
 
   leases.forEach(l => {
-    pmLeasingFees += Number(l.Leasing_Commission_Fee || 0);
+    // Sinkronisasi header skema SheetSchema: Management_Commission_Fee
+    const commFee = Number(l.Management_Commission_Fee || l.Leasing_Commission_Fee || 0);
+    pmLeasingFees += commFee;
   });
 
   invoices.forEach(inv => {
     if (inv.Status === "Paid") {
       const unit = units.find(u => String(u.Unit_ID).trim() === String(inv.Unit_ID).trim()) || {};
-      const mgmtPercent = Number(unit.Management_Fee_Percent || 10) / 100;
-      pmManagementFees += (Number(inv.Rent_Fee || 0) * mgmtPercent);
+      const mgmtPercent = Number(unit.Management_Percent || unit.Management_Fee_Percent || 10) / 100;
+      pmManagementFees += (Number(inv.Rent_Amount || inv.Rent_Fee || 0) * mgmtPercent);
     }
   });
 
@@ -32,7 +34,7 @@ function generateFinancialStatements() {
   const ownerStatements = {};
 
   units.forEach(u => {
-    const ownerName = u.Landlord_Name || "Default Owner";
+    const ownerName = u.Landlord_Name || "Management Pool";
     if (!ownerStatements[ownerName]) {
       ownerStatements[ownerName] = {
         ownerName: ownerName,
@@ -53,11 +55,11 @@ function generateFinancialStatements() {
   invoices.forEach(inv => {
     if (inv.Status === "Paid") {
       const unit = units.find(u => String(u.Unit_ID).trim() === String(inv.Unit_ID).trim()) || {};
-      const ownerName = unit.Landlord_Name || "Default Owner";
+      const ownerName = unit.Landlord_Name || "Management Pool";
       if (ownerStatements[ownerName]) {
-        const rent = Number(inv.Rent_Fee || 0);
-        const ipl = Number(inv.IPL_Fee || unit.IPL_Fee || 0);
-        const mgmtPercent = Number(unit.Management_Fee_Percent || 10) / 100;
+        const rent = Number(inv.Rent_Amount || inv.Rent_Fee || 0);
+        const ipl = Number(inv.IPL_Amount || inv.IPL_Fee || unit.IPL_Fee || 0);
+        const mgmtPercent = Number(unit.Management_Percent || unit.Management_Fee_Percent || 10) / 100;
         const mgmtFee = rent * mgmtPercent;
 
         ownerStatements[ownerName].grossRental += rent;
@@ -70,7 +72,7 @@ function generateFinancialStatements() {
   maintenance.forEach(m => {
     const cost = Number(m.Estimated_Cost || 0);
     const unit = units.find(u => String(u.Unit_ID).trim() === String(m.Unit_ID).trim()) || {};
-    const ownerName = unit.Landlord_Name || "Default Owner";
+    const ownerName = unit.Landlord_Name || "Management Pool";
     if (ownerStatements[ownerName]) {
       ownerStatements[ownerName].maintenanceDeduction += cost;
     }
@@ -93,8 +95,11 @@ function generateFinancialStatements() {
 
   invoices.forEach(inv => {
     if (inv.Status === "Paid") {
-      corpGrossRevenue += (Number(inv.Rent_Fee || 0) + Number(inv.Utility_Fee || 0) + Number(inv.IPL_Fee || 0));
-      corpTotalIPL += Number(inv.IPL_Fee || 0);
+      const rent = Number(inv.Rent_Amount || inv.Rent_Fee || 0);
+      const util = Number(inv.Utility_Amount || inv.Utility_Fee || 0);
+      const ipl = Number(inv.IPL_Amount || inv.IPL_Fee || 0);
+      corpGrossRevenue += (rent + util + ipl);
+      corpTotalIPL += ipl;
     }
   });
 
