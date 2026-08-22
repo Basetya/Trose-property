@@ -1,3 +1,131 @@
+# ==============================================================================
+# Kusuma Properti - Japandi Minimalist UI Design System Overhaul (v10.0)
+# ==============================================================================
+
+Write-Host "Menerapkan Estetika Japandi (Japanese-Scandinavian) pada Kusuma Properti..." -ForegroundColor Cyan
+
+New-Item -ItemType Directory -Force -Path "frontend/css", "frontend/js", "frontend/img" | Out-Null
+$Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
+
+# ==============================================================================
+# 1. FRONTEND STYLING (frontend/css/custom.css)
+# ==============================================================================
+Write-Host "Memperbarui frontend/css/custom.css (Japandi Warm Earthy Palette)..." -ForegroundColor Yellow
+$customCss = @'
+/* Kusuma Properti - Japandi Design System (v10.0) */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
+
+:root {
+  --japandi-bg: #FAF7F2;
+  --japandi-surface: #FFFFFF;
+  --japandi-panel: #F4EFE6;
+  --japandi-wood: #C28E5C;
+  --japandi-wood-dark: #8C5835;
+  --japandi-clay: #B35436;
+  --japandi-moss: #3A5A40;
+  --japandi-charcoal: #2C2C2A;
+  --japandi-muted: #737370;
+  --japandi-border: #E8DFD3;
+}
+
+* {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2, .font-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--japandi-bg);
+  color: var(--japandi-charcoal);
+  letter-spacing: -0.01em;
+}
+
+.bg-japandi-canvas {
+  background-color: #FAF7F2;
+  background-image: 
+    radial-gradient(at 100% 0%, rgba(212, 163, 115, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(58, 90, 64, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+.japandi-card {
+  background: #FFFFFF;
+  border: 1px solid var(--japandi-border);
+  box-shadow: 0 4px 20px -2px rgba(44, 44, 42, 0.04);
+}
+
+.japandi-card-warm {
+  background: var(--japandi-panel);
+  border: 1px solid #E2D7C8;
+}
+
+.japandi-panel {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--japandi-border);
+}
+
+.japandi-btn-wood {
+  background-color: #8C5835;
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.japandi-btn-wood:hover {
+  background-color: #704326;
+  box-shadow: 0 4px 12px rgba(140, 88, 53, 0.25);
+}
+
+.japandi-btn-moss {
+  background-color: #3A5A40;
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.japandi-btn-moss:hover {
+  background-color: #2D4732;
+  box-shadow: 0 4px 12px rgba(58, 90, 64, 0.25);
+}
+
+.japandi-btn-clay {
+  background-color: #B35436;
+  color: #FFFFFF;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.japandi-btn-clay:hover {
+  background-color: #944026;
+  box-shadow: 0 4px 12px rgba(179, 84, 54, 0.25);
+}
+
+/* Scrollbar Minimalis Organik */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8CEBE;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #BFAFA0;
+}
+'@
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/css/custom.css", $customCss, $Utf8NoBomEncoding)
+
+
+# ==============================================================================
+# 2. FRONTEND LANDING PAGE (frontend/index.html)
+# ==============================================================================
+Write-Host "Memperbarui frontend/index.html (Japandi Warm Aesthetic)..." -ForegroundColor Yellow
+$indexHtml = @'
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -120,7 +248,7 @@
         <div class="space-y-3">
           <span class="px-3 py-1 bg-[#F4EFE6] text-[#8C5835] text-[11px] font-bold tracking-wider uppercase rounded-full">Single / Eksekutif</span>
           <h4 class="text-xl font-bold text-[#2C2C2A]">Studio Deluxe</h4>
-          <p class="text-xs text-[#737370]">Luas 21 mÂ² â€¢ Full Furnished â€¢ AC, Spring Bed, Kitchen Set, Smart TV</p>
+          <p class="text-xs text-[#737370]">Luas 21 m² • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV</p>
           <div class="pt-4 border-t border-[#E8DFD3]">
             <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
             <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 3.000.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
@@ -135,7 +263,7 @@
         <div class="space-y-3">
           <span class="px-3 py-1 bg-[#8C5835] text-white text-[11px] font-bold tracking-wider uppercase rounded-full">Paling Favorit</span>
           <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Standard</h4>
-          <p class="text-xs text-[#737370]">Luas 33 mÂ² â€¢ 2 Kamar Tidur â€¢ Living Room, Dapur Lengkap, Balkon</p>
+          <p class="text-xs text-[#737370]">Luas 33 m² • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon</p>
           <div class="pt-4 border-t border-[#DDD3C2]">
             <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
             <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 4.200.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
@@ -150,7 +278,7 @@
         <div class="space-y-3">
           <span class="px-3 py-1 bg-[#EAF0EB] text-[#3A5A40] text-[11px] font-bold tracking-wider uppercase rounded-full">Green Palace Resort</span>
           <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Executive</h4>
-          <p class="text-xs text-[#737370]">Akses Kolam Renang Tematik â€¢ Gym Indoor â€¢ Interior Modern</p>
+          <p class="text-xs text-[#737370]">Akses Kolam Renang Tematik • Gym Indoor • Interior Modern</p>
           <div class="pt-4 border-t border-[#E8DFD3]">
             <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
             <p class="text-2xl font-bold text-[#3A5A40] font-serif">Rp 5.500.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
@@ -251,7 +379,7 @@
 
   <!-- Footer -->
   <footer class="japandi-panel border-t border-[#E8DFD3] py-8 px-4 text-center text-xs text-[#737370] space-y-2">
-    <p class="font-semibold text-[#2C2C2A]">Kusuma Properti &copy; 2026 â€” Kalibata City Haven</p>
+    <p class="font-semibold text-[#2C2C2A]">Kusuma Properti &copy; 2026 — Kalibata City Haven</p>
     <p>Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750</p>
   </footer>
 
@@ -322,3 +450,17 @@
   <script src="js/landing.js"></script>
 </body>
 </html>
+'@
+[System.IO.File]::WriteAllText("$PSScriptRoot/frontend/index.html", $indexHtml, $Utf8NoBomEncoding)
+
+
+# ==============================================================================
+# 3. DEFENSIVE GIT COMMIT
+# ==============================================================================
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    Write-Host "Menyimpan commit transformasi gaya Japandi ke Git..." -ForegroundColor Cyan
+    git add .
+    git commit -m "style: overhaul entire visual design system to Japandi minimalism (v10.0)"
+}
+
+Write-Host "`n[SUCCESS] Seluruh Tampilan Berhasil Dikonversi ke Style Japandi (v10.0)!" -ForegroundColor Green
