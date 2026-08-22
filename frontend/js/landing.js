@@ -1,10 +1,26 @@
 /**
- * Kusuma Properti Manager - Kusuma AI Concierge Context Engine (v9.1)
- * Real-Time Knowledge Base & Smart NLP Fallback
+ * Kusuma Properti Manager - Kusuma AI Concierge & Dynamic Visual Engine (v11.3)
  * File: frontend/js/landing.js
  */
 
+// 1. Terapkan Pengaturan Visual Latar Belakang (Opacity, Brightness, Contrast) dari Admin
+function applyPublicVisualSettings() {
+  const op = localStorage.getItem("kusuma_bg_opacity") || "90";
+  const br = localStorage.getItem("kusuma_bg_brightness") || "100";
+  const ct = localStorage.getItem("kusuma_bg_contrast") || "100";
+
+  const root = document.documentElement;
+  root.style.setProperty("--bg-overlay-opacity", (Number(op) / 100).toString());
+  root.style.setProperty("--bg-brightness", br + "%");
+  root.style.setProperty("--bg-contrast", ct + "%");
+}
+
+// Jalankan segera saat file JS dimuat agar tidak ada kedipan (flash of unstyled background)
+applyPublicVisualSettings();
+
 async function initLandingSettings() {
+  applyPublicVisualSettings();
+
   const localWa = localStorage.getItem("kusuma_official_wa") || localStorage.getItem("trose_official_wa");
   if (localWa) OFFICIAL_WA_NUMBER = localWa;
 
@@ -88,12 +104,12 @@ async function handleWidgetSend() {
 function generateSmartKnowledgeReply(userQuery) {
   const q = String(userQuery || '').toLowerCase();
 
-  // 1. Cek Pertanyaan Parkir & Kendaraan
+  // 1. Parkir & Kendaraan
   if (q.includes("parkir") || q.includes("mobil") || q.includes("motor") || q.includes("kendaraan") || q.includes("slot")) {
     return "Untuk area parkir di Apartemen Kalibata City:\n- Tersedia basement luas dan gedung parkir khusus penghuni maupun pengunjung.\n- Tarif parkir berlangganan (member bulanan) mobil dan motor dapat didaftarkan langsung ke kantor Badan Pengelola Kalibata City setelah kontrak sewa aktif.\n- Akses keluar-masuk menggunakan sistem kartu gate otomatis 24 jam.";
   }
 
-  // 2. Cek Pertanyaan Jam Buka / Operasional Mall & Kantor
+  // 2. Jam Buka / Operasional Mall & Kantor
   if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional")) {
     if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market")) {
       return "Mall Kalibata City Square (KCS) buka setiap hari mulai pukul 10.00 WIB hingga 22.00 WIB. Untuk Farmers Market di lantai dasar buka lebih awal mulai pukul 08.00 WIB.";
@@ -101,27 +117,27 @@ function generateSmartKnowledgeReply(userQuery) {
     return "Mall Kalibata City Square buka pukul 10.00 - 22.00 WIB setiap hari. Sedangkan layanan konsultasi & survei unit Kusuma Properti buka pukul 09.00 - 18.00 WIB.";
   }
 
-  // 3. Cek Pertanyaan Sewa Harian (Strict Policy)
+  // 3. Sewa Harian (Strict Policy)
   if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
     return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni.";
   }
 
-  // 4. Cek Pertanyaan Harga / Tipe Unit
+  // 4. Harga / Tipe Unit
   if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa") || q.includes("2br")) {
     return "Pilihan sewa unit bulanan resmi di Kalibata City bersama Kusuma Properti:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bln\nSemua unit Full Furnished siap huni. Tersedia juga opsi diskon untuk sewa tahunan.";
   }
 
-  // 5. Cek Pertanyaan Fasilitas & Olahraga
+  // 5. Fasilitas & Olahraga
   if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("renang") || q.includes("green palace")) {
     return "Fasilitas lengkap di kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, XXI, kuliner 24 jam).\n- Kolam renang dewasa & anak serta Gym Center di Tower Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
   }
 
-  // 6. Cek Lokasi & Transportasi
+  // 6. Lokasi & Transportasi
   if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat") || q.includes("peta")) {
     return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan bisnis Kuningan & Gatot Subroto.";
   }
 
-  // 7. Cek Jadwal Survei / Viewing
+  // 7. Jadwal Survei / Viewing
   if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal")) {
     return "Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp' untuk konfirmasi jam kunjungan bersama tim konsultan kami.";
   }
