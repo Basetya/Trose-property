@@ -1,12 +1,12 @@
-/* Kusuma Properti - Japandi Design System (v10.0) */
+/* Kusuma Properti - Japandi Design System with Integrated Photo Backdrop (v10.1) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 
 :root {
   --japandi-bg: #FAF7F2;
   --japandi-surface: #FFFFFF;
   --japandi-panel: #F4EFE6;
-  --japandi-wood: #C28E5C;
-  --japandi-wood-dark: #8C5835;
+  --japandi-wood: #8C5835;
+  --japandi-wood-light: #C28E5C;
   --japandi-clay: #B35436;
   --japandi-moss: #3A5A40;
   --japandi-charcoal: #2C2C2A;
@@ -20,7 +20,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-h1, h2, .font-display {
+h1, h2, h3, .font-display {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
@@ -32,29 +32,37 @@ body {
   letter-spacing: -0.01em;
 }
 
-.bg-japandi-canvas {
+/* Background Foto Gedung dengan Lapisan Hangat Japandi */
+.bg-japandi-canvas, .bg-kalibata {
   background-color: #FAF7F2;
   background-image: 
-    radial-gradient(at 100% 0%, rgba(212, 163, 115, 0.08) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(58, 90, 64, 0.05) 0px, transparent 50%);
+    linear-gradient(to bottom, rgba(250, 247, 242, 0.86), rgba(244, 239, 230, 0.94)),
+    url('../img/bg-kalibata.webp');
+  background-size: cover;
+  background-position: center;
   background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 .japandi-card {
-  background: #FFFFFF;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--japandi-border);
-  box-shadow: 0 4px 20px -2px rgba(44, 44, 42, 0.04);
+  box-shadow: 0 4px 24px -2px rgba(44, 44, 42, 0.05);
 }
 
 .japandi-card-warm {
-  background: var(--japandi-panel);
-  border: 1px solid #E2D7C8;
+  background: rgba(244, 239, 230, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid #D4A373;
 }
 
 .japandi-panel {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--japandi-border);
 }
 
@@ -65,7 +73,7 @@ body {
 }
 .japandi-btn-wood:hover {
   background-color: #704326;
-  box-shadow: 0 4px 12px rgba(140, 88, 53, 0.25);
+  box-shadow: 0 4px 14px rgba(140, 88, 53, 0.25);
 }
 
 .japandi-btn-moss {
@@ -75,7 +83,7 @@ body {
 }
 .japandi-btn-moss:hover {
   background-color: #2D4732;
-  box-shadow: 0 4px 12px rgba(58, 90, 64, 0.25);
+  box-shadow: 0 4px 14px rgba(58, 90, 64, 0.25);
 }
 
 .japandi-btn-clay {
@@ -85,10 +93,10 @@ body {
 }
 .japandi-btn-clay:hover {
   background-color: #944026;
-  box-shadow: 0 4px 12px rgba(179, 84, 54, 0.25);
+  box-shadow: 0 4px 14px rgba(179, 84, 54, 0.25);
 }
 
-/* Scrollbar Minimalis Organik */
+/* Scrollbar Minimalis */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
