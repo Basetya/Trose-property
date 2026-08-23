@@ -10,49 +10,40 @@
 <body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3]">
   
   <!-- Navbar -->
-  <header class="sticky top-0 z-40 japandi-panel px-4 md:px-8 py-3.5 border-b border-[#E8DFD3]">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-[#8C5835] text-white flex items-center justify-center font-serif text-xl font-bold shadow-sm">K</div>
-        <div>
-          <div class="nav-brand" style="display: flex; align-items: center; gap: 12px;">
-        <div class="brand-logo" style="width: 40px; height: 40px; border-radius: 50%; background: #8c4a24; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">K</div>
-        <div class="brand-text" style="display: flex; flex-direction: column; justify-content: center;">
-          <span style="font-weight: 800; font-size: 1.1rem; color: #111827; line-height: 1.2;">Kusuma Properti</span>
-          <span style="font-size: 0.72rem; color: #8c4a24; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; line-height: 1.2;">KALIBATA CITY HAVEN</span>
-        </div>
-      </div>
-      <div class="brand-text">
-            <span style="font-weight: 800; font-size: 1.1rem; color: #111827; display: block; line-height: 1.2;">Kusuma Properti</span>
-            <span style="font-size: 0.75rem; color: #8c4a24; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">KALIBATA CITY HAVEN</span>
+      <!-- HEADER NAVBAR CLEAN -->
+    <header class="main-header" style="position: sticky; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #eef2f6; padding: 12px 24px;">
+      <div style="max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+        
+        <!-- Logo & Brand Tunggal -->
+        <a href="#" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: #8c4a24; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(140, 74, 36, 0.25);">K</div>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-weight: 800; font-size: 1.12rem; color: #111827; line-height: 1.2;">Kusuma Properti</span>
+            <span style="font-size: 0.72rem; color: #8c4a24; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; line-height: 1.2;">KALIBATA CITY HAVEN</span>
           </div>
-        </div>
-          <p class="text-[10px] text-[#8C5835] font-semibold tracking-wider uppercase">Kalibata City Haven</p>
-        </div>
-      </div>
-
-      <nav class="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-[#737370]">
-        <a href="#keunggulan" class="hover:text-[#8C5835] transition">Harmoni & Akses</a>
-        <a href="#tipe-unit" class="hover:text-[#8C5835] transition">Katalog Unit</a>
-        <a href="#fasilitas" class="hover:text-[#8C5835] transition">Fasilitas Kawasan</a>
-        <a href="#lokasi" class="hover:text-[#8C5835] transition">Lokasi</a>
-        <button onclick="openWhatsAppDirect()" class="text-[#3A5A40] hover:text-[#2D4732] flex items-center gap-1.5 font-bold transition">
-          <span class="w-2 h-2 rounded-full bg-[#3A5A40] animate-pulse"></span>
-          WhatsApp Admin
-        </button>
-      </nav>
-
-      <div class="flex items-center gap-2">
-        <button onclick="openWhatsAppDirect()" class="md:hidden px-3.5 py-2 japandi-btn-moss font-bold text-xs rounded-xl shadow-sm">
-          Chat WA
-        </button>
-        <a href="dashboard.html" class="px-4 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1.5">
-          <span>Admin Cockpit</span>
-          <svg class="w-3.5 h-3.5 text-[#8C5835]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </a>
+
+        <!-- Menu Navigasi Tengah -->
+        <nav class="nav-links" style="display: flex; align-items: center; gap: 24px;">
+          <a href="#keunggulan" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">HARMONI &amp; AKSES</a>
+          <a href="#katalog" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">KATALOG UNIT</a>
+          <a href="#fasilitas" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">FASILITAS KAWASAN</a>
+          <a href="#lokasi" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">LOKASI</a>
+          <a href="https://wa.me/6281221559000" target="_blank" rel="noopener noreferrer" style="color: #16a34a; text-decoration: none; font-size: 0.86rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a; display: inline-block;"></span>
+            WhatsApp Admin
+          </a>
+        </nav>
+
+        <!-- Tombol Admin Cockpit Kanan -->
+        <div style="display: flex; align-items: center;">
+          <a href="admin.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 50px; border: 1px solid #e2e8f0; background: #ffffff; color: #1e293b; font-size: 0.85rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease;">
+            Admin Cockpit &rarr;
+          </a>
+        </div>
+
       </div>
-    </div>
-  </header>
+    </header>
 
   <!-- Hero Section with Adaptive Scrim Backplate -->
   <section class="max-w-6xl mx-auto px-4 md:px-8 pt-12 pb-16 md:pt-20 md:pb-28 text-center">
