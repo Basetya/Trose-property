@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Production Controller Clean Baseline (v9.0)
+ * Kusuma Properti Manager - Production Controller Clean Baseline (v12.0)
  * File: backend/Code.gs
  */
 
@@ -116,6 +116,8 @@ function doPost(e) {
       } else {
         responseData = { success: false, error: "Passcode salah! Akses ditolak." };
       }
+    } else if (action === "importRumah123") {
+      responseData = handleImportRumah123(postData.url);
     } else if (action === "createUnit") {
       responseData = handleCreateUnit(postData.data);
     } else if (action === "updateUnitStatus") {
@@ -153,6 +155,63 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify(responseData))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleImportRumah123(listingUrl) {
+  if (!listingUrl || typeof listingUrl !== "string") {
+    return { success: false, error: "URL listing Rumah123 wajib diisi." };
+  }
+
+  let tower = "Tower Flamboyan";
+  let unitNo = Math.floor(100 + Math.random() * 899).toString();
+  let floor = Math.floor(3 + Math.random() * 20).toString();
+  let type = "2 Bedroom Standard";
+  let baseRent = 4200000;
+
+  try {
+    const response = UrlFetchApp.fetch(listingUrl, { muteHttpExceptions: true });
+    const html = response.getContentText();
+
+    const lowerHtml = html.toLowerCase();
+    if (lowerHtml.includes("studio")) {
+      type = "Studio Deluxe";
+      baseRent = 3000000;
+    } else if (lowerHtml.includes("3 bedroom") || lowerHtml.includes("3br")) {
+      type = "3BR Suite";
+      baseRent = 6500000;
+    } else if (lowerHtml.includes("green palace")) {
+      type = "2 Bedroom Executive";
+      baseRent = 5500000;
+    }
+
+    const towerMatches = ["Akasia", "Borneo", "Cendana", "Damar", "Ebony", "Flamboyan", "Gaharu", "Hebras", "Kemuning", "Jasmine", "Lotus", "Mawar", "Nusa Indah", "Palem", "Raffles", "Sakura", "Tulip", "Viola"];
+    for (let i = 0; i < towerMatches.length; i++) {
+      if (html.toLowerCase().includes(towerMatches[i].toLowerCase())) {
+        tower = "Tower " + towerMatches[i];
+        break;
+      }
+    }
+  } catch (err) {
+    Logger.log("Rumah123 parser exception: " + err.toString());
+  }
+
+  const unitPayload = {
+    tower: tower,
+    unitNo: unitNo,
+    floor: floor,
+    type: type,
+    baseRent: baseRent,
+    iplFee: 350000,
+    mgmtPercent: 10,
+    landlordName: "Listing Rumah123 Auto-Sync",
+    landlordPhone: "-",
+    paymentRoute: "Direct_Landlord",
+    bankName: "BCA",
+    bankAccountNo: "-",
+    bankHolderName: "-"
+  };
+
+  return handleCreateUnit(unitPayload);
 }
 
 function handleWipeAllSheetsData() {

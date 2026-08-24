@@ -335,3 +335,45 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchDashboard();
   }
 });
+// ==========================================
+// ONE-CLICK RUMAH123 IMPORTER HANDLERS
+// ==========================================
+function openImportRumah123Modal() {
+  const modal = document.getElementById("modal-import-rumah123");
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeImportRumah123Modal() {
+  const modal = document.getElementById("modal-import-rumah123");
+  if (modal) modal.classList.add("hidden");
+}
+
+async function handleExecuteImportRumah123(e) {
+  e.preventDefault();
+  const urlInput = document.getElementById("import-listing-url");
+  const listingUrl = urlInput ? urlInput.value.trim() : "";
+  if (!listingUrl) return;
+
+  const btn = document.getElementById("btn-submit-import");
+  btn.disabled = true;
+  btn.innerText = "Mengekstrak & Mengunggah...";
+
+  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode") || "kusuma288";
+
+  try {
+    const res = await gasApiCall("importRumah123", { passcode: currentPasscode, url: listingUrl }, "POST");
+    if (res && res.success) {
+      showToast(res.message || "Listing berhasil diimpor & otomatis muncul di landing page!");
+      closeImportRumah123Modal();
+      if (urlInput) urlInput.value = "";
+      fetchDashboard();
+    } else {
+      showToast(res.error || "Gagal mengimpor listing", "error");
+    }
+  } catch (err) {
+    showToast("Error saat menghubungi server", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = "Impor ke Database";
+  }
+}

@@ -7,67 +7,63 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3]">
+<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3] pb-16 md:pb-0">
   
   <!-- Navbar -->
-      <!-- HEADER NAVBAR CLEAN -->
-    <header class="main-header" style="position: sticky; top: 0; left: 0; right: 0; z-index: 1000; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid #eef2f6; padding: 12px 24px;">
-      <div style="max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
-        
-        <!-- Logo & Brand Tunggal -->
-        <a href="#" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-          <div style="width: 42px; height: 42px; border-radius: 50%; background: #8c4a24; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem; flex-shrink: 0; box-shadow: 0 2px 8px rgba(140, 74, 36, 0.25);">K</div>
-          <div style="display: flex; flex-direction: column;">
-            <span style="font-weight: 800; font-size: 1.12rem; color: #111827; line-height: 1.2;">Kusuma Properti</span>
-            <span style="font-size: 0.72rem; color: #8c4a24; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; line-height: 1.2;">KALIBATA CITY HAVEN</span>
-          </div>
-        </a>
-
-        <!-- Menu Navigasi Tengah -->
-        <nav class="nav-links" style="display: flex; align-items: center; gap: 24px;">
-          <a href="#keunggulan" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">HARMONI &amp; AKSES</a>
-          <a href="#katalog" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">KATALOG UNIT</a>
-          <a href="#fasilitas" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">FASILITAS KAWASAN</a>
-          <a href="#lokasi" style="color: #475569; text-decoration: none; font-size: 0.86rem; font-weight: 600; transition: color 0.2s;">LOKASI</a>
-          <a href="https://wa.me/6281221559000" target="_blank" rel="noopener noreferrer" style="color: #16a34a; text-decoration: none; font-size: 0.86rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background: #16a34a; display: inline-block;"></span>
-            WhatsApp Admin
-          </a>
-        </nav>
-
-        <!-- Tombol Admin Cockpit Kanan -->
-        <div style="display: flex; align-items: center;">
-          <a href="admin.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 50px; border: 1px solid #e2e8f0; background: #ffffff; color: #1e293b; font-size: 0.85rem; font-weight: 600; text-decoration: none; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease;">
-            Admin Cockpit &rarr;
-          </a>
+  <header class="sticky top-0 z-40 japandi-panel px-4 md:px-8 py-3.5 border-b border-[#E8DFD3]">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2.5 md:gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-[#8C5835] text-white flex items-center justify-center font-serif text-xl font-bold shadow-sm">K</div>
+        <div>
+          <h1 class="text-sm md:text-base font-extrabold tracking-tight text-[#2C2C2A] leading-tight font-sans">Kusuma Properti</h1>
+          <p class="text-[9px] md:text-[10px] text-[#8C5835] font-semibold tracking-wider uppercase">Kalibata City Haven</p>
         </div>
-
       </div>
-    </header>
 
-  <!-- Hero Section with Adaptive Scrim Backplate -->
-  <section class="max-w-6xl mx-auto px-4 md:px-8 pt-12 pb-16 md:pt-20 md:pb-28 text-center">
-    <div class="hero-scrim-box p-6 md:p-10 rounded-3xl backdrop-blur-md max-w-4xl mx-auto space-y-6">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#EFE8DC]/90 border border-[#DDD3C2] text-[#8C5835] text-xs font-bold tracking-widest uppercase shadow-sm">
+      <nav class="hidden md:flex items-center gap-8 text-xs font-semibold uppercase tracking-wider text-[#737370]">
+        <a href="#keunggulan" class="hover:text-[#8C5835] transition">Harmoni & Akses</a>
+        <a href="#tipe-unit" class="hover:text-[#8C5835] transition">Katalog Unit</a>
+        <a href="#fasilitas" class="hover:text-[#8C5835] transition">Fasilitas Kawasan</a>
+        <a href="#lokasi" class="hover:text-[#8C5835] transition">Lokasi</a>
+        <button onclick="openWhatsAppDirect()" class="text-[#3A5A40] hover:text-[#2D4732] flex items-center gap-1.5 font-bold transition">
+          <span class="w-2 h-2 rounded-full bg-[#3A5A40] animate-pulse"></span>
+          WhatsApp Admin
+        </button>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openWhatsAppDirect()" class="md:hidden px-3.5 py-2 japandi-btn-moss font-bold text-xs rounded-xl shadow-sm">
+          Chat WA
+        </button>
+        <a href="dashboard.html" class="px-4 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1.5">
+          <span>Admin Cockpit</span>
+          <svg class="w-3.5 h-3.5 text-[#8C5835]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="max-w-6xl mx-auto px-4 md:px-8 pt-10 pb-14 md:pt-20 md:pb-28 text-center">
+    <div class="hero-scrim-box p-6 md:p-10 rounded-3xl backdrop-blur-md max-w-4xl mx-auto space-y-4 md:space-y-6">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE8DC]/90 border border-[#DDD3C2] text-[#8C5835] text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm">
         Ketenangan & Kemudahan Hidup di Jakarta Selatan
       </div>
       
-      
-          <h1 class="hero-main-title" style="font-size: 2.4rem; font-weight: 800; line-height: 1.2; margin: 20px 0 16px 0; text-align: center;">
-            <span style="color: #7a3e1d !important; text-transform: uppercase !important; display: block; font-size: 0.82em; letter-spacing: 0.5px; font-style: normal !important;">HARMONI HUNIAN SIAP PAKAI, LEBIH PRAKTIS DI</span>
-            <span style="color: #111827 !important; font-style: normal !important; font-weight: 800 !important; display: block; margin-top: 8px;">Apartemen Kalibata City</span>
-          </h1>
+      <h2 class="text-2xl md:text-6xl font-normal tracking-tight leading-[1.2] md:leading-[1.15] max-w-3xl mx-auto font-display hero-title-adaptive">
+        Harmoni Hunian Siap Pakai, Lebih Praktis di <span class="italic text-[#8C5835]">Apartemen Kalibata City</span>
+      </h2>
 
-      <p class="text-sm md:text-lg max-w-2xl mx-auto leading-relaxed font-normal hero-desc-adaptive">
+      <p class="text-xs md:text-lg max-w-2xl mx-auto leading-relaxed font-normal hero-desc-adaptive">
         Koleksi unit sewa bulanan dan tahunan bernuansa tenang dan fungsional. Dilengkapi akses instan menuju Mall Kalibata City Square dan 2 menit berjalan kaki ke Stasiun KRL.
       </p>
 
-      <div class="pt-3 flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
-        <button onclick="toggleFloatingChat()" class="w-full sm:w-auto px-7 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+      <div class="pt-2 md:pt-4 flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
+        <button onclick="toggleFloatingChat()" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
           <span>Konsultasi Sewa via Kusuma AI</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </button>
-        <button onclick="openWhatsAppDirect()" class="w-full sm:w-auto px-7 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2">
+        <button onclick="openWhatsAppDirect()" class="w-full sm:w-auto px-6 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2 min-h-[44px]">
           <span>Chat Konsultan Properti</span>
         </button>
       </div>
@@ -75,38 +71,38 @@
   </section>
 
   <!-- Keunggulan Section -->
-  <section id="keunggulan" class="max-w-6xl mx-auto px-4 md:px-8 py-16">
-    <div class="text-center space-y-2 mb-12">
-      <span class="text-xs font-bold text-[#8C5835] uppercase tracking-widest">Kenapa Memilih Kami</span>
-      <h3 class="text-2xl md:text-4xl text-[#2C2C2A] font-display font-normal">Kenyamanan Sederhana yang Esensial</h3>
+  <section id="keunggulan" class="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-16">
+    <div class="text-center space-y-1.5 md:space-y-2 mb-8 md:mb-12">
+      <span class="text-[10px] md:text-xs font-bold text-[#8C5835] uppercase tracking-widest">Kenapa Memilih Kami</span>
+      <h3 class="text-xl md:text-4xl text-[#2C2C2A] font-display font-normal">Kenyamanan Sederhana yang Esensial</h3>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="japandi-card p-7 rounded-3xl space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <div class="japandi-card p-5 md:p-7 rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
         </div>
-        <h4 class="text-lg font-bold text-[#2C2C2A] font-sans">Mall KCS Tepat di Bawah Unit</h4>
+        <h4 class="text-base md:text-lg font-bold text-[#2C2C2A] font-sans">Mall KCS Tepat di Bawah Unit</h4>
         <p class="text-[#737370] text-xs leading-relaxed">
           Pusat kuliner, Farmers Market, kafe santai, apotek, dan bioskop XXI tinggal turun lift tanpa repot berkendara keluar kawasan.
         </p>
       </div>
 
-      <div class="japandi-card p-7 rounded-3xl space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-[#EAF0EB] text-[#3A5A40] flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <div class="japandi-card p-5 md:p-7 rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#EAF0EB] text-[#3A5A40] flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
         </div>
-        <h4 class="text-lg font-bold text-[#2C2C2A] font-sans">200 Meter ke Stasiun KRL</h4>
+        <h4 class="text-base md:text-lg font-bold text-[#2C2C2A] font-sans">200 Meter ke Stasiun KRL</h4>
         <p class="text-[#737370] text-xs leading-relaxed">
           Cukup 2 menit jalan kaki santai ke Stasiun Duren Kalibata. Bebas macet menuju koridor segitiga emas Sudirman, Kuningan, dan Tebet.
         </p>
       </div>
 
-      <div class="japandi-card p-7 rounded-3xl space-y-3">
-        <div class="w-12 h-12 rounded-2xl bg-[#F8ECE8] text-[#B35436] flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <div class="japandi-card p-5 md:p-7 rounded-3xl space-y-2.5 md:space-y-3">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F8ECE8] text-[#B35436] flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
-        <h4 class="text-lg font-bold text-[#2C2C2A] font-sans">Full Furnished & Terawat</h4>
+        <h4 class="text-base md:text-lg font-bold text-[#2C2C2A] font-sans">Full Furnished & Terawat</h4>
         <p class="text-[#737370] text-xs leading-relaxed">
           Interior rapi dan terinspeksi bersih. Dilengkapi sistem keamanan kartu akses 24 jam serta transparansi proses sewa.
         </p>
@@ -114,119 +110,80 @@
     </div>
   </section>
 
-  <!-- Pilihan Unit Section -->
-  <section id="tipe-unit" class="max-w-6xl mx-auto px-4 md:px-8 py-16 border-t border-[#E8DFD3]">
-    <div class="text-center space-y-2 mb-12">
-      <span class="text-xs font-bold text-[#8C5835] uppercase tracking-widest">Katalog Pilihan</span>
-      <h3 class="text-2xl md:text-4xl text-[#2C2C2A] font-display font-normal">Tipe Unit Populer Siap Huni</h3>
+  <!-- Pilihan Unit Section (Dynamic Catalog Container) -->
+  <section id="tipe-unit" class="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-16 border-t border-[#E8DFD3]">
+    <div class="text-center space-y-1.5 md:space-y-2 mb-8 md:mb-12">
+      <span class="text-[10px] md:text-xs font-bold text-[#8C5835] uppercase tracking-widest">Katalog Pilihan</span>
+      <h3 class="text-xl md:text-4xl text-[#2C2C2A] font-display font-normal">Tipe Unit Populer Siap Huni</h3>
+      <p class="text-xs text-[#737370]">Diperbarui langsung dari database unit aktif Kusuma Properti.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="japandi-card p-7 rounded-3xl flex flex-col justify-between space-y-6">
-        <div class="space-y-3">
-          <span class="px-3 py-1 bg-[#F4EFE6] text-[#8C5835] text-[11px] font-bold tracking-wider uppercase rounded-full">Single / Eksekutif</span>
-          <h4 class="text-xl font-bold text-[#2C2C2A]">Studio Deluxe</h4>
-          <p class="text-xs text-[#737370]">Luas 21 m2 | Full Furnished | AC, Spring Bed, Kitchen Set, Smart TV</p>
-          <div class="pt-4 border-t border-[#E8DFD3]">
-            <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-            <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 3.000.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-          </div>
-        </div>
-        <button onclick="bookViewingUnit('Studio Deluxe')" class="w-full py-3 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
-          Jadwalkan Survei Unit
-        </button>
-      </div>
-
-      <div class="japandi-card-warm p-7 rounded-3xl flex flex-col justify-between space-y-6 shadow-md border-[#D4A373]">
-        <div class="space-y-3">
-          <span class="px-3 py-1 bg-[#8C5835] text-white text-[11px] font-bold tracking-wider uppercase rounded-full">Paling Favorit</span>
-          <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Standard</h4>
-          <p class="text-xs text-[#737370]">Luas 33 m2 | 2 Kamar Tidur | Living Room, Dapur Lengkap, Balkon</p>
-          <div class="pt-4 border-t border-[#DDD3C2]">
-            <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-            <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 4.200.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-          </div>
-        </div>
-        <button onclick="bookViewingUnit('2 Bedroom Standard')" class="w-full py-3 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition">
-          Jadwalkan Survei Unit
-        </button>
-      </div>
-
-      <div class="japandi-card p-7 rounded-3xl flex flex-col justify-between space-y-6">
-        <div class="space-y-3">
-          <span class="px-3 py-1 bg-[#EAF0EB] text-[#3A5A40] text-[11px] font-bold tracking-wider uppercase rounded-full">Green Palace Resort</span>
-          <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Executive</h4>
-          <p class="text-xs text-[#737370]">Akses Kolam Renang Tematik | Gym Indoor | Interior Modern</p>
-          <div class="pt-4 border-t border-[#E8DFD3]">
-            <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-            <p class="text-2xl font-bold text-[#3A5A40] font-serif">Rp 5.500.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-          </div>
-        </div>
-        <button onclick="bookViewingUnit('2 Bedroom Executive')" class="w-full py-3 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
-          Jadwalkan Survei Unit
-        </button>
+    <!-- Dynamic Unit Grid: 1 Col Mobile, 2 Col Tablet, 3 Col Desktop -->
+    <div id="dynamic-unit-catalog" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      <div class="col-span-full text-center py-12 text-xs text-[#737370] animate-pulse">
+        Memuat katalog unit siap huni...
       </div>
     </div>
   </section>
 
   <!-- Fasilitas Section -->
-  <section id="fasilitas" class="max-w-6xl mx-auto px-4 md:px-8 py-16 border-t border-[#E8DFD3]">
-    <div class="text-center space-y-2 mb-12">
-      <span class="text-xs font-bold text-[#8C5835] uppercase tracking-widest">Fasilitas Lengkap</span>
-      <h3 class="text-2xl md:text-4xl text-[#2C2C2A] font-display font-normal">Segala Kebutuhan di Satu Tempat</h3>
+  <section id="fasilitas" class="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-16 border-t border-[#E8DFD3]">
+    <div class="text-center space-y-1.5 md:space-y-2 mb-8 md:mb-12">
+      <span class="text-[10px] md:text-xs font-bold text-[#8C5835] uppercase tracking-widest">Fasilitas Lengkap</span>
+      <h3 class="text-xl md:text-4xl text-[#2C2C2A] font-display font-normal">Segala Kebutuhan di Satu Tempat</h3>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-      <div class="japandi-card p-6 rounded-3xl text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] mx-auto flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M3 9a4 4 0 014-4h10a4 4 0 014 4M3 12h18"></path></svg>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
+      <div class="japandi-card p-4 md:p-6 rounded-3xl text-center space-y-1.5 md:space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 15a4 4 0 004 4h10a4 4 0 004-4M3 9a4 4 0 014-4h10a4 4 0 014 4M3 12h18"></path></svg>
         </div>
-        <h5 class="font-bold text-sm text-[#2C2C2A]">Kolam Renang</h5>
-        <p class="text-[11px] text-[#737370]">Adult Pool & Kids Pool tematik di Green Palace.</p>
+        <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Kolam Renang</h5>
+        <p class="text-[10px] md:text-[11px] text-[#737370]">Adult Pool & Kids Pool tematik di Green Palace.</p>
       </div>
 
-      <div class="japandi-card p-6 rounded-3xl text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-[#EAF0EB] text-[#3A5A40] mx-auto flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12"></path></svg>
+      <div class="japandi-card p-4 md:p-6 rounded-3xl text-center space-y-1.5 md:space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#EAF0EB] text-[#3A5A40] mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16M7 6v12M17 6v12"></path></svg>
         </div>
-        <h5 class="font-bold text-sm text-[#2C2C2A]">Fitness Center</h5>
-        <p class="text-[11px] text-[#737370]">Pusat kebugaran cardio & beban indoor.</p>
+        <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Fitness Center</h5>
+        <p class="text-[10px] md:text-[11px] text-[#737370]">Pusat kebugaran cardio & beban indoor.</p>
       </div>
 
-      <div class="japandi-card p-6 rounded-3xl text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-[#F8ECE8] text-[#B35436] mx-auto flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <div class="japandi-card p-4 md:p-6 rounded-3xl text-center space-y-1.5 md:space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F8ECE8] text-[#B35436] mx-auto flex items-center justify-center">
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
-        <h5 class="font-bold text-sm text-[#2C2C2A]">Sports Court</h5>
-        <p class="text-[11px] text-[#737370]">Lapangan tenis, basket, futsal, & jogging track.</p>
+        <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Sports Court</h5>
+        <p class="text-[10px] md:text-[11px] text-[#737370]">Lapangan tenis, basket, futsal, & jogging track.</p>
       </div>
 
-      <div class="japandi-card p-6 rounded-3xl text-center space-y-2">
-        <div class="w-12 h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] mx-auto flex items-center justify-center">
+      <div class="japandi-card p-4 md:p-6 rounded-3xl text-center space-y-1.5 md:space-y-2">
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] mx-auto flex items-center justify-center">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         </div>
-        <h5 class="font-bold text-sm text-[#2C2C2A]">Mall KCS & Cinema</h5>
-        <p class="text-[11px] text-[#737370]">Farmers Market & XXI tinggal turun lift.</p>
+        <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Mall KCS & Cinema</h5>
+        <p class="text-[10px] md:text-[11px] text-[#737370]">Farmers Market & XXI tinggal turun lift.</p>
       </div>
     </div>
   </section>
 
   <!-- Peta Lokasi Section -->
-  <section id="lokasi" class="max-w-6xl mx-auto px-4 md:px-8 py-16 border-t border-[#E8DFD3]">
-    <div class="text-center space-y-2 mb-12">
-      <span class="text-xs font-bold text-[#8C5835] uppercase tracking-widest">Konektivitas</span>
-      <h3 class="text-2xl md:text-4xl text-[#2C2C2A] font-display font-normal">Akses Strategis Jakarta Selatan</h3>
+  <section id="lokasi" class="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-16 border-t border-[#E8DFD3]">
+    <div class="text-center space-y-1.5 md:space-y-2 mb-8 md:mb-12">
+      <span class="text-[10px] md:text-xs font-bold text-[#8C5835] uppercase tracking-widest">Konektivitas</span>
+      <h3 class="text-xl md:text-4xl text-[#2C2C2A] font-display font-normal">Akses Strategis Jakarta Selatan</h3>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-      <div class="lg:col-span-2 japandi-card p-4 rounded-3xl space-y-3">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 items-start">
+      <div class="lg:col-span-2 japandi-card p-3.5 md:p-4 rounded-3xl space-y-3">
         <div class="flex justify-between items-center px-2">
           <span class="text-xs font-bold text-[#2C2C2A]">Peta Kawasan Kalibata City</span>
           <a href="https://maps.google.com/?q=Apartemen+Kalibata+City+Jakarta+Selatan" target="_blank" class="text-xs text-[#8C5835] font-bold hover:underline">
             Buka di Google Maps &rarr;
           </a>
         </div>
-        <div class="w-full h-[280px] md:h-[380px] rounded-2xl overflow-hidden border border-[#E8DFD3]">
+        <div class="w-full h-[240px] md:h-[380px] rounded-2xl overflow-hidden border border-[#E8DFD3]">
           <iframe 
             title="Peta Presisi Apartemen Kalibata City"
             src="https://maps.google.com/maps?q=-6.2558,106.8552&hl=id&z=17&output=embed" 
@@ -239,35 +196,33 @@
         </div>
       </div>
 
-      <div class="space-y-4">
-        <div class="japandi-card p-6 rounded-3xl space-y-1 border-l-4 border-[#3A5A40]">
+      <div class="space-y-3 md:space-y-4">
+        <div class="japandi-card p-5 md:p-6 rounded-3xl space-y-1 border-l-4 border-[#3A5A40]">
           <span class="text-[10px] font-bold text-[#3A5A40] uppercase tracking-wider">Transportasi Terintegrasi</span>
-          <h5 class="font-bold text-sm text-[#2C2C2A]">Stasiun KRL Duren Kalibata (200m)</h5>
-          <p class="text-xs text-[#737370]">Jalan kaki santai 2 menit. Akses cepat ke Sudirman, Kuningan, dan Manggarai.</p>
+          <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Stasiun KRL Duren Kalibata (200m)</h5>
+          <p class="text-[11px] md:text-xs text-[#737370]">Jalan kaki santai 2 menit. Akses cepat ke Sudirman, Kuningan, dan Manggarai.</p>
         </div>
 
-        <div class="japandi-card p-6 rounded-3xl space-y-1 border-l-4 border-[#8C5835]">
+        <div class="japandi-card p-5 md:p-6 rounded-3xl space-y-1 border-l-4 border-[#8C5835]">
           <span class="text-[10px] font-bold text-[#8C5835] uppercase tracking-wider">Kawasan Bisnis & Tol</span>
-          <h5 class="font-bold text-sm text-[#2C2C2A]">Kuningan & Gatot Subroto (10-15 Menit)</h5>
-          <p class="text-xs text-[#737370]">Akses mudah ke perkantoran HR Rasuna Said, SCBD, MT Haryono, dan Pintu Tol Pancoran.</p>
+          <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Kuningan & Gatot Subroto (10-15 Menit)</h5>
+          <p class="text-[11px] md:text-xs text-[#737370]">Akses mudah ke perkantoran HR Rasuna Said, SCBD, MT Haryono, dan Pintu Tol Pancoran.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-        
-      
-<footer class="japandi-panel border-t border-[#E8DFD3] py-8 px-4 text-center text-xs text-[#737370] space-y-2">
+  <footer class="japandi-panel border-t border-[#E8DFD3] py-6 md:py-8 px-4 text-center text-xs text-[#737370] space-y-1.5">
     <p class="font-semibold text-[#2C2C2A]">Kusuma Properti &copy; 2026 - Kalibata City Haven</p>
     <p>Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750</p>
   </footer>
 
-  <!-- Floating Chatbot Widget -->
-  <div id="floating-chat-widget" class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
-    <div id="chat-popup" class="hidden japandi-panel border border-[#DDD3C2] rounded-3xl shadow-xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[480px]">
-      <div class="bg-[#F4EFE6] p-4 border-b border-[#E8DFD3] flex justify-between items-center">
-        <div class="flex items-center gap-3">
+  <!-- Floating Chatbot Widget (Mobile Touch Standard) -->
+  <div id="floating-chat-widget" class="fixed bottom-4 md:bottom-5 right-4 md:right-5 z-50 flex flex-col items-end">
+    <div id="chat-popup" class="hidden japandi-panel border border-[#DDD3C2] rounded-3xl shadow-2xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[460px] md:h-[480px]">
+      <div class="bg-[#F4EFE6] p-3.5 md:p-4 border-b border-[#E8DFD3] flex justify-between items-center">
+        <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-xs font-serif">K</div>
           <div>
             <h6 class="text-xs font-bold text-[#2C2C2A]">Kusuma AI Concierge</h6>
@@ -284,7 +239,7 @@
         </div>
       </div>
 
-      <div id="widget-messages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs bg-[#FAF7F2]">
+      <div id="widget-messages" class="flex-1 p-3.5 md:p-4 overflow-y-auto space-y-3 text-xs bg-[#FAF7F2]">
         <div class="flex items-start gap-2.5">
           <div class="w-7 h-7 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-[10px] font-serif shrink-0">K</div>
           <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] leading-relaxed shadow-sm">
@@ -293,14 +248,14 @@
         </div>
       </div>
 
-      <div class="px-3 py-2 bg-[#F4EFE6] border-t border-[#E8DFD3] flex gap-2 overflow-x-auto text-[11px]">
-        <button onclick="sendWidgetQuickPrompt('Berapa harga sewa unit Studio Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+      <div class="px-3 py-2 bg-[#F4EFE6] border-t border-[#E8DFD3] flex gap-2 overflow-x-auto text-[10px] md:text-[11px]">
+        <button onclick="sendWidgetQuickPrompt('Berapa harga sewa unit Studio Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Tarif Studio
         </button>
-        <button onclick="sendWidgetQuickPrompt('Bagaimana aturan dan biaya parkir mobil di Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+        <button onclick="sendWidgetQuickPrompt('Bagaimana aturan dan biaya parkir mobil di Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Info Parkir
         </button>
-        <button onclick="sendWidgetQuickPrompt('Jadwalkan survei unit 2BR')" class="bg-white border border-[#DDD3C2] px-3 py-1 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+        <button onclick="sendWidgetQuickPrompt('Jadwalkan survei unit 2BR')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Survei 2BR
         </button>
       </div>
@@ -314,7 +269,7 @@
     </div>
 
     <!-- Floating Toggle Buttons -->
-    <div class="flex items-center gap-2.5">
+    <div class="flex items-center gap-2">
       <button onclick="openWhatsAppDirect()" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-105">
         <span class="text-xs font-bold">WA</span>
       </button>
@@ -327,36 +282,5 @@
 
   <script src="js/config.js"></script>
   <script src="js/landing.js"></script>
-    
-    
-    <!-- FLOATING ACTIONS KIRI BAWAH -->
-    <div id="floating-left-widget" style="position: fixed; bottom: 24px; left: 24px; z-index: 99999; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; font-family: system-ui, -apple-system, sans-serif;">
-      
-      <!-- Tombol Listing Unit Lengkap -->
-      <a href="https://www.rumah123.com/agen-properti/independent-property-agent/kusuma-properti-4373821/?utm_source=organic&amp;utm_medium=share-collection&amp;collectionUuid=5be8d605-387f-4aa5-ab99-bbb19af20cad#collection-Semua-Properti-5be8d605-387f-4aa5-ab99-bbb19af20cad" 
-         target="_blank" 
-         rel="noopener noreferrer" 
-         title="Buka Listing Unit di Rumah123"
-         style="display: inline-flex; align-items: center; gap: 8px; background: #0d47a1; color: #ffffff !important; font-size: 13.5px; font-weight: 600; padding: 10px 18px; border-radius: 50px; text-decoration: none; box-shadow: 0 4px 16px rgba(13,71,161,0.4); white-space: nowrap; transition: transform 0.2s ease;">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink: 0;">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
-        <span>Listing Unit <span style="font-size: 12px; font-weight: 400; opacity: 0.9;">(klik cari + tampilkan)</span></span>
-      </a>
-
-      <!-- Tombol Instagram -->
-      <a href="https://www.instagram.com/kalibatacitybykusuma" 
-         target="_blank" 
-         rel="noopener noreferrer" 
-         aria-label="Instagram Kusuma Properti"
-         title="Instagram @kalibatacitybykusuma"
-         style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: #ffffff !important; border-radius: 50%; text-decoration: none; box-shadow: 0 4px 15px rgba(220,39,67,0.35); transition: transform 0.2s ease;">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink: 0;">
-          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-        </svg>
-      </a>
-
-    </div>
-    <!-- END FLOATING ACTIONS -->
 </body>
 </html>
