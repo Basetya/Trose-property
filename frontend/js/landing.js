@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v19.0)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v20.0)
  * File: frontend/js/landing.js
  */
 
@@ -56,12 +56,13 @@ function bindCleanEventListeners() {
   addClick("nav-btn-wa", () => openWhatsAppDirect());
   addClick("mobile-nav-btn-wa", () => openWhatsAppDirect());
   
-  // Hero Main Buttons
+  // Hero Buttons
   addClick("hero-btn-ai", () => toggleFloatingChat());
   addClick("hero-btn-wa", () => openWhatsAppDirect());
 
-  // Hero Quick Text Links (Di bawah tombol utama)
-  addClick("link-open-ai", () => toggleFloatingChat());
+  // Floating Buttons (Kanan Bawah)
+  addClick("floating-btn-wa", () => openWhatsAppDirect());
+  addClick("floating-btn-ai", () => toggleFloatingChat());
 
   // Widget Actions
   addClick("widget-btn-wa", () => openWhatsAppDirect());
