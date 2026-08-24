@@ -1,6 +1,6 @@
 /**
- * Kusuma Properti Manager - Kusuma AI Concierge Engine (v9.0)
- * Dynamic Knowledge Base & Context Sanitization
+ * Kusuma Properti Manager - Kusuma AI Concierge Engine (Pure LLM)
+ * Architecture: Clean Native System Instruction + Gemini Flash 2.5/3.6 LLM
  * File: backend/GeminiCRM.gs
  */
 
@@ -8,93 +8,78 @@ function handleGeminiAiChat(userMessage, senderIdentifier) {
   const scriptProperties = PropertiesService.getScriptProperties();
   const apiKey = scriptProperties.getProperty("GEMINI_API_KEY");
 
-  const storedKb = scriptProperties.getProperty("AI_KNOWLEDGE_BASE");
-  const storedGr = scriptProperties.getProperty("AI_GUARDRAILS");
+  if (!apiKey || apiKey.trim() === "") {
+    return {
+      success: false,
+      reply: "[Konfigurasi Diperlukan]: GEMINI_API_KEY belum disetel di Project Settings > Script Properties pada Google Apps Script."
+    };
+  }
 
-  const customKnowledgeBase = storedKb !== null ? storedKb : getDefaultKnowledgeBase();
-  const customGuardrails = storedGr !== null ? storedGr : getDefaultGuardrails();
-
+  // 1. Ambil Data Unit Aktual dari Tab 02_UNITS Google Sheets
   let liveUnitInventory = "";
   try {
     const units = getSheetDataAsJson("02_UNITS");
     const availableUnits = units.filter(u => u.Status === "Available");
     if (availableUnits.length > 0) {
-      liveUnitInventory = "DAFTAR UNIT TERSEDIA SAAT INI (REAL-TIME DATABASE KUSUMA PROPERTI):\n";
+      liveUnitInventory = "\nDAFTAR UNIT TERSEDIA SAAT INI DI DATABASE KUSUMA PROPERTI:\n";
       availableUnits.forEach(u => {
-        liveUnitInventory += `- ${u.Tower} No.${u.Unit_No} (${u.Type}): Rp${Number(u.Base_Rent).toLocaleString("id-ID")}/bln (Rute: ${u.Payment_Route}).\n`;
+        liveUnitInventory += `- ${u.Tower} No.${u.Unit_No} (${u.Type || 'Studio'}): Sewa Rp${Number(u.Base_Rent || 0).toLocaleString("id-ID")}/bln, IPL Rp${Number(u.IPL_Fee || 350000).toLocaleString("id-ID")}/bln.\n`;
       });
     } else {
-      liveUnitInventory = "STATUS UNIT: Semua unit kelolaan saat ini sedang terisi (Full Occupied).\n";
+      liveUnitInventory = "\nSTATUS UNIT: Semua unit kelolaan saat ini terisi penuh (Full Occupied).\n";
     }
   } catch (e) {
-    liveUnitInventory = "Katalog sewa bulanan dan tahunan Kalibata City aktif.\n";
+    liveUnitInventory = "\nKatalog unit aktif di Apartemen Kalibata City.\n";
   }
 
-  const cleanId = String(senderIdentifier || '').replace(/[^a-zA-Z0-9-]/g, '');
-  let verifiedCustomerContext = "";
+  // 2. System Instruction Terstruktur
+  const systemPrompt = `Anda adalah "Kusuma AI", asisten virtual dan leasing concierge resmi Kusuma Properti di Apartemen Kalibata City, Jakarta Selatan.
 
-  try {
-    const contacts = getSheetDataAsJson("03_CONTACTS_360");
-    const leases = getSheetDataAsJson("04_LEASES");
-    const invoices = getSheetDataAsJson("05_INVOICES");
+KNOWLEDGE BASE LENGKAP:
+- Alamat: Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan.
+- Total 18 Tower: Akasia, Borneo, Cendana, Damar, Ebony, Flamboyan, Gaharu, Hebras, Kemuning, Jasmine, Lotus, Mawar, Nusa Indah, Palem, Raffles, Sakura, Tulip, Viola.
+- Tower Green Palace: Memiliki kolam renang tematik dan gym indoor khusus penghuni tower Green Palace.
+- Tarif Sewa Rata-rata:
+  * Studio (21 m²): Mulai Rp 3.000.000 - Rp 3.500.000/bulan.
+  * 2 Bedroom Standard (33 m²): Mulai Rp 4.200.000 - Rp 4.500.000/bulan.
+  * 2 Bedroom Green Palace (33-35 m²): Mulai Rp 5.000.000 - Rp 5.500.000/bulan.
+- Rincian Biaya IPL (Iuran Pengelolaan Lingkungan / Maintenance Fee):
+  * Unit Studio (21 m²): Sekitar Rp 300.000 - Rp 350.000 per bulan.
+  * Unit 2 Bedroom (33 m²): Sekitar Rp 450.000 - Rp 500.000 per bulan.
+  * Listrik & Air: Menggunakan token/meteran terpisah sesuai pemakaian riil penyewa.
+- Fasilitas Sekitar:
+  * Mall Kalibata City Square (KCS) di bawah tower (Bioskop XXI, Farmers Market, ATM Center, Restoran 24 jam).
+  * Stasiun KRL Duren Kalibata: 5 menit jalan kaki santai (200 meter).
+  * Laundry: Tersedia banyak laundry kiloan dan satuan di lantai dasar / area ruko tower.
+  * Rumah Sakit Terdekat: RS Brawijaya Duren Tiga (2.5 km), RSUD Budhi Asih (3 km), RS Tebet (3.5 km), serta klinik & apotek 24 jam di dalam Mall KCS.
+  * Pendidikan: Universitas Trilogi berada tepat di samping kawasan apartemen (100 meter).
+- Kebijakan Sewa: Hanya melayani sewa bulanan dan tahunan (TIDAK menyediakan sewa harian).
 
-    let matchedContact = contacts.find(c => 
-      (c.Phone_WA && String(c.Phone_WA).replace(/[^0-9]/g, '') === cleanId) ||
-      (c.Contact_ID && String(c.Contact_ID).trim().toLowerCase() === cleanId.toLowerCase())
-    );
-
-    if (matchedContact) {
-      const userLease = leases.find(l => String(l.Tenant_ID).trim() === String(matchedContact.Contact_ID).trim() && l.Status === "Active");
-      const userInvoices = invoices.filter(inv => userLease && String(inv.Lease_ID).trim() === String(userLease.Lease_ID).trim());
-      
-      verifiedCustomerContext = `\n[DATA PENYEWA TERVERIFIKASI SISTEM]\n` +
-        `- Nama: ${matchedContact.Full_Name}\n` +
-        `- Status: ${matchedContact.Role}\n` +
-        (userLease ? `- Kontrak Unit: ${userLease.Unit_ID} (Berakhir: ${userLease.End_Date}, Sewa: Rp${Number(userLease.Monthly_Rent).toLocaleString('id-ID')}/bln)\n` : "- Belum memiliki kontrak aktif.\n") +
-        `- Tagihan: ${userInvoices.length} total (${userInvoices.filter(i => i.Status === 'Unpaid').length} belum lunas).\n`;
-    }
-  } catch (err) {
-    Logger.log("Customer context resolution error: " + err.toString());
-  }
-
-  if (!apiKey) {
-    return {
-      success: true,
-      reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails)
-    };
-  }
-
-  const systemPrompt = `Anda adalah "Kusuma AI", Asisten Virtual AI & Leasing Concierge resmi untuk Kusuma Properti di Superblock Apartemen Kalibata City, Jakarta Selatan.
-
-${customKnowledgeBase ? '=== KNOWLEDGE BASE AKTIF DARI PENGELOLA ===\n' + customKnowledgeBase : '=== KNOWLEDGE BASE: Default Clean Property Context ==='}
-
-=== LIVE INVENTORY DARI GOOGLE SHEETS ===
 ${liveUnitInventory}
 
-${customGuardrails ? '=== ATURAN GUARDRAILS & KEBIJAKAN RESPON ===\n' + customGuardrails : '=== GUARDRAILS: Strict Professional Property Guidelines ==='}
+PANDUAN JAWABAN:
+1. Jawab langsung ke inti pertanyaan pengguna dengan nada ramah, sopan, dan informatif dalam 1–2 paragraf ringkas.
+2. Jangan mengulang perkenalan diri panjang jika pertanyaan sudah spesifik.
+3. Di akhir jawaban, tawarkan bantuan untuk mengatur jadwal survei unit (viewing) atau mengarahkan ke tombol WhatsApp Admin.`;
 
-=== DATA PELANGGAN TERDAFTAR ===
-${verifiedCustomerContext || "PENGGUNA SAAT INI: Pengunjung umum / Belum terverifikasi."}
-
-Panduan Respon:
-1. Bersikap ramah, sopan, profesional, ringkas (maksimal 2-3 paragraf), bahasa Indonesia elegan.
-2. JANGAN PERNAH membocorkan nama pemilik unit, nomor rekening landlord, atau data sewa penyewa lain.
-3. Selalu prioritaskan jawaban berdasarkan data aktif di atas.`;
-
+  // 3. Payload Native System Instruction
   const payload = {
+    system_instruction: {
+      parts: [{ text: systemPrompt }]
+    },
     contents: [
       {
         role: "user",
-        parts: [{ text: systemPrompt + "\n\nPertanyaan Pengguna: " + userMessage }]
+        parts: [{ text: String(userMessage) }]
       }
     ],
     generationConfig: {
       temperature: 0.7,
-      maxOutputTokens: 400
+      maxOutputTokens: 600
     }
   };
 
-  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+  const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey.trim();
   const options = {
     method: "post",
     contentType: "application/json",
@@ -103,42 +88,44 @@ Panduan Respon:
   };
 
   try {
-    const response = UrlFetchApp.fetch(endpoint, options);
-    const json = JSON.parse(response.getContentText());
+    let response = UrlFetchApp.fetch(endpoint, options);
+    let responseCode = response.getResponseCode();
+    let responseBody = response.getContentText();
+    let json = JSON.parse(responseBody);
 
-    if (json.candidates && json.candidates.length > 0 &&
-        json.candidates[0].content &&
-        json.candidates[0].content.parts &&
-        json.candidates[0].content.parts[0] &&
-        json.candidates[0].content.parts[0].text) {
-      return { success: true, reply: json.candidates[0].content.parts[0].text };
+    if (responseCode === 404) {
+      const fallbackEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + apiKey.trim();
+      response = UrlFetchApp.fetch(fallbackEndpoint, options);
+      responseCode = response.getResponseCode();
+      responseBody = response.getContentText();
+      json = JSON.parse(responseBody);
+    }
+
+    if (responseCode === 200 && json.candidates && json.candidates.length > 0 &&
+        json.candidates[0].content && json.candidates[0].content.parts &&
+        json.candidates[0].content.parts[0] && json.candidates[0].content.parts[0].text) {
+      return {
+        success: true,
+        reply: json.candidates[0].content.parts[0].text.trim()
+      };
     } else {
-      return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
+      const errorMsg = (json.error && json.error.message) ? json.error.message : responseBody;
+      Logger.log("Gemini API Error: " + errorMsg);
+      return {
+        success: false,
+        reply: "[Google AI Error " + responseCode + "]: " + errorMsg
+      };
     }
   } catch (err) {
-    Logger.log("Gemini Live API Error: " + err.toString());
-    return { success: true, reply: generateStructuredOfflineAnswer(userMessage, customKnowledgeBase, customGuardrails) };
+    Logger.log("Exception: " + err.toString());
+    return {
+      success: false,
+      reply: "[Apps Script Fetch Error]: " + err.toString()
+    };
   }
 }
 
-function generateStructuredOfflineAnswer(userQuery, kb, gr) {
-  const q = String(userQuery || '').toLowerCase();
-  
-  if (q.includes("harian") || q.includes("hari") || q.includes("malam") || q.includes("transit") || q.includes("short stay")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan fasilitas sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, keamanan, serta privasi optimal bagi seluruh penghuni. Apakah Anda ingin mengetahui pilihan unit bulanan kami?";
-  }
-  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("tarif") || q.includes("rate") || q.includes("sewa")) {
-    return "Berikut pilihan sewa bulanan resmi di Kalibata City bersama Kusuma Properti:\n- Studio Deluxe (21 m2): Mulai Rp 3.000.000/bulan\n- 2 Bedroom Standard (33 m2): Mulai Rp 4.200.000/bulan\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bulan\nSemua unit Full Furnished siap huni. Kami juga melayani sewa tahunan dengan tarif lebih hemat.";
-  }
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("mall") || q.includes("green palace")) {
-    return "Fasilitas lengkap di kawasan Superblock Kalibata City:\n- Mall Kalibata City Square (KCS) langsung di bawah hunian (Farmers Market, XXI, kuliner 24 jam).\n- Kolam renang tematik (Adult & Kids Pool) dan Gym Center di Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
-  }
-  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat") || q.includes("peta")) {
-    return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200m) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10-15 menit ke kawasan perkantoran Kuningan (Rasuna Said) serta Gatot Subroto.";
-  }
-  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal")) {
-    return "Tentu! Jadwal survei unit (viewing) tersedia setiap hari (Senin-Minggu, 09.00 - 18.00 WIB). Silakan klik tombol 'WhatsApp Admin' untuk konfirmasi jam kunjungan Anda bersama tim konsultan Kusuma Properti.";
-  }
-
-  return "Halo! Saya Kusuma AI, Concierge resmi Apartemen Kalibata City dari Kusuma Properti. Kami siap membantu informasi sewa unit bulanan dan tahunan, fasilitas Superblock, maupun jadwal survei lokasi. Ada yang bisa saya bantu?";
+function testGeminiChatbot() {
+  const res = handleGeminiAiChat("berapa menit ke stasiun KRL?", "Test_User");
+  Logger.log(JSON.stringify(res, null, 2));
 }
