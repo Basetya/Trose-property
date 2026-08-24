@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v21.0)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v21.1)
  * File: frontend/js/landing.js
  */
 
@@ -297,7 +297,7 @@ function appendWidgetMessage(text, sender) {
     `;
   } else {
     wrapper.innerHTML = `
-      <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
+      <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
       <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] leading-relaxed text-xs shadow-sm whitespace-pre-line">
         ${escapeHtml(text)}
       </div>
@@ -313,7 +313,7 @@ function appendWidgetTyping() {
   const wrapper = document.createElement("div");
   wrapper.className = "flex items-start gap-2.5";
   wrapper.innerHTML = `
-    <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
+    <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
     <div class="bg-white border border-[#E8DFD3] px-3 py-2 rounded-2xl rounded-tl-none text-[10px] text-[#737370] animate-pulse">
       Kusuma AI sedang berpikir...
     </div>
