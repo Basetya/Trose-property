@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Direct AI & Comprehensive Concierge Engine (v13.0)
+ * Kusuma Properti Manager - Direct AI Execution Engine (v13.1)
  * File: frontend/js/landing.js
  */
 
@@ -42,7 +42,7 @@ async function initLandingSettings() {
       localStorage.setItem("kusuma_official_wa", OFFICIAL_WA_NUMBER);
     }
   } catch (e) {
-    console.warn("Using active WA Number:", OFFICIAL_WA_NUMBER);
+    console.warn("Menggunakan nomor WhatsApp aktif:", OFFICIAL_WA_NUMBER);
   }
 }
 
@@ -58,7 +58,7 @@ async function loadDynamicCatalog() {
       return;
     }
   } catch (err) {
-    console.warn("Using default Japandi unit templates:", err);
+    console.warn("Menggunakan katalog default:", err);
   }
 
   renderDefaultFallbackCatalog();
@@ -200,80 +200,21 @@ async function handleWidgetSend() {
     const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "POST");
     typing.remove();
 
-    if (res && res.reply && res.reply.trim() !== "" && !res.reply.startsWith("Halo! Saya Kusuma AI, asisten virtual resmi")) {
+    if (res && res.success && res.reply && res.reply.trim() !== "") {
+      appendWidgetMessage(res.reply, "ai");
+    } else if (res && res.reply) {
       appendWidgetMessage(res.reply, "ai");
     } else {
-      appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
+      appendWidgetMessage("Kusuma AI sedang memproses pembaruan data. Jika butuh respons segera, silakan klik tombol WhatsApp untuk terhubung dengan tim konsultan kami.", "ai");
     }
   } catch (err) {
-    console.warn("GAS API Offline, using Smart Local Engine:", err);
+    console.error("Kesalahan koneksi AI:", err);
     typing.remove();
-    appendWidgetMessage(generateSmartKnowledgeReply(message), "ai");
+    appendWidgetMessage("Koneksi ke server AI terputus sejenak. Pastikan URL deployment Web App di config.js sudah aktif.", "ai");
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
   }
-}
-
-function generateSmartKnowledgeReply(userQuery) {
-  const q = String(userQuery || '').toLowerCase();
-
-  // 1. Rumah Sakit & Fasilitas Kesehatan
-  if (q.includes("rumah sakit") || q.includes("rs") || q.includes("klinik") || q.includes("dokter") || q.includes("medis") || q.includes("apotek") || q.includes("sakit") || q.includes("obat") || q.includes("puskesmas")) {
-    return "Tentu, ada beberapa fasilitas kesehatan dan rumah sakit terdekat dari Apartemen Kalibata City:\n\n" +
-      "1. RS Brawijaya Duren Tiga (±5–7 menit / 2.5 km)\n" +
-      "2. RSUD Budhi Asih Cawang (±7–10 menit / 3 km)\n" +
-      "3. RS Tebet (±10 menit / 3.5 km)\n" +
-      "4. RS Siloam & Medistra Gatot Subroto (±10–15 menit)\n" +
-      "5. Klinik 24 Jam & Apotek (Kimia Farma, Century, Guardian) tersedia langsung di lantai dasar Mall Kalibata City Square (KCS).\n\n" +
-      "Apakah Anda ingin informasi tambahan seputar fasilitas lain atau survei unit?";
-  }
-
-  // 2. Parkir & Kendaraan
-  if (q.includes("parkir") || q.includes("mobil") || q.includes("motor") || q.includes("kendaraan") || q.includes("slot") || q.includes("helm")) {
-    return "Untuk fasilitas parkir di Apartemen Kalibata City:\n- Tersedia area basement luas & gedung parkir bertingkat khusus penghuni dan tamu.\n- Tarif parkir member bulanan dapat didaftarkan langsung ke kantor Badan Pengelola setelah kontrak sewa berjalan.\n- Dilengkapi gate kartu akses otomatis dan keamanan CCTV 24 jam.";
-  }
-
-  // 3. Jam Operasional Mall & Kantor
-  if (q.includes("jam") || q.includes("buka") || q.includes("tutup") || q.includes("operasional") || q.includes("malam")) {
-    if (q.includes("mall") || q.includes("kcs") || q.includes("square") || q.includes("market") || q.includes("belanja")) {
-      return "Mall Kalibata City Square (KCS) buka setiap hari pukul 10.00 – 22.00 WIB. Khusus Farmers Market buka lebih awal mulai pukul 08.00 WIB.";
-    }
-    return "Layanan survei unit & kantor konsultasi Kusuma Properti buka setiap hari pukul 09.00 – 18.00 WIB. Sedangkan Mall KCS buka pukul 10.00 – 22.00 WIB.";
-  }
-
-  // 4. Sewa Harian (Strict Policy)
-  if (q.includes("harian") || q.includes("hari") || q.includes("transit") || q.includes("short stay") || q.includes("menginap")) {
-    return "Mohon maaf, saat ini kami tidak menyediakan sewa harian. Kusuma Properti berfokus melayani sewa bulanan (mulai Rp 3 Jt/bln) dan sewa tahunan demi kenyamanan, privasi, serta keamanan seluruh penghuni apartemen.";
-  }
-
-  // 5. Harga & Pilihan Tipe Unit
-  if (q.includes("studio") || q.includes("harga") || q.includes("biaya") || q.includes("rate") || q.includes("tarif") || q.includes("sewa") || q.includes("2br") || q.includes("kamar")) {
-    return "Pilihan sewa unit bulanan resmi bersama Kusuma Properti di Kalibata City:\n- Studio Deluxe (21 m²): Mulai Rp 3.000.000/bln\n- 2 Bedroom Standard (33 m²): Mulai Rp 4.200.000/bln\n- 2 Bedroom Green Palace (Pool Access): Mulai Rp 5.500.000/bln\nSemua unit Full Furnished siap huni (AC, Springbed, Kitchen Set, TV).";
-  }
-
-  // 6. Fasilitas Olahraga & Kawasan
-  if (q.includes("fasilitas") || q.includes("kolam") || q.includes("gym") || q.includes("renang") || q.includes("lapangan") || q.includes("green palace")) {
-    return "Fasilitas kawasan Superblock Kalibata City meliputi:\n- Mall Kalibata City Square (KCS) di bawah tower (XXI, Farmers Market, kuliner 24 jam).\n- Kolam renang dewasa & anak serta Gym Center di Green Palace.\n- Lapangan Tenis, Basket, Futsal, Jogging Track, dan Masjid Raya Nurullah.\n- Keamanan kartu akses lift 24 jam & CCTV.";
-  }
-
-  // 7. Lokasi & Transportasi
-  if (q.includes("lokasi") || q.includes("stasiun") || q.includes("krl") || q.includes("alamat") || q.includes("peta") || q.includes("jalan") || q.includes("akses")) {
-    return "Lokasi sangat strategis di Jl. Raya Kalibata No.1, Pancoran, Jakarta Selatan. Hanya 2 menit (200 meter) jalan kaki ke Stasiun KRL Duren Kalibata, dan 10–15 menit ke kawasan bisnis Kuningan serta Gatot Subroto.";
-  }
-
-  // 8. Jadwal Survei / Viewing
-  if (q.includes("survei") || q.includes("viewing") || q.includes("lihat") || q.includes("jadwal") || q.includes("kunjung")) {
-    return "Jadwal survei unit (viewing) tersedia setiap hari (Senin–Minggu, 09.00 – 18.00 WIB). Silakan klik tombol 'WhatsApp' untuk konfirmasi jam kunjungan bersama tim konsultan kami.";
-  }
-
-  // Custom Knowledge Base Admin fallback jika ada
-  const dynamicKb = localStorage.getItem("kusuma_ai_kb") || "";
-  if (dynamicKb && dynamicKb.length > 30) {
-    return "Halo! Berdasarkan informasi resmi Kusuma Properti:\n\n" + dynamicKb.substring(0, 300) + "...\n\nAda yang ingin Anda tanyakan lebih spesifik seputar ketersediaan unit atau jadwal viewing?";
-  }
-
-  return "Halo! Saya Kusuma AI, asisten virtual resmi Apartemen Kalibata City. Kami menyediakan pilihan sewa unit Studio & 2BR siap huni, informasi fasilitas (kolam renang, gym, mall, rumah sakit terdekat), hingga jadwal survei unit. Ada yang bisa saya bantu?";
 }
 
 function appendWidgetMessage(text, sender) {
@@ -307,7 +248,7 @@ function appendWidgetTyping() {
   wrapper.innerHTML = `
     <div class="w-6 h-6 rounded-lg bg-[#8C5835] text-white flex items-center justify-center font-bold text-[10px] shrink-0 font-serif">K</div>
     <div class="bg-white border border-[#E8DFD3] px-3 py-2 rounded-2xl rounded-tl-none text-[10px] text-[#737370] animate-pulse">
-      Kusuma AI sedang mengetik...
+      Kusuma AI sedang berpikir...
     </div>
   `;
   container.appendChild(wrapper);
