@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v16.3)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v19.0)
  * File: frontend/js/landing.js
  */
 
@@ -55,12 +55,17 @@ function bindCleanEventListeners() {
 
   addClick("nav-btn-wa", () => openWhatsAppDirect());
   addClick("mobile-nav-btn-wa", () => openWhatsAppDirect());
+  
+  // Hero Main Buttons
   addClick("hero-btn-ai", () => toggleFloatingChat());
   addClick("hero-btn-wa", () => openWhatsAppDirect());
+
+  // Hero Quick Text Links (Di bawah tombol utama)
+  addClick("link-open-ai", () => toggleFloatingChat());
+
+  // Widget Actions
   addClick("widget-btn-wa", () => openWhatsAppDirect());
   addClick("widget-btn-close", () => toggleFloatingChat());
-  addClick("floating-btn-wa", () => openWhatsAppDirect());
-  addClick("floating-btn-ai", () => toggleFloatingChat());
 
   addClick("quick-prompt-studio", () => sendWidgetQuickPrompt("Berapa harga sewa unit Studio Kalibata City?"));
   addClick("quick-prompt-parkir", () => sendWidgetQuickPrompt("Bagaimana aturan dan biaya parkir mobil di Kalibata City?"));
@@ -236,7 +241,7 @@ function sendWidgetQuickPrompt(text) {
   }
 }
 
-// REAL-TIME AI ENGINE (Direct Gemini 2.5 Flash via GET Protocol)
+// REAL-TIME AI ENGINE (Direct Gemini LLM via GET Protocol)
 async function handleWidgetSend() {
   const input = document.getElementById("widget-input");
   if (!input) return;
@@ -258,12 +263,10 @@ async function handleWidgetSend() {
     const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "GET");
     typing.remove();
 
-    if (res && res.success && res.reply && res.reply.trim() !== "") {
-      appendWidgetMessage(res.reply, "ai");
-    } else if (res && res.reply && res.reply.trim() !== "") {
+    if (res && res.reply && res.reply.trim() !== "") {
       appendWidgetMessage(res.reply, "ai");
     } else if (res && res.error) {
-      appendWidgetMessage(`[Kusuma AI Info]: Backend error - ${res.error}`, "ai");
+      appendWidgetMessage(`[Kusuma AI Info]: ${res.error}`, "ai");
     } else {
       appendWidgetMessage("Maaf, server AI tidak memberikan balasan teks. Silakan coba kembali.", "ai");
     }

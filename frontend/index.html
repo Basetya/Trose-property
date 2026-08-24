@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3] pb-16 md:pb-0">
+<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3] pb-12 md:pb-0">
   
   <!-- Navbar -->
   <header class="sticky top-0 z-40 japandi-panel px-4 md:px-8 py-3.5 border-b border-[#E8DFD3]">
@@ -45,8 +45,8 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="max-w-6xl mx-auto px-4 md:px-8 pt-10 pb-14 md:pt-20 md:pb-28 text-center">
-    <div class="hero-scrim-box p-6 md:p-10 rounded-3xl backdrop-blur-md max-w-4xl mx-auto space-y-4 md:space-y-6">
+  <section class="max-w-6xl mx-auto px-4 md:px-8 pt-10 pb-14 md:pt-20 md:pb-24 text-center">
+    <div class="hero-scrim-box p-6 md:p-10 rounded-3xl backdrop-blur-md max-w-4xl mx-auto space-y-5 md:space-y-6">
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE8DC]/90 border border-[#DDD3C2] text-[#8C5835] text-[10px] md:text-xs font-bold tracking-widest uppercase shadow-sm">
         Ketenangan & Kemudahan Hidup di Jakarta Selatan
       </div>
@@ -59,6 +59,7 @@
         Koleksi unit sewa bulanan dan tahunan bernuansa tenang dan fungsional. Dilengkapi akses instan menuju Mall Kalibata City Square dan 2 menit berjalan kaki ke Stasiun KRL.
       </p>
 
+      <!-- Main Action Buttons -->
       <div class="pt-2 md:pt-4 flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
         <button id="hero-btn-ai" type="button" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
           <span>Konsultasi Sewa via Kusuma AI</span>
@@ -67,6 +68,23 @@
         <button id="hero-btn-wa" type="button" class="w-full sm:w-auto px-6 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2 min-h-[44px]">
           <span>Chat Konsultan Properti</span>
         </button>
+      </div>
+
+      <!-- Quick Action Links (Sub-Links di Bawah Tombol Utama) -->
+      <div class="pt-2 flex flex-wrap items-center justify-center gap-4 md:gap-6 text-xs font-semibold">
+        <button id="link-open-ai" type="button" class="inline-flex items-center gap-1.5 text-[#8C5835] hover:text-[#704326] underline underline-offset-4 transition py-1">
+          <span class="w-2 h-2 rounded-full bg-[#8C5835] animate-pulse"></span>
+          <span>Buka Chatbot Kusuma AI</span>
+        </button>
+        
+        <span class="text-[#DDD3C2] hidden sm:inline">•</span>
+
+        <a id="link-open-ig" href="https://www.instagram.com/kusumaproperti" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-[#737370] hover:text-[#B35436] transition py-1">
+          <svg class="w-4 h-4 text-[#B35436]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span>Instagram @kusumaproperti</span>
+        </a>
       </div>
     </div>
   </section>
@@ -119,7 +137,6 @@
       <p class="text-xs text-[#737370]">Diperbarui langsung dari database unit aktif Kusuma Properti.</p>
     </div>
 
-    <!-- Dynamic Unit Grid -->
     <div id="dynamic-unit-catalog" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <div class="col-span-full text-center py-12 text-xs text-[#737370] animate-pulse">
         Memuat katalog unit siap huni...
@@ -219,7 +236,7 @@
     <p>Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750</p>
   </footer>
 
-  <!-- Floating Chatbot Widget (CSP Compliant - No Inline Events) -->
+  <!-- Chatbot Modal Popup (Terbuka Saat Tombol AI Diklik) -->
   <div id="floating-chat-widget" class="fixed bottom-4 md:bottom-5 right-4 md:right-5 z-50 flex flex-col items-end">
     <div id="chat-popup" class="hidden japandi-panel border border-[#DDD3C2] rounded-3xl shadow-2xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[460px] md:h-[480px]">
       <div class="bg-[#F4EFE6] p-3.5 md:p-4 border-b border-[#E8DFD3] flex justify-between items-center">
@@ -267,17 +284,6 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </button>
       </div>
-    </div>
-
-    <!-- Floating Toggle Buttons -->
-    <div class="flex items-center gap-2">
-      <button id="floating-btn-wa" type="button" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-105">
-        <span class="text-xs font-bold">WA</span>
-      </button>
-      <button id="floating-btn-ai" type="button" class="px-5 py-3.5 japandi-btn-wood font-semibold text-xs tracking-wider uppercase rounded-full shadow-lg flex items-center gap-2 transition transform hover:scale-105">
-        <span class="w-2 h-2 rounded-full bg-[#EAF0EB]"></span>
-        <span>Tanya Kusuma AI</span>
-      </button>
     </div>
   </div>
 
