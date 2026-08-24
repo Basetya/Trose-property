@@ -8,7 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
-<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3] pb-20 md:pb-0">
+<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen selection:bg-[#E8DFD3] pb-24 md:pb-0">
   
   <!-- Navbar -->
   <header class="sticky top-0 z-40 japandi-panel px-4 md:px-8 py-3.5 border-b border-[#E8DFD3]">
@@ -69,9 +69,9 @@
 
       <!-- Tombol Aksi Utama -->
       <div class="flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
-        <button id="hero-btn-ai" type="button" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+        <button id="hero-btn-ai" type="button" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2.5">
+          <img src="img/kusuma-avatar.png" alt="Avatar Kusuma AI" class="w-6 h-6 rounded-full object-cover border border-white/80 shrink-0" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
           <span>Konsultasi Sewa via Kusuma AI</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </button>
         <button id="hero-btn-wa" type="button" class="w-full sm:w-auto px-6 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2 min-h-[44px]">
           <span>Chat Konsultan Properti</span>
@@ -239,11 +239,15 @@
 
   <!-- Floating Chatbot Widget & WA Button (Kanan Bawah) -->
   <div id="floating-chat-widget" class="fixed bottom-4 md:bottom-5 right-4 md:right-5 z-50 flex flex-col items-end">
+    
     <!-- Popup Dialog Chat -->
     <div id="chat-popup" class="hidden japandi-panel border border-[#DDD3C2] rounded-3xl shadow-2xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[460px] md:h-[480px]">
       <div class="bg-[#F4EFE6] p-3.5 md:p-4 border-b border-[#E8DFD3] flex justify-between items-center">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-xs font-serif">K</div>
+          <div class="relative">
+            <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#3A5A40] border-2 border-white"></span>
+          </div>
           <div>
             <h6 class="text-xs font-bold text-[#2C2C2A]">Kusuma AI Concierge</h6>
             <p class="text-[10px] text-[#3A5A40] flex items-center gap-1 font-medium">
@@ -261,7 +265,7 @@
 
       <div id="widget-messages" class="flex-1 p-3.5 md:p-4 overflow-y-auto space-y-3 text-xs bg-[#FAF7F2]">
         <div class="flex items-start gap-2.5">
-          <div class="w-7 h-7 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-[10px] font-serif shrink-0">K</div>
+          <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
           <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] leading-relaxed shadow-sm">
             Halo! Saya Kusuma AI. Ada yang bisa saya bantu terkait pilihan unit sewa, tarif bulanan, info parkir, atau fasilitas di Kalibata City?
           </div>
@@ -288,14 +292,21 @@
       </div>
     </div>
 
-    <!-- Tombol Melayang (Floating Action Buttons Kanan Bawah) -->
-    <div class="flex items-center gap-2">
-      <button id="floating-btn-wa" type="button" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-105 min-h-[44px]">
+    <!-- Tombol Melayang (Floating Action Buttons Kanan Bawah dengan Avatar Kusuma AI) -->
+    <div class="flex items-center gap-2.5">
+      <button id="floating-btn-wa" type="button" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-xl flex items-center justify-center transition transform hover:scale-105 min-h-[44px]">
         <span class="text-xs font-bold">WA</span>
       </button>
-      <button id="floating-btn-ai" type="button" class="px-5 py-3.5 japandi-btn-wood font-semibold text-xs tracking-wider uppercase rounded-full shadow-lg flex items-center gap-2 transition transform hover:scale-105 min-h-[44px]">
-        <span class="w-2 h-2 rounded-full bg-[#EAF0EB]"></span>
-        <span>Tanya Kusuma AI</span>
+      
+      <button id="floating-btn-ai" type="button" class="pl-1.5 pr-4 py-1.5 japandi-btn-wood rounded-full shadow-xl flex items-center gap-2.5 transition transform hover:scale-105 min-h-[44px] group border-2 border-white/20">
+        <div class="relative w-9 h-9 shrink-0">
+          <img src="img/kusuma-avatar.png" alt="Avatar Kusuma AI" class="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=120&q=80'">
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-[#3A5A40] border-2 border-white ring-1 ring-[#3A5A40]/40 animate-pulse"></span>
+        </div>
+        <div class="text-left">
+          <p class="text-[11px] font-bold text-white tracking-wide leading-tight">Tanya Kusuma AI</p>
+          <p class="text-[9px] text-[#F4EFE6]/90 font-medium">Asisten Kalibata City</p>
+        </div>
       </button>
     </div>
   </div>
