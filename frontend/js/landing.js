@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v14.2)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v16.0)
  * File: frontend/js/landing.js
  */
 
@@ -31,6 +31,7 @@ applyPublicVisualSettings();
 async function initLandingSettings() {
   applyPublicVisualSettings();
   loadDynamicCatalog();
+  bindWidgetEvents();
 
   const localWa = localStorage.getItem("kusuma_official_wa") || localStorage.getItem("trose_official_wa");
   if (localWa) OFFICIAL_WA_NUMBER = localWa;
@@ -43,6 +44,27 @@ async function initLandingSettings() {
     }
   } catch (e) {
     console.warn("Menggunakan nomor WhatsApp aktif:", OFFICIAL_WA_NUMBER);
+  }
+}
+
+function bindWidgetEvents() {
+  const btnSend = document.getElementById("btn-widget-send");
+  const inputEl = document.getElementById("widget-input");
+  
+  if (btnSend) {
+    btnSend.onclick = (e) => {
+      e.preventDefault();
+      handleWidgetSend();
+    };
+  }
+
+  if (inputEl) {
+    inputEl.onkeydown = (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleWidgetSend();
+      }
+    };
   }
 }
 
@@ -153,7 +175,8 @@ function toggleFloatingChat() {
   const popup = document.getElementById("chat-popup");
   if (popup.classList.contains("hidden")) {
     popup.classList.remove("hidden");
-    document.getElementById("widget-input").focus();
+    const input = document.getElementById("widget-input");
+    if (input) input.focus();
   } else {
     popup.classList.add("hidden");
   }
@@ -172,19 +195,26 @@ function bookViewingUnit(unitType) {
     openWhatsAppDirect(msg);
   } else {
     toggleFloatingChat();
-    document.getElementById("widget-input").value = msg;
-    handleWidgetSend();
+    const input = document.getElementById("widget-input");
+    if (input) {
+      input.value = msg;
+      handleWidgetSend();
+    }
   }
 }
 
 function sendWidgetQuickPrompt(text) {
-  document.getElementById("widget-input").value = text;
-  handleWidgetSend();
+  const input = document.getElementById("widget-input");
+  if (input) {
+    input.value = text;
+    handleWidgetSend();
+  }
 }
 
-// REAL-TIME AI SEND HANDLER (Murni LLM Gemini via Backend)
+// REAL-TIME AI ENGINE (Direct Gemini 2.5 Flash via GET Web App)
 async function handleWidgetSend() {
   const input = document.getElementById("widget-input");
+  if (!input) return;
   const message = input.value.trim();
   if (!message) return;
 
@@ -192,13 +222,15 @@ async function handleWidgetSend() {
   input.value = "";
 
   const btn = document.getElementById("btn-widget-send");
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-pulse">...</span>`;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="animate-pulse">...</span>`;
+  }
 
   const typing = appendWidgetTyping();
 
   try {
-    const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "POST");
+    const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "GET");
     typing.remove();
 
     if (res && res.success && res.reply && res.reply.trim() !== "") {
@@ -206,22 +238,25 @@ async function handleWidgetSend() {
     } else if (res && res.reply && res.reply.trim() !== "") {
       appendWidgetMessage(res.reply, "ai");
     } else if (res && res.error) {
-      appendWidgetMessage(`[Kusuma AI Info]: Backend merespons: ${res.error}`, "ai");
+      appendWidgetMessage(`[Kusuma AI Info]: Backend error - ${res.error}`, "ai");
     } else {
-      appendWidgetMessage("Maaf, AI server tidak memberikan respon teks. Silakan coba kembali atau hubungi WhatsApp Admin kami.", "ai");
+      appendWidgetMessage("Maaf, server AI tidak memberikan balasan teks. Silakan coba kembali.", "ai");
     }
   } catch (err) {
-    console.error("[AI Chatbot Connection Failed]:", err);
+    console.error("[AI Chatbot Failed]:", err);
     typing.remove();
-    appendWidgetMessage(`[Koneksi Error]: Gagal terhubung ke Google Apps Script backend. Pastikan Web App GAS sudah di-deploy dengan opsi 'Anyone' (siapa saja dapat mengakses). Detail: ${err.message}`, "ai");
+    appendWidgetMessage(`[Koneksi Error]: Gagal memanggil endpoint AI: ${err.message}. Pastikan Web App Apps Script sudah di-deploy ulang.`, "ai");
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+    }
   }
 }
 
 function appendWidgetMessage(text, sender) {
   const container = document.getElementById("widget-messages");
+  if (!container) return;
   const wrapper = document.createElement("div");
   wrapper.className = sender === "user" ? "flex justify-end" : "flex items-start gap-2";
 
@@ -254,8 +289,10 @@ function appendWidgetTyping() {
       Kusuma AI sedang berpikir...
     </div>
   `;
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
+  if (container) {
+    container.appendChild(wrapper);
+    container.scrollTop = container.scrollHeight;
+  }
   return wrapper;
 }
 
@@ -267,10 +304,4 @@ function escapeHtml(text) {
 
 document.addEventListener("DOMContentLoaded", () => {
   initLandingSettings();
-  const input = document.getElementById("widget-input");
-  if (input) {
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") handleWidgetSend();
-    });
-  }
 });

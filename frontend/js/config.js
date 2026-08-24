@@ -1,6 +1,6 @@
 /**
  * Kusuma Properti Manager - Central Configuration & CORS-Proof API Dispatcher
- * Version: v14.2.0
+ * Version: v16.0.0
  * File: frontend/js/config.js
  */
 
@@ -9,8 +9,17 @@ const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzX9pZnyEmHZsxrehzL
 let OFFICIAL_WA_NUMBER = "+6281221559000";
 const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti Kalibata City, saya ingin konsultasi sewa unit.";
 
-// Universal API Dispatcher (Bebas Masalah CORS Google Apps Script)
+// Universal API Dispatcher (GET Mode untuk Chatbot agar 100% bebas CORS)
 async function gasApiCall(action, payload = {}, method = "POST") {
+  // Jika action adalah aiChatbot, selalu gunakan metode GET agar bebas redirect CORS
+  if (action === "aiChatbot") {
+    const params = new URLSearchParams({ action: "aiChatbot", message: payload.message || "", senderPhone: payload.senderPhone || "Public_Web_Lead" });
+    const fullUrl = `${GAS_API_URL}?${params.toString()}`;
+    const response = await fetch(fullUrl, { method: "GET", redirect: "follow" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  }
+
   const isGet = method.toUpperCase() === "GET";
   let url = GAS_API_URL;
 
@@ -29,15 +38,9 @@ async function gasApiCall(action, payload = {}, method = "POST") {
     requestOptions.body = JSON.stringify({ action, ...payload });
   }
 
-  try {
-    const response = await fetch(url, requestOptions);
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`[GAS API CALL ERROR] Action: ${action}`, error);
-    throw error;
+  const response = await fetch(url, requestOptions);
+  if (!response.ok) {
+    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
   }
+  return await response.json();
 }

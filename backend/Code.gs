@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Production Controller Clean Baseline (v12.0)
+ * Kusuma Properti Manager - Production Controller Clean Baseline (v16.0)
  * File: backend/Code.gs
  */
 
@@ -8,7 +8,11 @@ function doGet(e) {
   let responseData = {};
 
   try {
-    if (action === "getAiConfig") {
+    if (action === "aiChatbot") {
+      const msg = e.parameter.message || "";
+      const sender = e.parameter.senderPhone || "Public_Web_Lead";
+      responseData = handleGeminiAiChat(msg, sender);
+    } else if (action === "getAiConfig") {
       const sp = PropertiesService.getScriptProperties();
       const kb = sp.getProperty("AI_KNOWLEDGE_BASE");
       const gr = sp.getProperty("AI_GUARDRAILS");
@@ -90,7 +94,9 @@ function doPost(e) {
       }
     }
 
-    if (action === "wipeAllMockupData") {
+    if (action === "aiChatbot") {
+      responseData = handleGeminiAiChat(postData.message, postData.senderPhone);
+    } else if (action === "wipeAllMockupData") {
       responseData = handleWipeAllSheetsData();
     } else if (action === "saveAiConfig") {
       const sp = PropertiesService.getScriptProperties();
@@ -108,14 +114,6 @@ function doPost(e) {
         sp.setProperty("LANDING_WA_NUMBER", String(postData.waNumber).trim());
       }
       responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
-    } else if (action === "verifyPasscode") {
-      const inputPass = String(postData.passcode || "").trim().toLowerCase();
-      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
-      if (inputPass === expectedPass || inputPass === "kusuma288" || inputPass === "trose288") {
-        responseData = { success: true, message: "Authentication successful." };
-      } else {
-        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
-      }
     } else if (action === "importRumah123") {
       responseData = handleImportRumah123(postData.url);
     } else if (action === "createUnit") {
@@ -144,8 +142,6 @@ function doPost(e) {
       responseData = handleUpdateLeadStage(postData.leadId, postData.stage, postData.notes);
     } else if (action === "whatsappWebhook") {
       responseData = handleIncomingWhatsAppWebhook(postData);
-    } else if (action === "aiChatbot") {
-      responseData = handleGeminiAiChat(postData.message, postData.senderPhone);
     } else {
       responseData = { success: false, error: "Invalid POST action: " + action };
     }
