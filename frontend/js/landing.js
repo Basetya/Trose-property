@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Direct AI Execution Engine (v13.1)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v14.2)
  * File: frontend/js/landing.js
  */
 
@@ -182,6 +182,7 @@ function sendWidgetQuickPrompt(text) {
   handleWidgetSend();
 }
 
+// REAL-TIME AI SEND HANDLER (Murni LLM Gemini via Backend)
 async function handleWidgetSend() {
   const input = document.getElementById("widget-input");
   const message = input.value.trim();
@@ -202,15 +203,17 @@ async function handleWidgetSend() {
 
     if (res && res.success && res.reply && res.reply.trim() !== "") {
       appendWidgetMessage(res.reply, "ai");
-    } else if (res && res.reply) {
+    } else if (res && res.reply && res.reply.trim() !== "") {
       appendWidgetMessage(res.reply, "ai");
+    } else if (res && res.error) {
+      appendWidgetMessage(`[Kusuma AI Info]: Backend merespons: ${res.error}`, "ai");
     } else {
-      appendWidgetMessage("Kusuma AI sedang memproses pembaruan data. Jika butuh respons segera, silakan klik tombol WhatsApp untuk terhubung dengan tim konsultan kami.", "ai");
+      appendWidgetMessage("Maaf, AI server tidak memberikan respon teks. Silakan coba kembali atau hubungi WhatsApp Admin kami.", "ai");
     }
   } catch (err) {
-    console.error("Kesalahan koneksi AI:", err);
+    console.error("[AI Chatbot Connection Failed]:", err);
     typing.remove();
-    appendWidgetMessage("Koneksi ke server AI terputus sejenak. Pastikan URL deployment Web App di config.js sudah aktif.", "ai");
+    appendWidgetMessage(`[Koneksi Error]: Gagal terhubung ke Google Apps Script backend. Pastikan Web App GAS sudah di-deploy dengan opsi 'Anyone' (siapa saja dapat mengakses). Detail: ${err.message}`, "ai");
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
