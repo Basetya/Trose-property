@@ -1,9 +1,8 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot & Dynamic Catalog Engine (v16.2)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v16.3)
  * File: frontend/js/landing.js
  */
 
-// 1. Terapkan Pengaturan Visual Latar Belakang (Opacity, Brightness, Contrast) dari Admin
 function applyPublicVisualSettings() {
   const opVal = Number(localStorage.getItem("kusuma_bg_opacity") || 90);
   const br = localStorage.getItem("kusuma_bg_brightness") || "100";
@@ -32,7 +31,7 @@ applyPublicVisualSettings();
 async function initLandingSettings() {
   applyPublicVisualSettings();
   loadDynamicCatalog();
-  bindWidgetEvents();
+  bindCleanEventListeners();
 
   const localWa = localStorage.getItem("kusuma_official_wa") || localStorage.getItem("trose_official_wa");
   if (localWa) OFFICIAL_WA_NUMBER = localWa;
@@ -48,24 +47,36 @@ async function initLandingSettings() {
   }
 }
 
-function bindWidgetEvents() {
+function bindCleanEventListeners() {
+  const addClick = (id, fn) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("click", fn);
+  };
+
+  addClick("nav-btn-wa", () => openWhatsAppDirect());
+  addClick("mobile-nav-btn-wa", () => openWhatsAppDirect());
+  addClick("hero-btn-ai", () => toggleFloatingChat());
+  addClick("hero-btn-wa", () => openWhatsAppDirect());
+  addClick("widget-btn-wa", () => openWhatsAppDirect());
+  addClick("widget-btn-close", () => toggleFloatingChat());
+  addClick("floating-btn-wa", () => openWhatsAppDirect());
+  addClick("floating-btn-ai", () => toggleFloatingChat());
+
+  addClick("quick-prompt-studio", () => sendWidgetQuickPrompt("Berapa harga sewa unit Studio Kalibata City?"));
+  addClick("quick-prompt-parkir", () => sendWidgetQuickPrompt("Bagaimana aturan dan biaya parkir mobil di Kalibata City?"));
+  addClick("quick-prompt-2br", () => sendWidgetQuickPrompt("Jadwalkan survei unit 2BR"));
+
   const btnSend = document.getElementById("btn-widget-send");
   const inputEl = document.getElementById("widget-input");
   
-  if (btnSend) {
-    btnSend.onclick = (e) => {
-      e.preventDefault();
-      handleWidgetSend();
-    };
-  }
-
+  if (btnSend) btnSend.addEventListener("click", () => handleWidgetSend());
   if (inputEl) {
-    inputEl.onkeydown = (e) => {
+    inputEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
         handleWidgetSend();
       }
-    };
+    });
   }
 }
 
@@ -112,12 +123,18 @@ function renderCatalogCards(units) {
             <p class="text-xl md:text-2xl font-bold text-[#8C5835] font-serif">Rp ${Number(u.Base_Rent || 3000000).toLocaleString('id-ID')} <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
           </div>
         </div>
-        <button onclick="bookViewingUnit('${u.Tower} #${u.Unit_No} (${u.Type})')" class="${btnClass}">
+        <button type="button" data-unit="${u.Tower} #${u.Unit_No} (${u.Type})" class="catalog-book-btn ${btnClass}">
           Jadwalkan Survei Unit
         </button>
       </div>
     `;
   }).join('');
+
+  container.querySelectorAll(".catalog-book-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      bookViewingUnit(btn.getAttribute("data-unit"));
+    });
+  });
 }
 
 function renderDefaultFallbackCatalog() {
@@ -135,7 +152,7 @@ function renderDefaultFallbackCatalog() {
           <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 3.000.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
         </div>
       </div>
-      <button onclick="bookViewingUnit('Studio Deluxe')" class="w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
+      <button type="button" data-unit="Studio Deluxe" class="catalog-book-btn w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
         Jadwalkan Survei Unit
       </button>
     </div>
@@ -150,7 +167,7 @@ function renderDefaultFallbackCatalog() {
           <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 4.200.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
         </div>
       </div>
-      <button onclick="bookViewingUnit('2 Bedroom Standard')" class="w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition">
+      <button type="button" data-unit="2 Bedroom Standard" class="catalog-book-btn w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition">
         Jadwalkan Survei Unit
       </button>
     </div>
@@ -165,15 +182,22 @@ function renderDefaultFallbackCatalog() {
           <p class="text-2xl font-bold text-[#3A5A40] font-serif">Rp 5.500.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
         </div>
       </div>
-      <button onclick="bookViewingUnit('2 Bedroom Executive')" class="w-full py-3.5 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
+      <button type="button" data-unit="2 Bedroom Executive" class="catalog-book-btn w-full py-3.5 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
         Jadwalkan Survei Unit
       </button>
     </div>
   `;
+
+  container.querySelectorAll(".catalog-book-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      bookViewingUnit(btn.getAttribute("data-unit"));
+    });
+  });
 }
 
 function toggleFloatingChat() {
   const popup = document.getElementById("chat-popup");
+  if (!popup) return;
   if (popup.classList.contains("hidden")) {
     popup.classList.remove("hidden");
     const input = document.getElementById("widget-input");

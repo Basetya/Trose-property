@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Kusuma Properti - Hunian Nyaman & Alami di Kalibata City</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%238C5835'/><text x='50%' y='65%' font-size='50' font-weight='bold' fill='white' font-family='serif' text-anchor='middle'>K</text></svg>">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
 </head>
@@ -25,14 +26,14 @@
         <a href="#tipe-unit" class="hover:text-[#8C5835] transition">Katalog Unit</a>
         <a href="#fasilitas" class="hover:text-[#8C5835] transition">Fasilitas Kawasan</a>
         <a href="#lokasi" class="hover:text-[#8C5835] transition">Lokasi</a>
-        <button onclick="openWhatsAppDirect()" class="text-[#3A5A40] hover:text-[#2D4732] flex items-center gap-1.5 font-bold transition">
+        <button id="nav-btn-wa" type="button" class="text-[#3A5A40] hover:text-[#2D4732] flex items-center gap-1.5 font-bold transition">
           <span class="w-2 h-2 rounded-full bg-[#3A5A40] animate-pulse"></span>
           WhatsApp Admin
         </button>
       </nav>
 
       <div class="flex items-center gap-2">
-        <button onclick="openWhatsAppDirect()" class="md:hidden px-3.5 py-2 japandi-btn-moss font-bold text-xs rounded-xl shadow-sm">
+        <button id="mobile-nav-btn-wa" type="button" class="md:hidden px-3.5 py-2 japandi-btn-moss font-bold text-xs rounded-xl shadow-sm">
           Chat WA
         </button>
         <a href="dashboard.html" class="px-4 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1.5">
@@ -59,11 +60,11 @@
       </p>
 
       <div class="pt-2 md:pt-4 flex flex-col sm:flex-row justify-center items-center gap-3 md:gap-4">
-        <button onclick="toggleFloatingChat()" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+        <button id="hero-btn-ai" type="button" class="w-full sm:w-auto px-6 py-3.5 japandi-btn-wood font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-md transition flex items-center justify-center gap-2">
           <span>Konsultasi Sewa via Kusuma AI</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </button>
-        <button onclick="openWhatsAppDirect()" class="w-full sm:w-auto px-6 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2 min-h-[44px]">
+        <button id="hero-btn-wa" type="button" class="w-full sm:w-auto px-6 py-3.5 bg-white/95 hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#DDD3C2] font-semibold text-xs uppercase tracking-wider rounded-2xl shadow-sm transition flex items-center justify-center gap-2 min-h-[44px]">
           <span>Chat Konsultan Properti</span>
         </button>
       </div>
@@ -118,7 +119,7 @@
       <p class="text-xs text-[#737370]">Diperbarui langsung dari database unit aktif Kusuma Properti.</p>
     </div>
 
-    <!-- Dynamic Unit Grid: 1 Col Mobile, 2 Col Tablet, 3 Col Desktop -->
+    <!-- Dynamic Unit Grid -->
     <div id="dynamic-unit-catalog" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       <div class="col-span-full text-center py-12 text-xs text-[#737370] animate-pulse">
         Memuat katalog unit siap huni...
@@ -160,7 +161,7 @@
 
       <div class="japandi-card p-4 md:p-6 rounded-3xl text-center space-y-1.5 md:space-y-2">
         <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#F4EFE6] text-[#8C5835] mx-auto flex items-center justify-center">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         </div>
         <h5 class="font-bold text-xs md:text-sm text-[#2C2C2A]">Mall KCS & Cinema</h5>
         <p class="text-[10px] md:text-[11px] text-[#737370]">Farmers Market & XXI tinggal turun lift.</p>
@@ -218,7 +219,7 @@
     <p>Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750</p>
   </footer>
 
-  <!-- Floating Chatbot Widget (Mobile Touch Standard) -->
+  <!-- Floating Chatbot Widget (CSP Compliant - No Inline Events) -->
   <div id="floating-chat-widget" class="fixed bottom-4 md:bottom-5 right-4 md:right-5 z-50 flex flex-col items-end">
     <div id="chat-popup" class="hidden japandi-panel border border-[#DDD3C2] rounded-3xl shadow-2xl w-[calc(100vw-32px)] md:w-96 mb-3 overflow-hidden flex flex-col h-[460px] md:h-[480px]">
       <div class="bg-[#F4EFE6] p-3.5 md:p-4 border-b border-[#E8DFD3] flex justify-between items-center">
@@ -232,10 +233,10 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="openWhatsAppDirect()" class="text-xs font-bold text-[#3A5A40] bg-[#EAF0EB] px-2.5 py-1 rounded-lg border border-[#D5E2D7]">
+          <button id="widget-btn-wa" type="button" class="text-xs font-bold text-[#3A5A40] bg-[#EAF0EB] px-2.5 py-1 rounded-lg border border-[#D5E2D7]">
             WA
           </button>
-          <button onclick="toggleFloatingChat()" class="text-[#737370] hover:text-[#2C2C2A] text-lg font-bold px-1.5">&times;</button>
+          <button id="widget-btn-close" type="button" class="text-[#737370] hover:text-[#2C2C2A] text-lg font-bold px-1.5">&times;</button>
         </div>
       </div>
 
@@ -243,26 +244,26 @@
         <div class="flex items-start gap-2.5">
           <div class="w-7 h-7 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-[10px] font-serif shrink-0">K</div>
           <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] leading-relaxed shadow-sm">
-            Halo! Saya Kusuma AI. Ada yang bisa saya bantu terkait pilihan unit sewa, tarif bulanan, info parkir, atau jadwal survei di Kalibata City?
+            Halo! Saya Kusuma AI. Ada yang bisa saya bantu terkait pilihan unit sewa, tarif bulanan, info parkir, atau fasilitas di Kalibata City?
           </div>
         </div>
       </div>
 
       <div class="px-3 py-2 bg-[#F4EFE6] border-t border-[#E8DFD3] flex gap-2 overflow-x-auto text-[10px] md:text-[11px]">
-        <button onclick="sendWidgetQuickPrompt('Berapa harga sewa unit Studio Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+        <button id="quick-prompt-studio" type="button" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Tarif Studio
         </button>
-        <button onclick="sendWidgetQuickPrompt('Bagaimana aturan dan biaya parkir mobil di Kalibata City?')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+        <button id="quick-prompt-parkir" type="button" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Info Parkir
         </button>
-        <button onclick="sendWidgetQuickPrompt('Jadwalkan survei unit 2BR')" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
+        <button id="quick-prompt-2br" type="button" class="bg-white border border-[#DDD3C2] px-3 py-1.5 rounded-xl text-[#2C2C2A] whitespace-nowrap hover:bg-[#FAF7F2]">
           Survei 2BR
         </button>
       </div>
 
       <div class="p-3 bg-white border-t border-[#E8DFD3] flex gap-2">
         <input type="text" id="widget-input" placeholder="Tanyakan seputar unit sewa & fasilitas..." class="flex-1 px-3.5 py-2.5 bg-[#FAF7F2] border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
-        <button onclick="handleWidgetSend()" id="btn-widget-send" class="px-4 py-2.5 japandi-btn-wood rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center">
+        <button id="btn-widget-send" type="button" class="px-4 py-2.5 japandi-btn-wood rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </button>
       </div>
@@ -270,10 +271,10 @@
 
     <!-- Floating Toggle Buttons -->
     <div class="flex items-center gap-2">
-      <button onclick="openWhatsAppDirect()" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-105">
+      <button id="floating-btn-wa" type="button" title="Chat WhatsApp Konsultan" class="w-12 h-12 bg-[#3A5A40] hover:bg-[#2D4732] text-white font-bold rounded-full shadow-lg flex items-center justify-center transition transform hover:scale-105">
         <span class="text-xs font-bold">WA</span>
       </button>
-      <button onclick="toggleFloatingChat()" class="px-5 py-3.5 japandi-btn-wood font-semibold text-xs tracking-wider uppercase rounded-full shadow-lg flex items-center gap-2 transition transform hover:scale-105">
+      <button id="floating-btn-ai" type="button" class="px-5 py-3.5 japandi-btn-wood font-semibold text-xs tracking-wider uppercase rounded-full shadow-lg flex items-center gap-2 transition transform hover:scale-105">
         <span class="w-2 h-2 rounded-full bg-[#EAF0EB]"></span>
         <span>Tanya Kusuma AI</span>
       </button>
