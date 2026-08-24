@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v21.1)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot & Dynamic Catalog Engine (v22.0)
  * File: frontend/js/landing.js
  */
 
@@ -56,15 +56,12 @@ function bindCleanEventListeners() {
   addClick("nav-btn-wa", () => openWhatsAppDirect());
   addClick("mobile-nav-btn-wa", () => openWhatsAppDirect());
   
-  // Hero Buttons
   addClick("hero-btn-ai", () => toggleFloatingChat());
   addClick("hero-btn-wa", () => openWhatsAppDirect());
 
-  // Floating Buttons (Kanan Bawah)
   addClick("floating-btn-wa", () => openWhatsAppDirect());
   addClick("floating-btn-ai", () => toggleFloatingChat());
 
-  // Widget Actions
   addClick("widget-btn-wa", () => openWhatsAppDirect());
   addClick("widget-btn-close", () => toggleFloatingChat());
 
@@ -86,113 +83,86 @@ function bindCleanEventListeners() {
   }
 }
 
-async function loadDynamicCatalog() {
-  const catalogContainer = document.getElementById("dynamic-unit-catalog");
-  if (!catalogContainer) return;
-
-  try {
-    const res = await gasApiCall("getUnits");
-    if (res && res.success && Array.isArray(res.units) && res.units.length > 0) {
-      const availableUnits = res.units.filter(u => u.Status === "Available");
-      renderCatalogCards(availableUnits.length > 0 ? availableUnits : res.units);
-      return;
+function getPopularUnitsData() {
+  const saved = localStorage.getItem("kusuma_cms_popular_units");
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      console.warn("Invalid CMS storage, using default units");
     }
-  } catch (err) {
-    console.warn("Menggunakan katalog default:", err);
   }
-
-  renderDefaultFallbackCatalog();
+  return [
+    {
+      badge: "Single / Eksekutif",
+      title: "Studio Deluxe",
+      desc: "Luas 21 m2 • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV",
+      price: 3000000
+    },
+    {
+      badge: "Paling Favorit",
+      title: "2 Bedroom Standard",
+      desc: "Luas 33 m2 • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon",
+      price: 4200000
+    },
+    {
+      badge: "Green Palace Resort",
+      title: "2 Bedroom Executive",
+      desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Modern",
+      price: 5500000
+    }
+  ];
 }
 
-function renderCatalogCards(units) {
+async function loadDynamicCatalog() {
   const container = document.getElementById("dynamic-unit-catalog");
   if (!container) return;
 
-  container.innerHTML = units.slice(0, 6).map((u, idx) => {
-    const isSpecial = idx % 2 === 1;
-    const cardClass = isSpecial ? "japandi-card-warm p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6 shadow-md border-[#D4A373]" : "japandi-card p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6";
-    const btnClass = isSpecial ? "w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition" : "w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition";
+  const units = getPopularUnitsData();
+
+  container.innerHTML = units.map((u, idx) => {
+    const isSpecial = idx === 1;
+    const isGreen = idx === 2;
     
+    let badgeClass = "bg-[#F4EFE6] text-[#8C5835]";
+    let cardClass = "japandi-card p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6";
+    let btnClass = "w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition";
+    let priceColor = "text-[#8C5835]";
+
+    if (isSpecial) {
+      badgeClass = "bg-[#8C5835] text-white";
+      cardClass = "japandi-card-warm p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6 shadow-md border-[#D4A373]";
+      btnClass = "w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition";
+    } else if (isGreen) {
+      badgeClass = "bg-[#EAF0EB] text-[#3A5A40]";
+      priceColor = "text-[#3A5A40]";
+      btnClass = "w-full py-3.5 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition";
+    }
+
     return `
       <div class="${cardClass}">
-        <div class="space-y-3">
-          <div class="flex justify-between items-start">
-            <span class="px-3 py-1 bg-[#F4EFE6] text-[#8C5835] text-[10px] md:text-[11px] font-bold tracking-wider uppercase rounded-full">
-              ${u.Tower || "Kalibata City"}
+        <div class="space-y-3.5">
+          <div class="flex items-center justify-between">
+            <span class="px-3.5 py-1 ${badgeClass} text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase rounded-full">
+              ${escapeHtml(u.badge)}
             </span>
             <span class="text-[10px] text-[#3A5A40] font-bold bg-[#EAF0EB] px-2 py-0.5 rounded-lg">Siap Huni</span>
           </div>
-          <h4 class="text-lg md:text-xl font-bold text-[#2C2C2A] font-sans">${u.Type || "Apartment Unit"} #${u.Unit_No || "Unit"}</h4>
-          <p class="text-xs text-[#737370]">Lantai ${u.Floor || "-"} • Full Furnished • AC, Spring Bed, Kitchen Set, TV</p>
-          <div class="pt-4 border-t border-[#E8DFD3]">
-            <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-            <p class="text-xl md:text-2xl font-bold text-[#8C5835] font-serif">Rp ${Number(u.Base_Rent || 3000000).toLocaleString('id-ID')} <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
+          <h4 class="font-bold text-[#2C2C2A] font-sans card-unit-title">${escapeHtml(u.title)}</h4>
+          <p class="text-[#737370] card-unit-desc min-h-[42px]">${escapeHtml(u.desc)}</p>
+          <div class="pt-4 border-t border-[#E8DFD3]/80">
+            <span class="text-[11px] text-[#737370] block font-medium">Tarif Sewa Mulai</span>
+            <p class="font-bold ${priceColor} font-serif card-unit-price mt-0.5">
+              Rp ${Number(u.price || 3000000).toLocaleString('id-ID')} <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span>
+            </p>
           </div>
         </div>
-        <button type="button" data-unit="${u.Tower} #${u.Unit_No} (${u.Type})" class="catalog-book-btn ${btnClass}">
+        <button type="button" data-unit="${escapeHtml(u.title)}" class="catalog-book-btn ${btnClass}">
           Jadwalkan Survei Unit
         </button>
       </div>
     `;
   }).join('');
-
-  container.querySelectorAll(".catalog-book-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      bookViewingUnit(btn.getAttribute("data-unit"));
-    });
-  });
-}
-
-function renderDefaultFallbackCatalog() {
-  const container = document.getElementById("dynamic-unit-catalog");
-  if (!container) return;
-
-  container.innerHTML = `
-    <div class="japandi-card p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6">
-      <div class="space-y-3">
-        <span class="px-3 py-1 bg-[#F4EFE6] text-[#8C5835] text-[11px] font-bold tracking-wider uppercase rounded-full">Single / Eksekutif</span>
-        <h4 class="text-xl font-bold text-[#2C2C2A]">Studio Deluxe</h4>
-        <p class="text-xs text-[#737370]">Luas 21 m2 • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV</p>
-        <div class="pt-4 border-t border-[#E8DFD3]">
-          <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-          <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 3.000.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-        </div>
-      </div>
-      <button type="button" data-unit="Studio Deluxe" class="catalog-book-btn w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
-        Jadwalkan Survei Unit
-      </button>
-    </div>
-
-    <div class="japandi-card-warm p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6 shadow-md border-[#D4A373]">
-      <div class="space-y-3">
-        <span class="px-3 py-1 bg-[#8C5835] text-white text-[11px] font-bold tracking-wider uppercase rounded-full">Paling Favorit</span>
-        <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Standard</h4>
-        <p class="text-xs text-[#737370]">Luas 33 m2 • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon</p>
-        <div class="pt-4 border-t border-[#DDD3C2]">
-          <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-          <p class="text-2xl font-bold text-[#8C5835] font-serif">Rp 4.200.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-        </div>
-      </div>
-      <button type="button" data-unit="2 Bedroom Standard" class="catalog-book-btn w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition">
-        Jadwalkan Survei Unit
-      </button>
-    </div>
-
-    <div class="japandi-card p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6">
-      <div class="space-y-3">
-        <span class="px-3 py-1 bg-[#EAF0EB] text-[#3A5A40] text-[11px] font-bold tracking-wider uppercase rounded-full">Green Palace Resort</span>
-        <h4 class="text-xl font-bold text-[#2C2C2A]">2 Bedroom Executive</h4>
-        <p class="text-xs text-[#737370]">Akses Kolam Renang Tematik • Gym Indoor • Interior Modern</p>
-        <div class="pt-4 border-t border-[#E8DFD3]">
-          <span class="text-[11px] text-[#737370]">Tarif Sewa Mulai</span>
-          <p class="text-2xl font-bold text-[#3A5A40] font-serif">Rp 5.500.000 <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span></p>
-        </div>
-      </div>
-      <button type="button" data-unit="2 Bedroom Executive" class="catalog-book-btn w-full py-3.5 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition">
-        Jadwalkan Survei Unit
-      </button>
-    </div>
-  `;
 
   container.querySelectorAll(".catalog-book-btn").forEach(btn => {
     btn.addEventListener("click", () => {

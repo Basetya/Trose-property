@@ -1,4 +1,4 @@
-/* Kusuma Properti - Mobile-First CSS Architecture (v12.0) */
+/* Kusuma Properti - Japandi Responsive & Adaptive Typography Engine (v22.0) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 
 :root {
@@ -14,19 +14,16 @@
   --japandi-muted: #737370;
   --japandi-border: #E8DFD3;
   
-  /* Dynamic Background Controls */
   --bg-overlay-opacity: 0.90;
   --bg-brightness: 100%;
   --bg-contrast: 100%;
 
-  /* Adaptive Text Variables */
   --hero-title-color: #2C2C2A;
   --hero-desc-color: #595956;
   --hero-text-shadow: none;
   --hero-scrim-bg: transparent;
 }
 
-/* Base Reset & Mobile Touch Standard (Min 44px) */
 * {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   box-sizing: border-box;
@@ -52,7 +49,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Dynamic Architectural Background Layer */
 body::before {
   content: "";
   position: fixed;
@@ -73,7 +69,6 @@ body::after {
   background: linear-gradient(to bottom, rgba(250, 247, 242, var(--bg-overlay-opacity)), rgba(244, 239, 230, var(--bg-overlay-opacity)));
 }
 
-/* Mobile-First Adaptive Typography & Scrim */
 .hero-title-adaptive {
   color: var(--hero-title-color) !important;
   text-shadow: var(--hero-text-shadow) !important;
@@ -91,7 +86,23 @@ body::after {
   transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-/* Cards & Responsive Panels */
+/* Fluid Adaptive Catalog Typography */
+.card-unit-title {
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.card-unit-desc {
+  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.card-unit-price {
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+}
+
 .japandi-card {
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
@@ -114,7 +125,6 @@ body::after {
   border: 1px solid var(--japandi-border);
 }
 
-/* Mobile Touch Buttons */
 .japandi-btn-wood {
   background-color: #8C5835;
   color: #FFFFFF;
@@ -157,7 +167,6 @@ body::after {
   box-shadow: 0 4px 14px rgba(179, 84, 54, 0.25);
 }
 
-/* Minimalist Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
