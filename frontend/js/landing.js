@@ -1,8 +1,9 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot Engine (v16.0)
+ * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot & Dynamic Catalog Engine (v16.2)
  * File: frontend/js/landing.js
  */
 
+// 1. Terapkan Pengaturan Visual Latar Belakang (Opacity, Brightness, Contrast) dari Admin
 function applyPublicVisualSettings() {
   const opVal = Number(localStorage.getItem("kusuma_bg_opacity") || 90);
   const br = localStorage.getItem("kusuma_bg_brightness") || "100";
@@ -211,7 +212,7 @@ function sendWidgetQuickPrompt(text) {
   }
 }
 
-// REAL-TIME AI ENGINE (Direct Gemini 2.5 Flash via GET Web App)
+// REAL-TIME AI ENGINE (Direct Gemini 2.5 Flash via GET Protocol)
 async function handleWidgetSend() {
   const input = document.getElementById("widget-input");
   if (!input) return;
@@ -245,7 +246,7 @@ async function handleWidgetSend() {
   } catch (err) {
     console.error("[AI Chatbot Failed]:", err);
     typing.remove();
-    appendWidgetMessage(`[Koneksi Error]: Gagal memanggil endpoint AI: ${err.message}. Pastikan Web App Apps Script sudah di-deploy ulang.`, "ai");
+    appendWidgetMessage(`[Koneksi Error]: Gagal memanggil endpoint AI: ${err.message}.`, "ai");
   } finally {
     if (btn) {
       btn.disabled = false;
