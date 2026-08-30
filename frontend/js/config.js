@@ -1,13 +1,20 @@
 /**
  * Kusuma Properti Manager - Central Configuration & CORS-Proof API Dispatcher
- * Version: v16.2.0
+ * Version: v48.0.0 (Sanitized Official WhatsApp Number Default: 628135600058)
  * File: frontend/js/config.js
  */
 
 const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec";
 
-let OFFICIAL_WA_NUMBER = "+6281221559000";
+// Disetel mutlak ke nomor default baru (tanpa tanda + agar tidak duplikat)
+let OFFICIAL_WA_NUMBER = "628135600058";
 const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti Kalibata City, saya ingin konsultasi sewa unit.";
+
+// Konfigurasi Global APP_CONFIG
+window.APP_CONFIG = {
+  API_BASE_URL: GAS_API_URL,
+  DEFAULT_WA: OFFICIAL_WA_NUMBER
+};
 
 async function gasApiCall(action, payload = {}, method = "POST") {
   if (action === "aiChatbot") {

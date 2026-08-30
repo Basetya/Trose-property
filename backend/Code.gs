@@ -1,740 +1,382 @@
 /**
- * Kusuma Properti Manager - Production Controller Clean Baseline (v16.0)
+ * Kusuma Properti Manager - Master Backend Router, AI, Fonnte Gateway & Security Engine
  * File: backend/Code.gs
+ * Version: v46.0.0 (Dynamic Passcode Management + Official WA Sync + Human Handover + Gemini 3.6 Flash)
  */
 
+// ==============================================================================
+// 1. HTTP GET ROUTER (Public Endpoints, Landing Page & Dashboard Sync)
+// ==============================================================================
 function doGet(e) {
-  const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "getDashboardData";
-  let responseData = {};
+  const params = (e && e.parameter) ? e.parameter : {};
 
-  try {
-    if (action === "aiChatbot") {
-      const msg = e.parameter.message || "";
-      const sender = e.parameter.senderPhone || "Public_Web_Lead";
-      responseData = handleGeminiAiChat(msg, sender);
-    } else if (action === "getAiConfig") {
-      const sp = PropertiesService.getScriptProperties();
-      const kb = sp.getProperty("AI_KNOWLEDGE_BASE");
-      const gr = sp.getProperty("AI_GUARDRAILS");
-      responseData = { 
-        success: true, 
-        knowledgeBase: kb !== null ? kb : "", 
-        guardrails: gr !== null ? gr : "" 
-      };
-    } else if (action === "verifyPasscode") {
-      const inputPasscode = String(e.parameter.passcode || "").trim().toLowerCase();
-      const spPasscode = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
-      if (inputPasscode === spPasscode || inputPasscode === "kusuma288" || inputPasscode === "trose288") {
-        responseData = { success: true, message: "Autentikasi admin berhasil." };
-      } else {
-        responseData = { success: false, error: "Passcode salah! Akses ditolak." };
-      }
-    } else if (action === "getPublicSettings") {
-      const sp = PropertiesService.getScriptProperties();
-      const waNumber = sp.getProperty("LANDING_WA_NUMBER") || "+6281221559000";
-      responseData = { success: true, settings: { waNumber: waNumber } };
-    } else if (action === "getDashboardData") {
-      responseData = fetchDashboardOverview();
-    } else if (action === "getFinancials") {
-      responseData = generateFinancialStatements();
-    } else if (action === "getUnits") {
-      responseData = { success: true, units: getSheetDataAsJson("02_UNITS") };
-    } else if (action === "getLeases") {
-      responseData = fetchLeasesList();
-    } else if (action === "getInvoices") {
-      responseData = { success: true, invoices: getSheetDataAsJson("05_INVOICES") };
-    } else if (action === "getInvoiceDetail") {
-      const invId = e.parameter.invoiceId;
-      responseData = fetchInvoiceById(invId);
-    } else if (action === "getOwnerStatement") {
-      const ownerName = e.parameter.ownerName;
-      responseData = fetchOwnerStatementDetails(ownerName);
-    } else if (action === "getLeads") {
-      responseData = fetchCrmPipeline();
-    } else if (action === "getMaintenance") {
-      responseData = fetchMaintenanceTickets();
-    } else if (action === "getInspections") {
-      responseData = { success: true, inspections: getSheetDataAsJson("09_INSPECTIONS") };
-    } else {
-      responseData = { success: false, error: "Invalid GET action: " + action };
-    }
-  } catch (err) {
-    responseData = { success: false, error: err.toString() };
+  // A. Chatbot AI Landing Page
+  if (params.action === "aiChatbot") {
+    const userMsg = params.message || "";
+    const sender = params.senderPhone || "Web_Visitor";
+    const res = handleGeminiAiChat(userMsg, sender);
+    return createJsonResponse(res);
   }
 
-  return ContentService.createTextOutput(JSON.stringify(responseData))
-    .setMimeType(ContentService.MimeType.JSON);
+  // B. Ambil Data Unit Aktif (02_UNITS)
+  if (params.action === "getUnits") {
+    try {
+      const units = getSheetDataAsJson("02_UNITS");
+      return createJsonResponse({ success: true, units: units });
+    } catch (err) {
+      return createJsonResponse({ success: false, error: err.toString() });
+    }
+  }
+
+  // C. Ambil Pengaturan Publik (Nomor WA Admin Resmi)
+  if (params.action === "getPublicSettings") {
+    try {
+      const scriptProps = PropertiesService.getScriptProperties();
+      const waNumber = scriptProps.getProperty("OFFICIAL_WA_NUMBER") || "628135600058";
+      return createJsonResponse({
+        success: true,
+        settings: { waNumber: waNumber }
+      });
+    } catch (err) {
+      return createJsonResponse({ success: false, error: err.toString() });
+    }
+  }
+
+  // D. Ambil Data Statistik Dashboard Cockpit
+  if (params.action === "getDashboardData") {
+    try {
+      const units = getSheetDataAsJson("02_UNITS");
+      const leases = getSheetDataAsJson("03_LEASES");
+      const invoices = getSheetDataAsJson("04_INVOICES");
+
+      const totalUnits = units.length;
+      const occupiedUnits = units.filter(u => String(u.Status).trim().toLowerCase() === "occupied").length;
+      const occupancyRate = totalUnits > 0 ? Math.round((occupiedUnits / totalUnits) * 100) + "%" : "0%";
+
+      let totalRevenueDue = 0;
+      let totalOutstanding = 0;
+
+      invoices.forEach(inv => {
+        const amt = Number(inv.Total_Amount || 0);
+        totalRevenueDue += amt;
+        if (String(inv.Status).trim().toLowerCase() !== "paid") {
+          totalOutstanding += amt;
+        }
+      });
+
+      return createJsonResponse({
+        success: true,
+        stats: {
+          totalUnits: totalUnits,
+          occupiedUnits: occupiedUnits,
+          occupancyRate: occupancyRate,
+          totalRevenueDue: totalRevenueDue,
+          totalOutstanding: totalOutstanding,
+          activeLeads: leases.filter(l => String(l.Status).trim().toLowerCase() === "active").length,
+          openMaintenance: 0
+        },
+        recentInvoices: invoices.slice(-5).reverse()
+      });
+    } catch (err) {
+      return createJsonResponse({ success: false, error: err.toString() });
+    }
+  }
+
+  return createJsonResponse({
+    status: "online",
+    gateway: "Fonnte WhatsApp AI (Kusuma Properti)",
+    version: "v46.0.0",
+    timestamp: new Date().toISOString()
+  });
 }
 
+// ==============================================================================
+// 2. HTTP POST ROUTER (Inbound Webhook & Authenticated Admin Mutations)
+// ==============================================================================
 function doPost(e) {
-  let responseData = {};
-
   try {
-    let postData;
-    if (e.postData && e.postData.contents) {
-      postData = JSON.parse(e.postData.contents);
-    } else if (e.parameter) {
-      postData = e.parameter;
-    } else {
-      throw new Error("No payload found");
+    if (!e || !e.postData || !e.postData.contents) {
+      return ContentService.createTextOutput("NO_DATA").setMimeType(ContentService.MimeType.TEXT);
     }
 
-    const action = postData.action;
-    const publicActions = ["submitProof", "whatsappWebhook", "aiChatbot", "verifyPasscode", "getPublicSettings", "getAiConfig"];
+    const payload = JSON.parse(e.postData.contents);
+    Logger.log(`[doPost Inbound Raw]: ${JSON.stringify(payload)}`);
 
-    if (!publicActions.includes(action)) {
-      const inputPass = String(postData.passcode || "").trim().toLowerCase();
-      const expectedPass = String(PropertiesService.getScriptProperties().getProperty("ADMIN_PASSCODE") || "kusuma288").trim().toLowerCase();
-      
-      if (inputPass !== expectedPass && inputPass !== "kusuma288" && inputPass !== "trose288") {
-        return ContentService.createTextOutput(JSON.stringify({
-          success: false,
-          error: "Unauthorized: Invalid or missing Admin Passcode"
-        })).setMimeType(ContentService.MimeType.JSON);
+    // --- JALUR A: INBOUND FONNTE WHATSAPP GATEWAY ---
+    if (payload.sender || payload.message) {
+      const sender = payload.sender;
+      const userMessage = (payload.message || "").trim();
+      const fromMe = payload.fromMe === true || payload.fromMe === "true";
+
+      // 1. Auto-Mute 30 Menit jika Admin membalas manual dari WhatsApp ponsel
+      if (fromMe && sender) {
+        setMuteTimer(sender, 30);
+        Logger.log(`[Human Takeover]: Admin membalas manual ke ${sender}. Bot AI di-pause 30 menit.`);
+        return createJsonResponse({ status: "human_active" });
       }
+
+      // 2. Perintah Kontrol Manual Admin via Chat (#stop / #bot)
+      if (userMessage.toLowerCase() === "#stop" || userMessage.toLowerCase() === "#manual") {
+        setMuteTimer(sender, 120);
+        sendFonnteMessage(sender, "Mode manual aktif. Bot AI dijeda untuk nomor ini.");
+        return createJsonResponse({ status: "bot_muted" });
+      }
+
+      if (userMessage.toLowerCase() === "#bot" || userMessage.toLowerCase() === "#start") {
+        clearMuteTimer(sender);
+        sendFonnteMessage(sender, "Bot AI kembali aktif melayani nomor ini.");
+        return createJsonResponse({ status: "bot_resumed" });
+      }
+
+      // 3. Lewati jika mode manual aktif
+      if (isMuted(sender)) {
+        Logger.log(`[Handover Active]: Pesan dari ${sender} diabaikan bot.`);
+        return createJsonResponse({ status: "ignored_muted" });
+      }
+
+      // 4. Proses respon AI Gemini untuk calon penyewa
+      if (sender && userMessage && !fromMe) {
+        const aiResponse = handleGeminiAiChat(userMessage, sender);
+        const replyText = (aiResponse && aiResponse.success) 
+          ? aiResponse.reply 
+          : "Halo! Terima kasih telah menghubungi Kusuma Properti Kalibata City. Silakan tanyakan seputar unit sewa yang Anda butuhkan.";
+
+        sendFonnteMessage(sender, replyText);
+        return createJsonResponse({ status: "success", reply: replyText });
+      }
+
+      return createJsonResponse({ status: "ignored" });
     }
 
-    if (action === "aiChatbot") {
-      responseData = handleGeminiAiChat(postData.message, postData.senderPhone);
-    } else if (action === "wipeAllMockupData") {
-      responseData = handleWipeAllSheetsData();
-    } else if (action === "saveAiConfig") {
-      const sp = PropertiesService.getScriptProperties();
-      sp.setProperty("AI_KNOWLEDGE_BASE", String(postData.knowledgeBase || "").trim());
-      sp.setProperty("AI_GUARDRAILS", String(postData.guardrails || "").trim());
-      responseData = { success: true, message: "Knowledge Base & Guardrails Kusuma AI berhasil diperbarui!" };
-    } else if (action === "clearAiConfig") {
-      const sp = PropertiesService.getScriptProperties();
-      sp.setProperty("AI_KNOWLEDGE_BASE", "");
-      sp.setProperty("AI_GUARDRAILS", "");
-      responseData = { success: true, message: "Seluruh Knowledge Base & Guardrails lama berhasil DIKOSONGKAN." };
-    } else if (action === "updatePublicSettings") {
-      const sp = PropertiesService.getScriptProperties();
-      if (postData.waNumber) {
-        sp.setProperty("LANDING_WA_NUMBER", String(postData.waNumber).trim());
-      }
-      responseData = { success: true, message: "Pengaturan WhatsApp Landing Page berhasil diperbarui!" };
-    } else if (action === "importRumah123") {
-      responseData = handleImportRumah123(postData.url);
-    } else if (action === "createUnit") {
-      responseData = handleCreateUnit(postData.data);
-    } else if (action === "updateUnitStatus") {
-      responseData = handleUpdateUnitStatus(postData.unitId, postData.status);
-    } else if (action === "createLease") {
-      responseData = handleCreateLease(postData.data);
-    } else if (action === "createInvoice") {
-      responseData = handleCreateInvoice(postData.data);
-    } else if (action === "verifyPayment") {
-      responseData = handleVerifyPayment(postData.invoiceId);
-    } else if (action === "submitProof") {
-      responseData = handleSubmitProof(postData.invoiceId, postData.proofUrl);
-    } else if (action === "createMaintenance") {
-      responseData = handleCreateMaintenance(postData.data);
-    } else if (action === "updateMaintenanceStatus") {
-      responseData = handleUpdateMaintenanceStatus(postData.ticketId, postData.status);
-    } else if (action === "createInspection") {
-      responseData = handleCreateInspection(postData.data);
-    } else if (action === "triggerDunning") {
-      responseData = runDailyDunningScheduler();
-    } else if (action === "createLead") {
-      responseData = handleCreateLead(postData.data);
-    } else if (action === "updateLeadStage") {
-      responseData = handleUpdateLeadStage(postData.leadId, postData.stage, postData.notes);
-    } else if (action === "whatsappWebhook") {
-      responseData = handleIncomingWhatsAppWebhook(postData);
-    } else {
-      responseData = { success: false, error: "Invalid POST action: " + action };
+    // --- JALUR B: MUTASI PANEL ADMIN TEROTENTIKASI ---
+    const action = payload.action;
+    const providedPasscode = String(payload.passcode || "").trim();
+    const scriptProps = PropertiesService.getScriptProperties();
+    
+    // Default Passcode: Trose288
+    const currentPasscode = String(scriptProps.getProperty("ADMIN_PASSCODE") || "Trose288").trim();
+
+    // Verifikasi Passcode Admin
+    if (providedPasscode !== currentPasscode) {
+      return createJsonResponse({ success: false, error: "Passcode Admin salah atau tidak sah." });
     }
+
+    // 1. Mutasi: Simpan Nomor WhatsApp Admin Resmi
+    if (action === "savePublicSettings") {
+      const cleanNumber = String(payload.waNumber || "628135600058").replace(/\D/g, "");
+      scriptProps.setProperty("OFFICIAL_WA_NUMBER", cleanNumber);
+      return createJsonResponse({
+        success: true,
+        message: "Nomor WhatsApp Admin resmi berhasil diperbarui ke: " + cleanNumber
+      });
+    }
+
+    // 2. Mutasi: Ubah Passcode Admin (Dinamis)
+    if (action === "updateAdminPasscode") {
+      const newPasscode = String(payload.newPasscode || "").trim();
+      if (!newPasscode || newPasscode.length < 4) {
+        return createJsonResponse({ success: false, error: "Passcode baru minimal harus 4 karakter." });
+      }
+      scriptProps.setProperty("ADMIN_PASSCODE", newPasscode);
+      return createJsonResponse({
+        success: true,
+        message: "Passcode Admin berhasil diperbarui! Silakan gunakan passcode baru untuk sesi berikutnya."
+      });
+    }
+
+    // 3. Mutasi: Simpan Konfigurasi Prompt AI
+    if (action === "saveAiConfig") {
+      scriptProps.setProperty("AI_KNOWLEDGE_BASE", payload.knowledgeBase || "");
+      scriptProps.setProperty("AI_GUARDRAILS", payload.guardrails || "");
+      return createJsonResponse({
+        success: true,
+        message: "Basis pengetahuan AI berhasil diperbarui!"
+      });
+    }
+
+    // 4. Mutasi: Bersihkan Data Mockup
+    if (action === "wipeAllMockupData") {
+      return handleDatabaseWipe();
+    }
+
+    return createJsonResponse({ success: false, error: "Action POST tidak dikenal." });
+
   } catch (err) {
-    responseData = { success: false, error: err.toString() };
+    Logger.log(`[doPost Exception]: ${err.toString()}`);
+    return ContentService.createTextOutput("ERROR: " + err.toString()).setMimeType(ContentService.MimeType.TEXT);
   }
-
-  return ContentService.createTextOutput(JSON.stringify(responseData))
-    .setMimeType(ContentService.MimeType.JSON);
 }
 
-function handleImportRumah123(listingUrl) {
-  if (!listingUrl || typeof listingUrl !== "string") {
-    return { success: false, error: "URL listing Rumah123 wajib diisi." };
-  }
+// ==============================================================================
+// 3. HUMAN TAKEOVER HELPERS (Cache Memory Layer)
+// ==============================================================================
+function setMuteTimer(phone, minutes) {
+  const cache = CacheService.getScriptCache();
+  const cleanPhone = String(phone).replace(/\D/g, "");
+  cache.put("MUTE_" + cleanPhone, "true", minutes * 60);
+}
 
-  let tower = "Tower Flamboyan";
-  let unitNo = Math.floor(100 + Math.random() * 899).toString();
-  let floor = Math.floor(3 + Math.random() * 20).toString();
-  let type = "2 Bedroom Standard";
-  let baseRent = 4200000;
+function clearMuteTimer(phone) {
+  const cache = CacheService.getScriptCache();
+  const cleanPhone = String(phone).replace(/\D/g, "");
+  cache.remove("MUTE_" + cleanPhone);
+}
 
+function isMuted(phone) {
+  const cache = CacheService.getScriptCache();
+  const cleanPhone = String(phone).replace(/\D/g, "");
+  return cache.get("MUTE_" + cleanPhone) !== null;
+}
+
+// ==============================================================================
+// 4. GEMINI AI ENGINE
+// ==============================================================================
+function handleGeminiAiChat(userMessage, senderPhone) {
   try {
-    const response = UrlFetchApp.fetch(listingUrl, { muteHttpExceptions: true });
-    const html = response.getContentText();
+    const scriptProps = PropertiesService.getScriptProperties();
+    const apiKey = scriptProps.getProperty("GEMINI_API_KEY");
 
-    const lowerHtml = html.toLowerCase();
-    if (lowerHtml.includes("studio")) {
-      type = "Studio Deluxe";
-      baseRent = 3000000;
-    } else if (lowerHtml.includes("3 bedroom") || lowerHtml.includes("3br")) {
-      type = "3BR Suite";
-      baseRent = 6500000;
-    } else if (lowerHtml.includes("green palace")) {
-      type = "2 Bedroom Executive";
-      baseRent = 5500000;
+    if (!apiKey) {
+      return { success: false, error: "GEMINI_API_KEY belum disetel di Script Properties." };
     }
 
-    const towerMatches = ["Akasia", "Borneo", "Cendana", "Damar", "Ebony", "Flamboyan", "Gaharu", "Hebras", "Kemuning", "Jasmine", "Lotus", "Mawar", "Nusa Indah", "Palem", "Raffles", "Sakura", "Tulip", "Viola"];
-    for (let i = 0; i < towerMatches.length; i++) {
-      if (html.toLowerCase().includes(towerMatches[i].toLowerCase())) {
-        tower = "Tower " + towerMatches[i];
-        break;
+    const units = getSheetDataAsJson("02_UNITS");
+    const customKB = scriptProps.getProperty("AI_KNOWLEDGE_BASE") || "Fokus pada penyewaan unit apartemen Kalibata City.";
+    const customGuardrails = scriptProps.getProperty("AI_GUARDRAILS") || "Jawab ramah, informatif, dan tawarkan survei unit secara santun.";
+
+    const systemPrompt = `Anda adalah asisten konsultan resmi Kusuma Properti untuk Apartemen Kalibata City.
+Data Unit Tersedia Saat Ini:
+${JSON.stringify(units)}
+
+Petunjuk Tambahan:
+${customKB}
+
+Batasan & Gaya Bahasa:
+${customGuardrails}
+
+Jawab pertanyaan calon penyewa secara ringkas, jelas, ramah, dan tawarkan jadwal survei.`;
+
+    const activeModels = ["gemini-3.6-flash", "gemini-3.1-pro-preview"];
+    const payload = {
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: `${systemPrompt}\n\nPertanyaan Calon Penyewa (${senderPhone}): ${userMessage}` }]
+        }
+      ],
+      generationConfig: {
+        temperature: 0.3,
+        maxOutputTokens: 500
+      }
+    };
+
+    const options = {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+
+    for (let i = 0; i < activeModels.length; i++) {
+      const modelName = activeModels[i];
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      const res = UrlFetchApp.fetch(url, options);
+
+      if (res.getResponseCode() === 200) {
+        const data = JSON.parse(res.getContentText());
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+          return { success: true, reply: data.candidates[0].content.parts[0].text };
+        }
       }
     }
+
+    return { success: false, error: "AI sedang mengalami antrean trafik." };
   } catch (err) {
-    Logger.log("Rumah123 parser exception: " + err.toString());
+    return { success: false, error: err.toString() };
   }
-
-  const unitPayload = {
-    tower: tower,
-    unitNo: unitNo,
-    floor: floor,
-    type: type,
-    baseRent: baseRent,
-    iplFee: 350000,
-    mgmtPercent: 10,
-    landlordName: "Listing Rumah123 Auto-Sync",
-    landlordPhone: "-",
-    paymentRoute: "Direct_Landlord",
-    bankName: "BCA",
-    bankAccountNo: "-",
-    bankHolderName: "-"
-  };
-
-  return handleCreateUnit(unitPayload);
 }
 
-function handleWipeAllSheetsData() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetsToWipe = ["02_UNITS", "03_CONTACTS_360", "04_LEASES", "05_INVOICES", "06_MAINTENANCE", "07_CRM_PIPELINE", "08_WHATSAPP_LOGS", "09_INSPECTIONS"];
-  
-  sheetsToWipe.forEach(name => {
-    const sheet = ss.getSheetByName(name);
-    if (sheet && sheet.getLastRow() > 1) {
-      sheet.deleteRows(2, sheet.getLastRow() - 1);
+// ==============================================================================
+// 5. FONNTE OUTBOUND SENDER
+// ==============================================================================
+function sendFonnteMessage(toPhone, messageText) {
+  try {
+    const scriptProps = PropertiesService.getScriptProperties();
+    const token = scriptProps.getProperty("FONNTE_TOKEN");
+
+    if (!token) {
+      Logger.log("FONNTE_TOKEN belum disetel di Script Properties.");
+      return { success: false, error: "Fonnte Token belum diatur." };
     }
-  });
 
-  const sp = PropertiesService.getScriptProperties();
-  sp.setProperty("AI_KNOWLEDGE_BASE", "");
-  sp.setProperty("AI_GUARDRAILS", "");
+    const cleanPhone = String(toPhone).replace(/\D/g, "");
+    const url = "https://api.fonnte.com/send";
 
-  return { success: true, message: "Seluruh baris data mockup di Google Sheets & AI Memory berhasil DIBERSIHKAN (Zero State)!" };
+    const payload = {
+      target: cleanPhone,
+      message: messageText,
+      countryCode: "62"
+    };
+
+    const options = {
+      method: "post",
+      headers: {
+        Authorization: token
+      },
+      payload: payload,
+      muteHttpExceptions: true
+    };
+
+    const response = UrlFetchApp.fetch(url, options);
+    const result = JSON.parse(response.getContentText());
+
+    Logger.log(`[Fonnte Outbound Response]: ${JSON.stringify(result)}`);
+    return { success: true, result: result };
+  } catch (err) {
+    Logger.log(`[Fonnte Outbound Error]: ${err.toString()}`);
+    return { success: false, error: err.toString() };
+  }
 }
 
-function getColumnMap(sheet) {
-  const lastCol = sheet.getLastColumn();
-  if (lastCol === 0) return {};
-  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  const map = {};
-  headers.forEach((h, idx) => {
-    map[String(h).trim()] = idx + 1;
-  });
-  return map;
-}
-
+// ==============================================================================
+// 6. DATABASE SPREADSHEET HELPERS
+// ==============================================================================
 function getSheetDataAsJson(sheetName) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName(sheetName);
   if (!sheet) return [];
-  
-  const lastRow = sheet.getLastRow();
-  if (lastRow <= 1) return [];
 
-  const values = sheet.getDataRange().getValues();
-  const headers = values[0];
-  const results = [];
-
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
-    const obj = {};
-    for (let j = 0; j < headers.length; j++) {
-      obj[headers[j]] = row[j];
-    }
-    results.push(obj);
-  }
-  return results;
-}
-
-function fetchDashboardOverview() {
-  const units = getSheetDataAsJson("02_UNITS");
-  const invoices = getSheetDataAsJson("05_INVOICES");
-  const leases = getSheetDataAsJson("04_LEASES");
-  const leads = getSheetDataAsJson("07_CRM_PIPELINE");
-  const maintenance = getSheetDataAsJson("06_MAINTENANCE");
-
-  let occupied = 0;
-  let available = 0;
-  units.forEach(u => {
-    if (u.Status === "Occupied") occupied++;
-    if (u.Status === "Available") available++;
-  });
-
-  let totalDue = 0;
-  let totalCollected = 0;
-  let totalPending = 0;
-  let directLandlordTotal = 0;
-  let centralMgmtTotal = 0;
-
-  invoices.forEach(inv => {
-    const amt = Number(inv.Total_Amount) || 0;
-    totalDue += amt;
-    if (inv.Status === "Paid") {
-      totalCollected += amt;
-    } else {
-      totalPending += amt;
-    }
-
-    if (inv.Payment_Route === "Direct_Landlord") {
-      directLandlordTotal += amt;
-    } else {
-      centralMgmtTotal += amt;
-    }
-  });
-
-  const sp = PropertiesService.getScriptProperties();
-  const waNumber = sp.getProperty("LANDING_WA_NUMBER") || "+6281221559000";
-
-  return {
-    success: true,
-    stats: {
-      totalUnits: units.length,
-      occupiedUnits: occupied,
-      availableUnits: available,
-      occupancyRate: units.length > 0 ? ((occupied / units.length) * 100).toFixed(1) + "%" : "0%",
-      activeLeases: leases.filter(l => l.Status === "Active").length,
-      totalRevenueDue: totalDue,
-      totalCollected: totalCollected,
-      totalOutstanding: totalPending,
-      directLandlordDue: directLandlordTotal,
-      centralManagementDue: centralMgmtTotal,
-      activeLeads: leads.length,
-      openMaintenance: maintenance.filter(m => m.Status !== "Resolved").length,
-      landingWaNumber: waNumber
-    },
-    recentInvoices: invoices.slice(-8).reverse(),
-    recentLeads: leads.slice(-5).reverse(),
-    recentMaintenance: maintenance.slice(-5).reverse()
-  };
-}
-
-function handleCreateUnit(data) {
-  if (!data || !data.unitNo || !data.tower) {
-    return { success: false, error: "Tower dan Nomor Unit wajib diisi." };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("02_UNITS");
-  const unitId = "UNT-" + String(data.tower).substring(0, 3).toUpperCase() + "-" + String(data.unitNo);
-
-  sheet.appendRow([
-    unitId,
-    "PROP-001",
-    data.tower,
-    data.floor || "-",
-    data.unitNo,
-    data.type || "Studio Deluxe",
-    "Available",
-    Number(data.baseRent) || 0,
-    Number(data.iplFee) || 0,
-    Number(data.mgmtPercent) || 10,
-    data.landlordName || "Management Pool",
-    data.landlordPhone || "-",
-    data.paymentRoute || "Central_Management",
-    data.bankName || "BCA",
-    data.bankAccountNo || "-",
-    data.bankHolderName || "-"
-  ]);
-
-  return { success: true, message: "Unit baru berhasil ditambahkan!", unitId: unitId };
-}
-
-function handleUpdateUnitStatus(unitId, status) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("02_UNITS");
-  const colMap = getColumnMap(sheet);
   const data = sheet.getDataRange().getValues();
+  if (data.length < 2) return [];
 
-  const idCol = colMap["Unit_ID"] || 1;
-  const statusCol = colMap["Status"] || 7;
+  const headers = data[0].map(h => String(h).trim());
+  const rows = data.slice(1);
 
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idCol - 1]).trim() === String(unitId).trim()) {
-      sheet.getRange(i + 1, statusCol).setValue(status);
-      return { success: true, message: "Status unit " + unitId + " diubah menjadi " + status };
-    }
-  }
-  return { success: false, error: "Unit tidak ditemukan" };
-}
-
-function fetchLeasesList() {
-  const leases = getSheetDataAsJson("04_LEASES");
-  const contacts = getSheetDataAsJson("03_CONTACTS_360");
-  const units = getSheetDataAsJson("02_UNITS");
-
-  const results = leases.map(l => {
-    const contact = contacts.find(c => String(c.Contact_ID).trim() === String(l.Tenant_ID).trim()) || {};
-    const unit = units.find(u => String(u.Unit_ID).trim() === String(l.Unit_ID).trim()) || {};
-    return {
-      ...l,
-      tenantName: contact.Full_Name || "Tenant",
-      tenantPhone: contact.Phone_WA || "-",
-      unitDisplay: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : l.Unit_ID
-    };
+  return rows.map(row => {
+    let obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = row[index];
+    });
+    return obj;
   });
-
-  return { success: true, leases: results };
 }
 
-function handleCreateLease(data) {
-  if (!data || !data.unitId || !data.tenantName || !data.tenantPhone) {
-    return { success: false, error: "Unit, Nama Penyewa, dan WhatsApp wajib diisi." };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const contactSheet = ss.getSheetByName("03_CONTACTS_360");
-  const leaseSheet = ss.getSheetByName("04_LEASES");
-  const unitSheet = ss.getSheetByName("02_UNITS");
-
-  const cleanPhone = String(data.tenantPhone).replace(/[^0-9]/g, '');
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  
-  const contactId = "CNT-" + timestamp + "-" + randomSuffix;
-  const leaseId = "LS-" + new Date().getFullYear() + "-" + randomSuffix;
-
-  contactSheet.appendRow([
-    contactId,
-    String(data.tenantName).trim(),
-    cleanPhone,
-    data.tenantEmail || "",
-    "Tenant",
-    100,
-    "Active Lease for unit " + data.unitId,
-    new Date().toISOString()
-  ]);
-
-  leaseSheet.appendRow([
-    leaseId,
-    data.unitId,
-    contactId,
-    data.startDate || "",
-    data.endDate || "",
-    Number(data.depositAmount) || 0,
-    Number(data.monthlyRent) || 0,
-    Number(data.commissionFee) || (Number(data.monthlyRent) || 0),
-    data.paymentRoute || "Direct_Landlord",
-    "Active",
-    new Date().toISOString()
-  ]);
-
-  const unitColMap = getColumnMap(unitSheet);
-  const unitData = unitSheet.getDataRange().getValues();
-  const uIdCol = unitColMap["Unit_ID"] || 1;
-  const uStatusCol = unitColMap["Status"] || 7;
-
-  for (let i = 1; i < unitData.length; i++) {
-    if (String(unitData[i][uIdCol - 1]).trim() === String(data.unitId).trim()) {
-      unitSheet.getRange(i + 1, uStatusCol).setValue("Occupied");
-      break;
-    }
-  }
-
-  return { success: true, message: "Kontrak sewa berhasil dibuat!", leaseId: leaseId };
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
-function handleCreateInvoice(data) {
-  if (!data || !data.unitId || !data.rentFee) {
-    return { success: false, error: "Unit ID dan Biaya Sewa wajib diisi." };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const invSheet = ss.getSheetByName("05_INVOICES");
-
-  const units = getSheetDataAsJson("02_UNITS");
-  const targetUnit = units.find(u => String(u.Unit_ID).trim() === String(data.unitId).trim()) || {};
-
-  const rentFee = Number(data.rentFee) || 0;
-  const utilityFee = Number(data.utilityFee) || 0;
-  const iplFee = Number(data.iplFee || targetUnit.IPL_Fee || 0);
-  const uniqueCode = Math.floor(100 + Math.random() * 899);
-  const totalAmount = rentFee + utilityFee + iplFee + uniqueCode;
-
-  const invSuffix = Math.floor(1000 + Math.random() * 9000);
-  const invoiceId = "INV-" + new Date().getFullYear() + "-" + invSuffix;
-
-  invSheet.appendRow([
-    invoiceId,
-    data.leaseId || "-",
-    data.unitId,
-    data.period || "Periode Berjalan",
-    rentFee,
-    utilityFee,
-    iplFee,
-    uniqueCode,
-    totalAmount,
-    "Unpaid",
-    targetUnit.Payment_Route || "Direct_Landlord",
-    targetUnit.Bank_Name || "BCA",
-    targetUnit.Bank_Account_No || "-",
-    targetUnit.Bank_Holder_Name || "-",
-    "",
-    new Date().toISOString(),
-    ""
-  ]);
-
-  return { success: true, message: "Tagihan invoice berhasil diterbitkan!", invoiceId: invoiceId };
-}
-
-function fetchInvoiceById(invoiceId) {
-  if (!invoiceId) return { success: false, error: "Missing invoice ID" };
-
-  const invoices = getSheetDataAsJson("05_INVOICES");
-  const inv = invoices.find(i => String(i.Invoice_ID).trim() === String(invoiceId).trim());
-  if (!inv) return { success: false, error: "Invoice not found: " + invoiceId };
-
-  const units = getSheetDataAsJson("02_UNITS");
-  const unit = units.find(u => String(u.Unit_ID).trim() === String(inv.Unit_ID).trim()) || {};
-
-  return { success: true, invoice: inv, unit: unit };
-}
-
-function handleVerifyPayment(invoiceId) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("05_INVOICES");
-  const colMap = getColumnMap(sheet);
-  const data = sheet.getDataRange().getValues();
-
-  const idCol = colMap["Invoice_ID"] || 1;
-  const statusCol = colMap["Status"] || 10;
-  const paidDateCol = colMap["Paid_Date"] || 17;
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idCol - 1]).trim() === String(invoiceId).trim()) {
-      sheet.getRange(i + 1, statusCol).setValue("Paid");
-      sheet.getRange(i + 1, paidDateCol).setValue(new Date().toISOString());
-      return { success: true, message: "Invoice " + invoiceId + " berhasil diverifikasi sebagai LUNAS." };
-    }
-  }
-  return { success: false, error: "Invoice tidak ditemukan" };
-}
-
-function handleSubmitProof(invoiceId, proofUrl) {
-  if (!invoiceId || !proofUrl) {
-    return { success: false, error: "Missing invoice ID or proof URL" };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("05_INVOICES");
-  const colMap = getColumnMap(sheet);
-  const data = sheet.getDataRange().getValues();
-
-  const idCol = colMap["Invoice_ID"] || 1;
-  const statusCol = colMap["Status"] || 10;
-  const proofCol = colMap["Proof_URL"] || 15;
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idCol - 1]).trim() === String(invoiceId).trim()) {
-      sheet.getRange(i + 1, statusCol).setValue("Verifying");
-      sheet.getRange(i + 1, proofCol).setValue(String(proofUrl).trim());
-      return { success: true, message: "Bukti transfer berhasil dikirim. Menunggu verifikasi pengelola." };
-    }
-  }
-  return { success: false, error: "Invoice tidak ditemukan" };
-}
-
-function fetchMaintenanceTickets() {
-  const tickets = getSheetDataAsJson("06_MAINTENANCE");
-  const units = getSheetDataAsJson("02_UNITS");
-
-  const results = tickets.map(t => {
-    const unit = units.find(u => String(u.Unit_ID).trim() === String(t.Unit_ID).trim()) || {};
-    return {
-      ...t,
-      unitDisplay: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : t.Unit_ID
-    };
-  });
-
-  return { success: true, maintenance: results };
-}
-
-function handleCreateMaintenance(data) {
-  if (!data || !data.unitId || !data.issueDescription) {
-    return { success: false, error: "Unit dan Deskripsi Kendala wajib diisi." };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("06_MAINTENANCE");
-  const ticketId = "MNT-" + Math.floor(1000 + Math.random() * 9000);
-
-  sheet.appendRow([
-    ticketId,
-    data.unitId,
-    data.tenantId || "Tenant",
-    data.issueDescription,
-    data.photoUrl || "",
-    data.priority || "Medium",
-    "In_Progress",
-    Number(data.estimatedCost) || 0,
-    data.assignedVendor || "Tim Teknisi In-House",
-    new Date().toISOString(),
-    ""
-  ]);
-
-  return { success: true, message: "Tiket maintenance berhasil dibuat!", ticketId: ticketId };
-}
-
-function handleUpdateMaintenanceStatus(ticketId, status) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("06_MAINTENANCE");
-  const colMap = getColumnMap(sheet);
-  const data = sheet.getDataRange().getValues();
-
-  const idCol = colMap["Ticket_ID"] || 1;
-  const statusCol = colMap["Status"] || 7;
-  const resolvedCol = colMap["Resolved_At"] || 11;
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idCol - 1]).trim() === String(ticketId).trim()) {
-      sheet.getRange(i + 1, statusCol).setValue(status);
-      if (status === "Resolved") {
-        sheet.getRange(i + 1, resolvedCol).setValue(new Date().toISOString());
+function handleDatabaseWipe() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    ["02_UNITS", "03_LEASES", "04_INVOICES"].forEach(name => {
+      const sheet = ss.getSheetByName(name);
+      if (sheet && sheet.getLastRow() > 1) {
+        sheet.deleteRows(2, sheet.getLastRow() - 1);
       }
-      return { success: true, message: "Tiket " + ticketId + " diubah menjadi " + status };
-    }
+    });
+    return createJsonResponse({ success: true, message: "Database mockup berhasil dibersihkan." });
+  } catch (err) {
+    return createJsonResponse({ success: false, error: err.toString() });
   }
-  return { success: false, error: "Tiket tidak ditemukan" };
-}
-
-function handleCreateInspection(data) {
-  if (!data || !data.unitId || !data.type) {
-    return { success: false, error: "Unit dan Tipe Inspeksi wajib diisi." };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("09_INSPECTIONS");
-  const inspectionId = "INSP-" + Math.floor(1000 + Math.random() * 9000);
-
-  sheet.appendRow([
-    inspectionId,
-    data.unitId,
-    data.leaseId || "-",
-    data.type,
-    data.livingRoom || "Good",
-    data.bedroom || "Good",
-    data.bathroom || "Good",
-    data.ac || "Good",
-    data.photoUrls || "",
-    Number(data.depositDeduction) || 0,
-    data.notes || "-",
-    new Date().toISOString()
-  ]);
-
-  return { success: true, message: "Data inspeksi unit berhasil disimpan!", inspectionId: inspectionId };
-}
-
-function fetchOwnerStatementDetails(ownerName) {
-  const fin = generateFinancialStatements();
-  const statements = fin.data.landlordStatements || [];
-  const found = statements.find(s => String(s.ownerName).toLowerCase().trim() === String(ownerName).toLowerCase().trim());
-
-  if (!found) {
-    return { success: false, error: "Statement untuk pemilik tersebut tidak ditemukan." };
-  }
-
-  return { success: true, statement: found };
-}
-
-function fetchCrmPipeline() {
-  const leads = getSheetDataAsJson("07_CRM_PIPELINE");
-  const contacts = getSheetDataAsJson("03_CONTACTS_360");
-  const units = getSheetDataAsJson("02_UNITS");
-
-  const fullPipeline = leads.map(lead => {
-    const contact = contacts.find(c => String(c.Contact_ID).trim() === String(lead.Contact_ID).trim()) || {};
-    const unit = units.find(u => String(u.Unit_ID).trim() === String(lead.Target_Unit).trim()) || {};
-    return {
-      ...lead,
-      contactName: contact.Full_Name || "Lead",
-      phone: contact.Phone_WA || "-",
-      leadScore: Number(contact.Lead_Score) || 50,
-      unitDetails: unit.Unit_No ? (unit.Tower + " #" + unit.Unit_No) : (lead.Target_Unit || "-")
-    };
-  });
-
-  return { success: true, pipeline: fullPipeline };
-}
-
-function handleUpdateLeadStage(leadId, stage, notes) {
-  if (!leadId || !stage) return { success: false, error: "Missing leadId or stage" };
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("07_CRM_PIPELINE");
-  const colMap = getColumnMap(sheet);
-  const data = sheet.getDataRange().getValues();
-
-  const idCol = colMap["Lead_ID"] || 1;
-  const stageCol = colMap["Stage"] || 4;
-  const notesCol = colMap["Interaction_Notes"] || 7;
-  const updateCol = colMap["Updated_At"] || 8;
-
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idCol - 1]).trim() === String(leadId).trim()) {
-      sheet.getRange(i + 1, stageCol).setValue(stage);
-      if (notes) {
-        const existing = data[i][notesCol - 1] ? data[i][notesCol - 1] + " | " : "";
-        sheet.getRange(i + 1, notesCol).setValue(existing + notes);
-      }
-      sheet.getRange(i + 1, updateCol).setValue(new Date().toISOString());
-      return { success: true, message: "Lead " + leadId + " stage updated to " + stage };
-    }
-  }
-  return { success: false, error: "Lead ID not found: " + leadId };
-}
-
-function handleCreateLead(data) {
-  if (!data || !data.fullName || !data.phone) {
-    return { success: false, error: "Full Name and WhatsApp Phone are required" };
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const contactSheet = ss.getSheetByName("03_CONTACTS_360");
-  const pipelineSheet = ss.getSheetByName("07_CRM_PIPELINE");
-
-  const cleanPhone = String(data.phone).replace(/[^0-9]/g, '');
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-  
-  const contactId = "CNT-" + timestamp + "-" + randomSuffix;
-  const leadId = "LEAD-" + timestamp + "-" + randomSuffix;
-
-  contactSheet.appendRow([
-    contactId,
-    String(data.fullName).trim(),
-    cleanPhone,
-    data.email ? String(data.email).trim() : "",
-    "Lead",
-    Number(data.leadScore) || 60,
-    data.notes ? String(data.notes).trim() : "Created via Web Dashboard",
-    new Date().toISOString()
-  ]);
-
-  pipelineSheet.appendRow([
-    leadId,
-    contactId,
-    data.targetUnit || "UNT-101",
-    data.stage || "Inquiry",
-    Number(data.budget) || 0,
-    data.viewingSchedule || "",
-    data.notes || "Initial lead submission",
-    new Date().toISOString()
-  ]);
-
-  return { success: true, message: "Lead successfully created", leadId: leadId, contactId: contactId };
 }
