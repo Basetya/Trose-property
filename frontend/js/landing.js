@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v113.0.0 (Anti-CORS Robust AI Handshake & Japandi Visual Baseline)
+ * Version: v123.0.0 (Robust GET Protocol with Automatic Cache-Busting)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initLandingChatbot();
 });
 
-// 1. Terapkan Kustomisasi Visual Latar Belakang dari LocalStorage
 function initVisualTheme() {
   const saved = localStorage.getItem("KUSUMA_VISUAL_SETTINGS");
   if (saved) {
@@ -32,7 +31,6 @@ function initVisualTheme() {
   }
 }
 
-// 2. Muat 3 Unit Populer (CMS / Database Fallback)
 function initDynamicUnits() {
   const catalogEl = document.getElementById("dynamic-unit-catalog");
   if (!catalogEl) return;
@@ -95,7 +93,6 @@ function initDynamicUnits() {
   `).join("");
 }
 
-// 3. Sinkronisasi Tombol WhatsApp Dinamis
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
 async function initWhatsAppButtons() {
@@ -132,7 +129,6 @@ async function initWhatsAppButtons() {
   window.handleInquireUnit = openWa;
 }
 
-// 4. Widget Chatbot AI Landing Page
 function initLandingChatbot() {
   const btnAi = document.getElementById("floating-btn-ai") || document.getElementById("chatToggleBtn");
   const popup = document.getElementById("chat-popup") || document.getElementById("chatWidget");
@@ -174,78 +170,43 @@ function initLandingChatbot() {
       messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
+    const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
+      ? window.APP_CONFIG.API_BASE_URL 
+      : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
+
+    let reply = "";
+
     try {
-      const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
-        ? window.APP_CONFIG.API_BASE_URL 
-        : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
+      const targetUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&prompt=${encodeURIComponent(text)}&_t=${Date.now()}`;
+      const res = await fetch(targetUrl, {
+        method: "GET",
+        mode: "cors",
+        redirect: "follow"
+      });
 
-      // 1. Coba Request POST Anti-CORS
-      let reply = "";
-      try {
-        const postRes = await fetch(apiEndpoint, {
-          method: "POST",
-          mode: "cors",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "aiChatbot",
-            message: text,
-            prompt: text,
-            senderPhone: "Web_Lead"
-          })
-        });
-        if (postRes.ok) {
-          const postData = await postRes.json();
-          reply = postData.reply || postData.response || postData.message || "";
-        }
-      } catch (errPost) {
-        console.warn("POST fetch gagal, beralih ke GET fallback:", errPost);
+      if (res.ok) {
+        const json = await res.json();
+        reply = json.reply || json.response || json.message || "";
       }
+    } catch (err) {
+      console.warn("Kusuma AI GET Fetch Encountered Issue:", err);
+    }
 
-      // 2. Jika POST gagal, otomatis gunakan GET Fallback
-      if (!reply) {
-        const getUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&senderPhone=Web_Lead&_t=${Date.now()}`;
-        const getRes = await fetch(getUrl, {
-          method: "GET",
-          mode: "cors",
-          redirect: "follow"
-        });
-        if (getRes.ok) {
-          const getData = await getRes.json();
-          reply = getData.reply || getData.response || getData.message || "";
-        }
-      }
+    document.getElementById(loadingId)?.remove();
 
-      document.getElementById(loadingId)?.remove();
+    if (!reply) {
+      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi unit sewa, tarif bulanan, dan survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp kami di 08135600058.";
+    }
 
-      if (!reply) {
-        reply = "Halo! Terima kasih telah menghubungi Kusuma Properti Kalibata City. 🙏\n\nUntuk konsultasi unit dan survei langsung ke Tower Flamboyan Lt. GF, Anda dapat langsung menghubungi WhatsApp resmi kami di 08135600058.";
-      }
-
-      if (messagesBox) {
-        messagesBox.innerHTML += `
-          <div class="flex items-start gap-2.5 my-2">
-            <img src="img/kusuma-avatar.png" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&q=80'" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
-            <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] text-xs leading-relaxed shadow-sm whitespace-pre-line">
-              ${reply}
-            </div>
-          </div>`;
-        messagesBox.scrollTop = messagesBox.scrollHeight;
-      }
-
-    } catch (e) {
-      console.error("AI Chatbot Fetch Fatal Error:", e);
-      document.getElementById(loadingId)?.remove();
-      if (messagesBox) {
-        messagesBox.innerHTML += `
-          <div class="flex items-start gap-2.5 my-2">
-            <img src="img/kusuma-avatar.png" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&q=80'" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
-            <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] text-xs leading-relaxed shadow-sm whitespace-pre-line">
-              Halo! Terima kasih atas pertanyaan Anda. Silakan langsung hubungi WhatsApp resmi admin kami di 08135600058 atau kunjungi kantor kami di Tower Flamboyan Lt. GF untuk survei unit.
-            </div>
-          </div>`;
-        messagesBox.scrollTop = messagesBox.scrollHeight;
-      }
+    if (messagesBox) {
+      messagesBox.innerHTML += `
+        <div class="flex items-start gap-2.5 my-2">
+          <img src="img/kusuma-avatar.png" onerror="this.src='https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&q=80'" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
+          <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] text-xs leading-relaxed shadow-sm whitespace-pre-line">
+            ${reply}
+          </div>
+        </div>`;
+      messagesBox.scrollTop = messagesBox.scrollHeight;
     }
   };
 
@@ -259,12 +220,11 @@ function initLandingChatbot() {
     };
   }
 
-  // Quick Prompt Listeners
+  // Quick Prompt Bindings
   document.getElementById("quick-prompt-studio")?.addEventListener("click", () => sendAiChat("Berapa tarif sewa unit Studio per bulan di Kalibata City?"));
   document.getElementById("quick-prompt-parkir")?.addEventListener("click", () => sendAiChat("Bagaimana informasi dan ketentuan parkir mobil/motor di Kalibata City?"));
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 
-  // Delegasi klik tombol quick pill berbasis teks
   document.querySelectorAll("[data-quick-topic], .quick-topic-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const topic = btn.textContent.trim();
