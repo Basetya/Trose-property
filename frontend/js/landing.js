@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v131.0.0 (Zero-Regression JSONP Anti-CORS Engine)
+ * Version: v132.0.0 (Internal Serverless AI Handshake)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -93,58 +93,9 @@ function initDynamicUnits() {
   `).join("");
 }
 
-// Helper Universal JSONP Requester (Bypass CORS 302 Secara Total)
-function requestJSONP(url, params = {}) {
-  return new Promise((resolve, reject) => {
-    const callbackName = "kusuma_cb_" + Math.random().toString(36).substring(2, 9);
-    const queryParams = new URLSearchParams({ ...params, callback: callbackName, _nocache: Date.now() });
-    const fullUrl = `${url}${url.includes("?") ? "&" : "?"}${queryParams.toString()}`;
+let targetAdminWa = "628135600058";
 
-    const script = document.createElement("script");
-    script.src = fullUrl;
-    script.async = true;
-
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error("JSONP Request Timeout"));
-    }, 15000);
-
-    function cleanup() {
-      if (window[callbackName]) delete window[callbackName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-      clearTimeout(timeout);
-    }
-
-    window[callbackName] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror = () => {
-      cleanup();
-      reject(new Error("JSONP Script Load Error"));
-    };
-
-    document.head.appendChild(script);
-  });
-}
-
-let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
-
-async function initWhatsAppButtons() {
-  const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
-    ? window.APP_CONFIG.API_BASE_URL 
-    : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
-
-  try {
-    const data = await requestJSONP(apiEndpoint, { action: "getPublicSettings" });
-    if (data.success && data.settings && data.settings.waNumber) {
-      targetAdminWa = String(data.settings.waNumber).replace(/\D/g, "");
-    }
-  } catch (e) {
-    targetAdminWa = "628135600058";
-  }
-
+function initWhatsAppButtons() {
   const btnFloatingWa = document.getElementById("floating-btn-wa");
   const btnWidgetWa = document.getElementById("widget-btn-wa");
 
@@ -201,31 +152,27 @@ function initLandingChatbot() {
       messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
-    const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
-      ? window.APP_CONFIG.API_BASE_URL 
-      : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
-
     let reply = "";
 
     try {
-      // Mengirim via JSONP bebas pemblokiran CORS browser
-      const data = await requestJSONP(apiEndpoint, {
-        action: "aiChatbot",
-        message: text,
-        prompt: text,
-        senderPhone: "Web_Lead"
+      // Memanggil Serverless API internal domain sendiri (Bebas CORS 100%)
+      const res = await fetch(`/api/chat?message=${encodeURIComponent(text)}&_nocache=${Date.now()}`, {
+        method: "GET",
+        headers: { "Accept": "application/json" }
       });
 
-      console.log("JSONP AI Response Payload:", data);
-      reply = data.reply || data.response || data.message || "";
+      if (res.ok) {
+        const data = await res.json();
+        reply = data.reply || data.response || data.message || "";
+      }
     } catch (err) {
-      console.error("JSONP Request Error:", err);
+      console.error("Internal Serverless Chat Error:", err);
     }
 
     document.getElementById(loadingId)?.remove();
 
     if (!reply) {
-      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi ketersediaan unit sewa, tarif bulanan, dan jadwal survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp kami di 08135600058.";
+      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi unit sewa, tarif bulanan, dan jadwal survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp kami di 08135600058.";
     }
 
     if (messagesBox) {
