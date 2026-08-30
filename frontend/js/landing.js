@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v128.0.0 (Zero-Regression Production Web App Receiver)
+ * Version: v129.0.0 (Zero-Regression Production Web App Receiver)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
