@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v123.0.0 (Robust GET Protocol with Automatic Cache-Busting)
+ * Version: v126.0.0 (Zero-Regression Production Web App Receiver)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -101,7 +101,7 @@ async function initWhatsAppButtons() {
     : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
 
   try {
-    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_t=${Date.now()}`, {
+    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_nocache=${Date.now()}`, {
       method: "GET",
       mode: "cors",
       redirect: "follow"
@@ -177,25 +177,29 @@ function initLandingChatbot() {
     let reply = "";
 
     try {
-      const targetUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&prompt=${encodeURIComponent(text)}&_t=${Date.now()}`;
+      const targetUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&prompt=${encodeURIComponent(text)}&senderPhone=Web_Lead&_nocache=${Date.now()}`;
+      
       const res = await fetch(targetUrl, {
         method: "GET",
         mode: "cors",
-        redirect: "follow"
+        redirect: "follow",
+        headers: {
+          "Accept": "application/json"
+        }
       });
 
       if (res.ok) {
         const json = await res.json();
         reply = json.reply || json.response || json.message || "";
       }
-    } catch (err) {
-      console.warn("Kusuma AI GET Fetch Encountered Issue:", err);
+    } catch (fetchError) {
+      console.error("Direct fetch exception:", fetchError);
     }
 
     document.getElementById(loadingId)?.remove();
 
     if (!reply) {
-      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi unit sewa, tarif bulanan, dan survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp kami di 08135600058.";
+      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi ketersediaan unit sewa, tarif bulanan, dan jadwal survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp resmi tim kami di 08135600058.";
     }
 
     if (messagesBox) {
@@ -220,7 +224,6 @@ function initLandingChatbot() {
     };
   }
 
-  // Quick Prompt Bindings
   document.getElementById("quick-prompt-studio")?.addEventListener("click", () => sendAiChat("Berapa tarif sewa unit Studio per bulan di Kalibata City?"));
   document.getElementById("quick-prompt-parkir")?.addEventListener("click", () => sendAiChat("Bagaimana informasi dan ketentuan parkir mobil/motor di Kalibata City?"));
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
