@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v129.0.0 (Zero-Regression Production Web App Receiver)
+ * Version: v131.0.0 (Zero-Regression JSONP Anti-CORS Engine)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -93,6 +93,42 @@ function initDynamicUnits() {
   `).join("");
 }
 
+// Helper Universal JSONP Requester (Bypass CORS 302 Secara Total)
+function requestJSONP(url, params = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = "kusuma_cb_" + Math.random().toString(36).substring(2, 9);
+    const queryParams = new URLSearchParams({ ...params, callback: callbackName, _nocache: Date.now() });
+    const fullUrl = `${url}${url.includes("?") ? "&" : "?"}${queryParams.toString()}`;
+
+    const script = document.createElement("script");
+    script.src = fullUrl;
+    script.async = true;
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("JSONP Request Timeout"));
+    }, 15000);
+
+    function cleanup() {
+      if (window[callbackName]) delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timeout);
+    }
+
+    window[callbackName] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("JSONP Script Load Error"));
+    };
+
+    document.head.appendChild(script);
+  });
+}
+
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
 async function initWhatsAppButtons() {
@@ -101,12 +137,7 @@ async function initWhatsAppButtons() {
     : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
 
   try {
-    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_nocache=${Date.now()}`, {
-      method: "GET",
-      mode: "cors",
-      redirect: "follow"
-    });
-    const data = await res.json();
+    const data = await requestJSONP(apiEndpoint, { action: "getPublicSettings" });
     if (data.success && data.settings && data.settings.waNumber) {
       targetAdminWa = String(data.settings.waNumber).replace(/\D/g, "");
     }
@@ -177,29 +208,24 @@ function initLandingChatbot() {
     let reply = "";
 
     try {
-      const targetUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&prompt=${encodeURIComponent(text)}&senderPhone=Web_Lead&_nocache=${Date.now()}`;
-      
-      const res = await fetch(targetUrl, {
-        method: "GET",
-        mode: "cors",
-        redirect: "follow",
-        headers: {
-          "Accept": "application/json"
-        }
+      // Mengirim via JSONP bebas pemblokiran CORS browser
+      const data = await requestJSONP(apiEndpoint, {
+        action: "aiChatbot",
+        message: text,
+        prompt: text,
+        senderPhone: "Web_Lead"
       });
 
-      if (res.ok) {
-        const json = await res.json();
-        reply = json.reply || json.response || json.message || "";
-      }
-    } catch (fetchError) {
-      console.error("Direct fetch exception:", fetchError);
+      console.log("JSONP AI Response Payload:", data);
+      reply = data.reply || data.response || data.message || "";
+    } catch (err) {
+      console.error("JSONP Request Error:", err);
     }
 
     document.getElementById(loadingId)?.remove();
 
     if (!reply) {
-      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi ketersediaan unit sewa, tarif bulanan, dan jadwal survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp resmi tim kami di 08135600058.";
+      reply = "Halo! Terima kasih atas pertanyaan Anda. Untuk informasi ketersediaan unit sewa, tarif bulanan, dan jadwal survei langsung di Tower Flamboyan Lt. GF, silakan langsung hubungi WhatsApp kami di 08135600058.";
     }
 
     if (messagesBox) {
