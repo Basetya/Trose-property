@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v53.0.0 (Dynamic WhatsApp Integration + Visual Japandi Theme Loader)
+ * Version: v112.0.0 (Unified aiChatbot Protocol & Anti-CORS Redirect Follow)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -101,10 +101,14 @@ let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window
 async function initWhatsAppButtons() {
   const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
     ? window.APP_CONFIG.API_BASE_URL 
-    : "https://script.google.com/macros/s/AKfycbxZ7ctf2V1Peo969s3UPBQxoHkaSyZMdstGosy8V1ZGL_fF-xSP0wf7L9Gv3qMhJOQ_nQ/exec";
+    : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
 
   try {
-    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_t=${Date.now()}`);
+    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_t=${Date.now()}`, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow"
+    });
     const data = await res.json();
     if (data.success && data.settings && data.settings.waNumber) {
       targetAdminWa = String(data.settings.waNumber).replace(/\D/g, "");
@@ -143,10 +147,10 @@ function initLandingChatbot() {
   if (btnClose) btnClose.onclick = () => popup.classList.add("hidden");
 
   const sendAiChat = async (presetText = "") => {
-    const text = presetText || inputMsg.value.trim();
+    const text = presetText || (inputMsg ? inputMsg.value.trim() : "");
     if (!text) return;
 
-    if (!presetText) inputMsg.value = "";
+    if (!presetText && inputMsg) inputMsg.value = "";
 
     messagesBox.innerHTML += `
       <div class="flex items-start justify-end gap-2.5">
@@ -169,15 +173,25 @@ function initLandingChatbot() {
     try {
       const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
         ? window.APP_CONFIG.API_BASE_URL 
-        : "https://script.google.com/macros/s/AKfycbxZ7ctf2V1Peo969s3UPBQxoHkaSyZMdstGosy8V1ZGL_fF-xSP0wf7L9Gv3qMhJOQ_nQ/exec";
+        : "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec";
 
-      const res = await fetch(`${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&senderPhone=Web_Lead`);
+      // Eksekusi GET dengan mode CORS dan follow redirect untuk bypass 302
+      const targetUrl = `${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&senderPhone=Web_Lead&_t=${Date.now()}`;
+      const res = await fetch(targetUrl, {
+        method: "GET",
+        mode: "cors",
+        redirect: "follow"
+      });
+
+      if (!res.ok) {
+        throw new Error("HTTP Status: " + res.status);
+      }
+
       const data = await res.json();
-
       document.getElementById(loadingId)?.remove();
 
-      const reply = (data.success && data.reply) 
-        ? data.reply 
+      const reply = (data && (data.reply || data.response || data.message))
+        ? (data.reply || data.response || data.message)
         : "Terima kasih telah bertanya. Silakan hubungi tim admin kami via WhatsApp untuk detail unit lebih lengkap.";
 
       messagesBox.innerHTML += `
@@ -188,6 +202,7 @@ function initLandingChatbot() {
           </div>
         </div>`;
     } catch (e) {
+      console.error("AI Chatbot Fetch Error:", e);
       document.getElementById(loadingId)?.remove();
       messagesBox.innerHTML += `
         <div class="flex items-start gap-2.5">
