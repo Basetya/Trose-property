@@ -1,19 +1,21 @@
 /**
- * Kusuma Properti Manager - Client Application Configuration
+ * Kusuma Properti - Application Global Configuration
  * File: frontend/js/config.js
- * Version: v79.0.0 (Client Account Web App Integration)
- * Architecture: Mobile-First, Decoupled Serverless Client Engine
+ * Version: v122.0.0 (Synchronized Production Web App Endpoint)
+ * Environment: Client-Side Configuration
  */
 
 window.APP_CONFIG = {
-  // Google Apps Script Production Web App Endpoint (Client Account)
+  // Alamat Web App Google Apps Script Aktif (Backend Router & Gemini Engine)
   API_BASE_URL: "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec",
   
-  // Official Business WhatsApp Number (Kalibata City CS / Management)
+  // Kontak Resmi WhatsApp Pengelola Kusuma Properti
   DEFAULT_WA: "628135600058",
   
-  // Application Metadata
-  APP_NAME: "Kusuma Properti",
-  OFFICE_LOCATION: "Tower Flamboyan Lt. GF, Apartemen Kalibata City, Jakarta Selatan",
-  SYSTEM_VERSION: "v79.0.0"
+  // Identitas Brand & Lokasi Layanan Fisik
+  BRAND_NAME: "Kusuma Properti",
+  OFFICE_LOCATION: "Apartemen Kalibata City Tower Flamboyan GF (Ground Floor)",
+  
+  // Parameter Default Obrolan AI
+  AI_CONCIERGE_NAME: "Kusuma AI Concierge"
 };
