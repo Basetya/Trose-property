@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v126.0.0 (Zero-Regression Production Web App Receiver)
+ * Version: v128.0.0 (Zero-Regression Production Web App Receiver)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -224,6 +224,7 @@ function initLandingChatbot() {
     };
   }
 
+  // Quick Prompt Bindings
   document.getElementById("quick-prompt-studio")?.addEventListener("click", () => sendAiChat("Berapa tarif sewa unit Studio per bulan di Kalibata City?"));
   document.getElementById("quick-prompt-parkir")?.addEventListener("click", () => sendAiChat("Bagaimana informasi dan ketentuan parkir mobil/motor di Kalibata City?"));
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
