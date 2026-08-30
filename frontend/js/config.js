@@ -1,57 +1,19 @@
 /**
- * Kusuma Properti Manager - Central Configuration & CORS-Proof API Dispatcher
- * Version: v48.0.0 (Sanitized Official WhatsApp Number Default: 628135600058)
+ * Kusuma Properti Manager - Client Application Configuration
  * File: frontend/js/config.js
+ * Version: v79.0.0 (Client Account Web App Integration)
+ * Architecture: Mobile-First, Decoupled Serverless Client Engine
  */
 
-const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec";
-
-// Disetel mutlak ke nomor default baru (tanpa tanda + agar tidak duplikat)
-let OFFICIAL_WA_NUMBER = "628135600058";
-const OFFICIAL_WA_GREETING = "Halo Admin Kusuma Properti Kalibata City, saya ingin konsultasi sewa unit.";
-
-// Konfigurasi Global APP_CONFIG
 window.APP_CONFIG = {
-  API_BASE_URL: GAS_API_URL,
-  DEFAULT_WA: OFFICIAL_WA_NUMBER
+  // Google Apps Script Production Web App Endpoint (Client Account)
+  API_BASE_URL: "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec",
+  
+  // Official Business WhatsApp Number (Kalibata City CS / Management)
+  DEFAULT_WA: "628135600058",
+  
+  // Application Metadata
+  APP_NAME: "Kusuma Properti",
+  OFFICE_LOCATION: "Tower Flamboyan Lt. GF, Apartemen Kalibata City, Jakarta Selatan",
+  SYSTEM_VERSION: "v79.0.0"
 };
-
-async function gasApiCall(action, payload = {}, method = "POST") {
-  if (action === "aiChatbot") {
-    const params = new URLSearchParams({
-      action: "aiChatbot",
-      message: payload.message || "",
-      senderPhone: payload.senderPhone || "Public_Web_Lead"
-    });
-    const fullUrl = `${GAS_API_URL}?${params.toString()}`;
-    const response = await fetch(fullUrl, { method: "GET", redirect: "follow" });
-    if (!response.ok) {
-      throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
-    }
-    return await response.json();
-  }
-
-  const isGet = method.toUpperCase() === "GET";
-  let url = GAS_API_URL;
-
-  const requestOptions = {
-    method: method.toUpperCase(),
-    redirect: "follow"
-  };
-
-  if (isGet) {
-    const params = new URLSearchParams({ action, ...payload });
-    url += (url.includes("?") ? "&" : "?") + params.toString();
-  } else {
-    requestOptions.headers = {
-      "Content-Type": "text/plain;charset=utf-8"
-    };
-    requestOptions.body = JSON.stringify({ action, ...payload });
-  }
-
-  const response = await fetch(url, requestOptions);
-  if (!response.ok) {
-    throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
-  }
-  return await response.json();
-}
