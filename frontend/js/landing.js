@@ -1,98 +1,43 @@
 /**
- * Kusuma Properti Manager - Pure Real-Time Gemini AI Chatbot & Dynamic Catalog Engine (v22.0)
+ * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
+ * Version: v53.0.0 (Dynamic WhatsApp Integration + Visual Japandi Theme Loader)
  */
 
-function applyPublicVisualSettings() {
-  const opVal = Number(localStorage.getItem("kusuma_bg_opacity") || 90);
-  const br = localStorage.getItem("kusuma_bg_brightness") || "100";
-  const ct = localStorage.getItem("kusuma_bg_contrast") || "100";
+document.addEventListener("DOMContentLoaded", () => {
+  initVisualTheme();
+  initDynamicUnits();
+  initWhatsAppButtons();
+  initLandingChatbot();
+});
 
-  const root = document.documentElement;
-  root.style.setProperty("--bg-overlay-opacity", (opVal / 100).toString());
-  root.style.setProperty("--bg-brightness", br + "%");
-  root.style.setProperty("--bg-contrast", ct + "%");
-
-  if (opVal <= 65) {
-    root.style.setProperty("--hero-title-color", "#1A1A18");
-    root.style.setProperty("--hero-desc-color", "#2B2B28");
-    root.style.setProperty("--hero-text-shadow", "0 2px 10px rgba(255, 255, 255, 0.85)");
-    root.style.setProperty("--hero-scrim-bg", "rgba(255, 255, 255, 0.75)");
-  } else {
-    root.style.setProperty("--hero-title-color", "#2C2C2A");
-    root.style.setProperty("--hero-desc-color", "#595956");
-    root.style.setProperty("--hero-text-shadow", "none");
-    root.style.setProperty("--hero-scrim-bg", "transparent");
-  }
-}
-
-applyPublicVisualSettings();
-
-async function initLandingSettings() {
-  applyPublicVisualSettings();
-  loadDynamicCatalog();
-  bindCleanEventListeners();
-
-  const localWa = localStorage.getItem("kusuma_official_wa") || localStorage.getItem("trose_official_wa");
-  if (localWa) OFFICIAL_WA_NUMBER = localWa;
-
-  try {
-    const res = await gasApiCall("getPublicSettings", {}, "GET");
-    if (res && res.success && res.settings && res.settings.waNumber) {
-      OFFICIAL_WA_NUMBER = res.settings.waNumber;
-      localStorage.setItem("kusuma_official_wa", OFFICIAL_WA_NUMBER);
-    }
-  } catch (e) {
-    console.warn("Menggunakan nomor WhatsApp aktif:", OFFICIAL_WA_NUMBER);
-  }
-}
-
-function bindCleanEventListeners() {
-  const addClick = (id, fn) => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener("click", fn);
-  };
-
-  addClick("nav-btn-wa", () => openWhatsAppDirect());
-  addClick("mobile-nav-btn-wa", () => openWhatsAppDirect());
-  
-  addClick("hero-btn-ai", () => toggleFloatingChat());
-  addClick("hero-btn-wa", () => openWhatsAppDirect());
-
-  addClick("floating-btn-wa", () => openWhatsAppDirect());
-  addClick("floating-btn-ai", () => toggleFloatingChat());
-
-  addClick("widget-btn-wa", () => openWhatsAppDirect());
-  addClick("widget-btn-close", () => toggleFloatingChat());
-
-  addClick("quick-prompt-studio", () => sendWidgetQuickPrompt("Berapa harga sewa unit Studio Kalibata City?"));
-  addClick("quick-prompt-parkir", () => sendWidgetQuickPrompt("Bagaimana aturan dan biaya parkir mobil di Kalibata City?"));
-  addClick("quick-prompt-2br", () => sendWidgetQuickPrompt("Jadwalkan survei unit 2BR"));
-
-  const btnSend = document.getElementById("btn-widget-send");
-  const inputEl = document.getElementById("widget-input");
-  
-  if (btnSend) btnSend.addEventListener("click", () => handleWidgetSend());
-  if (inputEl) {
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        handleWidgetSend();
-      }
-    });
-  }
-}
-
-function getPopularUnitsData() {
-  const saved = localStorage.getItem("kusuma_cms_popular_units");
+// 1. Terapkan Kustomisasi Visual Latar Belakang dari LocalStorage
+function initVisualTheme() {
+  const saved = localStorage.getItem("KUSUMA_VISUAL_SETTINGS");
   if (saved) {
     try {
-      return JSON.parse(saved);
+      const s = JSON.parse(saved);
+      if (s.opacity) {
+        document.documentElement.style.setProperty("--japandi-scrim-opacity", `${Number(s.opacity) / 100}`);
+      }
+      if (s.brightness) {
+        document.documentElement.style.setProperty("--japandi-bg-brightness", `${s.brightness}%`);
+      }
+      if (s.contrast) {
+        document.documentElement.style.setProperty("--japandi-bg-contrast", `${s.contrast}%`);
+      }
     } catch (e) {
-      console.warn("Invalid CMS storage, using default units");
+      console.warn("Gagal memuat tema visual:", e);
     }
   }
-  return [
+}
+
+// 2. Muat 3 Unit Populer (CMS / Database Fallback)
+function initDynamicUnits() {
+  const catalogEl = document.getElementById("dynamic-unit-catalog");
+  if (!catalogEl) return;
+
+  const defaultUnits = [
     {
       badge: "Single / Eksekutif",
       title: "Studio Deluxe",
@@ -112,195 +57,157 @@ function getPopularUnitsData() {
       price: 5500000
     }
   ];
-}
 
-async function loadDynamicCatalog() {
-  const container = document.getElementById("dynamic-unit-catalog");
-  if (!container) return;
-
-  const units = getPopularUnitsData();
-
-  container.innerHTML = units.map((u, idx) => {
-    const isSpecial = idx === 1;
-    const isGreen = idx === 2;
-    
-    let badgeClass = "bg-[#F4EFE6] text-[#8C5835]";
-    let cardClass = "japandi-card p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6";
-    let btnClass = "w-full py-3.5 bg-[#FAF7F2] hover:bg-[#8C5835] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition";
-    let priceColor = "text-[#8C5835]";
-
-    if (isSpecial) {
-      badgeClass = "bg-[#8C5835] text-white";
-      cardClass = "japandi-card-warm p-6 md:p-7 rounded-3xl flex flex-col justify-between space-y-6 shadow-md border-[#D4A373]";
-      btnClass = "w-full py-3.5 japandi-btn-wood text-xs font-bold rounded-2xl shadow transition";
-    } else if (isGreen) {
-      badgeClass = "bg-[#EAF0EB] text-[#3A5A40]";
-      priceColor = "text-[#3A5A40]";
-      btnClass = "w-full py-3.5 bg-[#FAF7F2] hover:bg-[#3A5A40] hover:text-white text-[#2C2C2A] border border-[#DDD3C2] text-xs font-bold rounded-2xl transition";
+  let units = defaultUnits;
+  const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  if (savedCMS) {
+    try {
+      const d = JSON.parse(savedCMS);
+      units = [
+        d.u1 || defaultUnits[0],
+        d.u2 || defaultUnits[1],
+        d.u3 || defaultUnits[2]
+      ];
+    } catch (e) {
+      units = defaultUnits;
     }
+  }
 
-    return `
-      <div class="${cardClass}">
-        <div class="space-y-3.5">
-          <div class="flex items-center justify-between">
-            <span class="px-3.5 py-1 ${badgeClass} text-[10px] md:text-[11px] font-extrabold tracking-wider uppercase rounded-full">
-              ${escapeHtml(u.badge)}
-            </span>
-            <span class="text-[10px] text-[#3A5A40] font-bold bg-[#EAF0EB] px-2 py-0.5 rounded-lg">Siap Huni</span>
-          </div>
-          <h4 class="font-bold text-[#2C2C2A] font-sans card-unit-title">${escapeHtml(u.title)}</h4>
-          <p class="text-[#737370] card-unit-desc min-h-[42px]">${escapeHtml(u.desc)}</p>
-          <div class="pt-4 border-t border-[#E8DFD3]/80">
-            <span class="text-[11px] text-[#737370] block font-medium">Tarif Sewa Mulai</span>
-            <p class="font-bold ${priceColor} font-serif card-unit-price mt-0.5">
-              Rp ${Number(u.price || 3000000).toLocaleString('id-ID')} <span class="text-xs text-[#737370] font-sans font-normal">/bulan</span>
-            </p>
-          </div>
+  catalogEl.innerHTML = units.map(u => `
+    <div class="japandi-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+      <div class="space-y-2">
+        <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#F4EFE6] text-[#8C5835] border border-[#DDD3C2]">
+          ${u.badge || "Tersedia"}
+        </span>
+        <h4 class="text-lg font-bold text-[#2C2C2A]">${u.title || "Unit Kalibata"}</h4>
+        <p class="text-xs text-[#737370] leading-relaxed">${u.desc || ""}</p>
+      </div>
+      <div class="pt-3 border-t border-[#E8DFD3] flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>
+          <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${Number(u.price || 0).toLocaleString("id-ID")}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
         </div>
-        <button type="button" data-unit="${escapeHtml(u.title)}" class="catalog-book-btn ${btnClass}">
-          Jadwalkan Survei Unit
+        <button onclick="handleInquireUnit('${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">
+          Tanya Unit
         </button>
       </div>
-    `;
-  }).join('');
-
-  container.querySelectorAll(".catalog-book-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      bookViewingUnit(btn.getAttribute("data-unit"));
-    });
-  });
+    </div>
+  `).join("");
 }
 
-function toggleFloatingChat() {
-  const popup = document.getElementById("chat-popup");
-  if (!popup) return;
-  if (popup.classList.contains("hidden")) {
-    popup.classList.remove("hidden");
-    const input = document.getElementById("widget-input");
-    if (input) input.focus();
-  } else {
-    popup.classList.add("hidden");
-  }
-}
+// 3. Sinkronisasi Tombol WhatsApp Dinamis
+let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
-function openWhatsAppDirect(customMessage) {
-  const phone = (typeof OFFICIAL_WA_NUMBER !== "undefined") ? OFFICIAL_WA_NUMBER : "+6281221559000";
-  const text = customMessage || ((typeof OFFICIAL_WA_GREETING !== "undefined") ? OFFICIAL_WA_GREETING : "Halo Admin Kusuma Properti Kalibata City, saya ingin konsultasi sewa unit.");
-  const url = `https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
-}
-
-function bookViewingUnit(unitType) {
-  const msg = `Halo Admin Kusuma Properti, saya ingin jadwalkan survei untuk unit ${unitType} di Kalibata City.`;
-  if (confirm(`Hubungi WhatsApp Pengelola untuk survei unit ${unitType}?`)) {
-    openWhatsAppDirect(msg);
-  } else {
-    toggleFloatingChat();
-    const input = document.getElementById("widget-input");
-    if (input) {
-      input.value = msg;
-      handleWidgetSend();
-    }
-  }
-}
-
-function sendWidgetQuickPrompt(text) {
-  const input = document.getElementById("widget-input");
-  if (input) {
-    input.value = text;
-    handleWidgetSend();
-  }
-}
-
-// REAL-TIME AI ENGINE (Direct Gemini LLM via GET Protocol)
-async function handleWidgetSend() {
-  const input = document.getElementById("widget-input");
-  if (!input) return;
-  const message = input.value.trim();
-  if (!message) return;
-
-  appendWidgetMessage(message, "user");
-  input.value = "";
-
-  const btn = document.getElementById("btn-widget-send");
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `<span class="animate-pulse">...</span>`;
-  }
-
-  const typing = appendWidgetTyping();
+async function initWhatsAppButtons() {
+  const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
+    ? window.APP_CONFIG.API_BASE_URL 
+    : "https://script.google.com/macros/s/AKfycbxZ7ctf2V1Peo969s3UPBQxoHkaSyZMdstGosy8V1ZGL_fF-xSP0wf7L9Gv3qMhJOQ_nQ/exec";
 
   try {
-    const res = await gasApiCall("aiChatbot", { message: message, senderPhone: "Public_Web_Lead" }, "GET");
-    typing.remove();
-
-    if (res && res.reply && res.reply.trim() !== "") {
-      appendWidgetMessage(res.reply, "ai");
-    } else if (res && res.error) {
-      appendWidgetMessage(`[Kusuma AI Info]: ${res.error}`, "ai");
-    } else {
-      appendWidgetMessage("Maaf, server AI tidak memberikan balasan teks. Silakan coba kembali.", "ai");
+    const res = await fetch(`${apiEndpoint}?action=getPublicSettings&_t=${Date.now()}`);
+    const data = await res.json();
+    if (data.success && data.settings && data.settings.waNumber) {
+      targetAdminWa = String(data.settings.waNumber).replace(/\D/g, "");
     }
-  } catch (err) {
-    console.error("[AI Chatbot Failed]:", err);
-    typing.remove();
-    appendWidgetMessage(`[Koneksi Error]: Gagal memanggil endpoint AI: ${err.message}.`, "ai");
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>`;
+  } catch (e) {
+    targetAdminWa = "628135600058";
+  }
+
+  const btnFloatingWa = document.getElementById("floating-btn-wa");
+  const btnWidgetWa = document.getElementById("widget-btn-wa");
+
+  const openWa = (unitName = "") => {
+    const text = unitName 
+      ? `Halo Admin Kusuma Properti, saya tertarik dengan unit ${unitName} di Kalibata City. Apakah masih tersedia?`
+      : "Halo Admin Kusuma Properti, saya ingin konsultasi seputar sewa unit di Kalibata City.";
+    window.open(`https://wa.me/${targetAdminWa}?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  if (btnFloatingWa) btnFloatingWa.onclick = () => openWa();
+  if (btnWidgetWa) btnWidgetWa.onclick = () => openWa();
+  window.handleInquireUnit = openWa;
+}
+
+// 4. Widget Chatbot AI Landing Page
+function initLandingChatbot() {
+  const btnAi = document.getElementById("floating-btn-ai");
+  const popup = document.getElementById("chat-popup");
+  const btnClose = document.getElementById("widget-btn-close");
+  const btnSend = document.getElementById("btn-widget-send");
+  const inputMsg = document.getElementById("widget-input");
+  const messagesBox = document.getElementById("widget-messages");
+
+  if (!btnAi || !popup) return;
+
+  btnAi.onclick = () => popup.classList.toggle("hidden");
+  if (btnClose) btnClose.onclick = () => popup.classList.add("hidden");
+
+  const sendAiChat = async (presetText = "") => {
+    const text = presetText || inputMsg.value.trim();
+    if (!text) return;
+
+    if (!presetText) inputMsg.value = "";
+
+    messagesBox.innerHTML += `
+      <div class="flex items-start justify-end gap-2.5">
+        <div class="bg-[#8C5835] text-white p-3 rounded-2xl rounded-tr-none text-xs leading-relaxed shadow-sm max-w-[80%]">
+          ${text}
+        </div>
+      </div>`;
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    const loadingId = "ai-loading-" + Date.now();
+    messagesBox.innerHTML += `
+      <div id="${loadingId}" class="flex items-start gap-2.5">
+        <img src="img/kusuma-avatar.png" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
+        <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#737370] text-xs italic shadow-sm animate-pulse">
+          Kusuma AI sedang mengetik...
+        </div>
+      </div>`;
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+
+    try {
+      const apiEndpoint = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
+        ? window.APP_CONFIG.API_BASE_URL 
+        : "https://script.google.com/macros/s/AKfycbxZ7ctf2V1Peo969s3UPBQxoHkaSyZMdstGosy8V1ZGL_fF-xSP0wf7L9Gv3qMhJOQ_nQ/exec";
+
+      const res = await fetch(`${apiEndpoint}?action=aiChatbot&message=${encodeURIComponent(text)}&senderPhone=Web_Lead`);
+      const data = await res.json();
+
+      document.getElementById(loadingId)?.remove();
+
+      const reply = (data.success && data.reply) 
+        ? data.reply 
+        : "Terima kasih telah bertanya. Silakan hubungi tim admin kami via WhatsApp untuk detail unit lebih lengkap.";
+
+      messagesBox.innerHTML += `
+        <div class="flex items-start gap-2.5">
+          <img src="img/kusuma-avatar.png" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
+          <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] text-xs leading-relaxed shadow-sm">
+            ${reply}
+          </div>
+        </div>`;
+    } catch (e) {
+      document.getElementById(loadingId)?.remove();
+      messagesBox.innerHTML += `
+        <div class="flex items-start gap-2.5">
+          <img src="img/kusuma-avatar.png" alt="AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
+          <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#B35436] text-xs shadow-sm">
+            Koneksi ke asisten AI terganggu. Silakan langsung chat via WhatsApp admin.
+          </div>
+        </div>`;
     }
-  }
-}
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  };
 
-function appendWidgetMessage(text, sender) {
-  const container = document.getElementById("widget-messages");
-  if (!container) return;
-  const wrapper = document.createElement("div");
-  wrapper.className = sender === "user" ? "flex justify-end" : "flex items-start gap-2.5";
-
-  if (sender === "user") {
-    wrapper.innerHTML = `
-      <div class="bg-[#8C5835] text-white p-3 rounded-2xl rounded-tr-none max-w-[85%] leading-relaxed text-xs shadow">
-        ${escapeHtml(text)}
-      </div>
-    `;
-  } else {
-    wrapper.innerHTML = `
-      <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
-      <div class="bg-white border border-[#E8DFD3] p-3 rounded-2xl rounded-tl-none text-[#2C2C2A] leading-relaxed text-xs shadow-sm whitespace-pre-line">
-        ${escapeHtml(text)}
-      </div>
-    `;
+  if (btnSend) btnSend.onclick = () => sendAiChat();
+  if (inputMsg) {
+    inputMsg.onkeydown = (e) => {
+      if (e.key === "Enter") sendAiChat();
+    };
   }
 
-  container.appendChild(wrapper);
-  container.scrollTop = container.scrollHeight;
+  document.getElementById("quick-prompt-studio")?.addEventListener("click", () => sendAiChat("Berapa tarif sewa unit Studio per bulan di Kalibata City?"));
+  document.getElementById("quick-prompt-parkir")?.addEventListener("click", () => sendAiChat("Bagaimana informasi dan ketentuan parkir mobil/motor di Kalibata City?"));
+  document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 }
-
-function appendWidgetTyping() {
-  const container = document.getElementById("widget-messages");
-  const wrapper = document.createElement("div");
-  wrapper.className = "flex items-start gap-2.5";
-  wrapper.innerHTML = `
-    <img src="img/kusuma-avatar.png" alt="Kusuma AI" class="w-7 h-7 rounded-full object-cover border border-white shrink-0 shadow-sm">
-    <div class="bg-white border border-[#E8DFD3] px-3 py-2 rounded-2xl rounded-tl-none text-[10px] text-[#737370] animate-pulse">
-      Kusuma AI sedang berpikir...
-    </div>
-  `;
-  if (container) {
-    container.appendChild(wrapper);
-    container.scrollTop = container.scrollHeight;
-  }
-  return wrapper;
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  initLandingSettings();
-});

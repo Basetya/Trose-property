@@ -1,183 +1,112 @@
-/* Kusuma Properti - Japandi Responsive & Adaptive Typography Engine (v22.0) */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
+/**
+ * Kusuma Properti Manager - Japandi Theme Stylesheet
+ * File: frontend/css/custom.css
+ * Version: v56.0.0 (Preserved Exact Asset Path: ../img/bg-kalibata.webp)
+ */
 
 :root {
-  --japandi-bg: #FAF7F2;
-  --japandi-surface: #FFFFFF;
-  --japandi-panel: #F4EFE6;
+  --japandi-canvas: #FAF7F2;
   --japandi-wood: #8C5835;
   --japandi-wood-hover: #704326;
-  --japandi-clay: #B35436;
   --japandi-moss: #3A5A40;
-  --japandi-charcoal: #2C2C2A;
-  --japandi-body-text: #3D3D3A;
-  --japandi-muted: #737370;
+  --japandi-moss-hover: #2D4732;
+  --japandi-clay: #B35436;
   --japandi-border: #E8DFD3;
+  --japandi-text: #2C2C2A;
+  --japandi-muted: #737370;
   
-  --bg-overlay-opacity: 0.90;
-  --bg-brightness: 100%;
-  --bg-contrast: 100%;
-
-  --hero-title-color: #2C2C2A;
-  --hero-desc-color: #595956;
-  --hero-text-shadow: none;
-  --hero-scrim-bg: transparent;
+  /* Dynamic Visual Tokens */
+  --japandi-scrim-opacity: 0.65;
+  --japandi-bg-brightness: 100%;
+  --japandi-bg-contrast: 100%;
 }
 
-* {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-button, a, input, select, textarea {
-  touch-action: manipulation;
-}
-
-h1, h2, h3, .font-display {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--japandi-bg);
-  color: var(--japandi-charcoal);
-  letter-spacing: -0.01em;
+/* Base Body Styling */
+body.bg-japandi-canvas {
+  background-color: var(--japandi-canvas) !important;
+  color: var(--japandi-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
-body::before {
+/* 1. LAYER FOTO ASLI LATAR BELAKANG (frontend/img/bg-kalibata.webp) */
+body.bg-japandi-canvas::before {
   content: "";
   position: fixed;
-  inset: 0;
-  z-index: -2;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-image: url('../img/bg-kalibata.webp');
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
-  filter: brightness(var(--bg-brightness)) contrast(var(--bg-contrast));
+  background-attachment: fixed;
+  filter: brightness(var(--japandi-bg-brightness)) contrast(var(--japandi-bg-contrast));
+  z-index: -2;
+  pointer-events: none;
 }
 
-body::after {
+/* 2. LAYER SCRIM TRANSPARANSI JAPANDI (Dimanipulasi Slider Opacity) */
+body.bg-japandi-canvas::after {
   content: "";
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(250, 247, 242, var(--japandi-scrim-opacity));
   z-index: -1;
-  background: linear-gradient(to bottom, rgba(250, 247, 242, var(--bg-overlay-opacity)), rgba(244, 239, 230, var(--bg-overlay-opacity)));
+  pointer-events: none;
+  transition: background-color 0.15s ease;
 }
 
-.hero-title-adaptive {
-  color: var(--hero-title-color) !important;
-  text-shadow: var(--hero-text-shadow) !important;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-.hero-desc-adaptive {
-  color: var(--hero-desc-color) !important;
-  text-shadow: var(--hero-text-shadow) !important;
-  transition: color 0.3s ease, text-shadow 0.3s ease;
-}
-
-.hero-scrim-box {
-  background: var(--hero-scrim-bg);
-  transition: background 0.3s ease, backdrop-filter 0.3s ease;
-}
-
-/* Fluid Adaptive Catalog Typography */
-.card-unit-title {
-  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
-  line-height: 1.25;
-  word-break: break-word;
-}
-
-.card-unit-desc {
-  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
-  line-height: 1.5;
-  word-break: break-word;
-}
-
-.card-unit-price {
-  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
-}
-
+/* Card & Panel Styles */
 .japandi-card {
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
   border: 1px solid var(--japandi-border);
-  box-shadow: 0 4px 20px -2px rgba(44, 44, 42, 0.05);
-}
-
-.japandi-card-warm {
-  background: rgba(244, 239, 230, 0.95);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid #D4A373;
+  box-shadow: 0 4px 20px -2px rgba(44, 44, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .japandi-panel {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+}
+
+.hero-scrim-box {
+  background-color: rgba(255, 255, 255, 0.85);
   border: 1px solid var(--japandi-border);
 }
 
+/* Button Variants */
 .japandi-btn-wood {
-  background-color: #8C5835;
+  background-color: var(--japandi-wood);
   color: #FFFFFF;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 .japandi-btn-wood:hover {
-  background-color: #704326;
-  box-shadow: 0 4px 14px rgba(140, 88, 53, 0.25);
+  background-color: var(--japandi-wood-hover);
+}
+.japandi-btn-wood:active {
+  transform: scale(0.98);
 }
 
 .japandi-btn-moss {
-  background-color: #3A5A40;
+  background-color: var(--japandi-moss);
   color: #FFFFFF;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 .japandi-btn-moss:hover {
-  background-color: #2D4732;
-  box-shadow: 0 4px 14px rgba(58, 90, 64, 0.25);
+  background-color: var(--japandi-moss-hover);
+}
+.japandi-btn-moss:active {
+  transform: scale(0.98);
 }
 
-.japandi-btn-clay {
-  background-color: #B35436;
-  color: #FFFFFF;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.japandi-btn-clay:hover {
-  background-color: #944026;
-  box-shadow: 0 4px 14px rgba(179, 84, 54, 0.25);
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #FAF7F2;
-}
-::-webkit-scrollbar-thumb {
-  background: #D8CEBE;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #BFAFA0;
+/* Typography */
+.font-display {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
 }
