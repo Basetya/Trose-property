@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v133.0.0 (Direct AI Edge Engine & Instant Knowledge Core)
+ * Version: v140.0.0 (Zero-Regression Edge AI & Surgical Copy Engine)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDynamicUnits();
   initWhatsAppButtons();
   initLandingChatbot();
+  updateHeroAndFooterCopy();
 });
 
 // 1. Terapkan Pengaturan Visual Japandi
@@ -191,10 +192,10 @@ function initLandingChatbot() {
       messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
-    // Simulasi jeda pengetikan alami (400ms) untuk pengalaman pengguna yang halus
+    // Simulasi jeda alami 400ms
     await new Promise(resolve => setTimeout(resolve, 400));
 
-    // Eksekusi jawaban cerdas real-time bebas gangguan jaringan
+    // Eksekusi jawaban cerdas real-time
     const reply = generateInstantAIReply(text);
 
     // Hapus indikator mengetik
@@ -228,7 +229,7 @@ function initLandingChatbot() {
   document.getElementById("quick-prompt-parkir")?.addEventListener("click", () => sendAiChat("Bagaimana informasi dan ketentuan parkir mobil/motor di Kalibata City?"));
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 
-  // Event Listener untuk tombol pil opsi cepat
+  // Event Listener tombol opsi cepat
   document.querySelectorAll("[data-quick-topic], .quick-topic-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const topic = btn.textContent.trim();
@@ -237,5 +238,26 @@ function initLandingChatbot() {
       else if (topic.includes("2BR")) sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?");
       else sendAiChat(topic);
     });
+  });
+}
+
+// 6. Surgical Copy Updater (Pengubah Teks Aman Tanpa Sentuh index.html)
+function updateHeroAndFooterCopy() {
+  // A. Perbarui Teks Tombol CTA Hero
+  const allLinksAndButtons = document.querySelectorAll('a, button');
+  allLinksAndButtons.forEach(el => {
+    const text = el.textContent || "";
+    if (text.includes("Lihat Unit") || text.includes("disewa dan dijual") || text.includes("click \"Cari\"") || text.includes("Tampilkan")) {
+      el.textContent = "Lihat unit disewa dan dijual";
+    }
+  });
+
+  // B. Perbarui Teks Copyright di Footer
+  const allFooterElements = document.querySelectorAll('footer p, footer div, footer span, p, div');
+  allFooterElements.forEach(el => {
+    const text = el.textContent || "";
+    if (text.includes("Kalibata City Haven") || (text.includes("Kusuma Properti ©") && text.includes("Haven"))) {
+      el.textContent = "Kusuma Properti © 2026 - Kalibata City";
+    }
   });
 }
