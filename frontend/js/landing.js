@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v142.0.0 (Direct Gemini 1.5/3.6 Flash Client Engine)
+ * Version: v148.0.0 (Zero-Regression Clean WhatsApp Link & Direct Edge Engine)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -88,7 +88,7 @@ function initDynamicUnits() {
           <span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>
           <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${Number(u.price || 0).toLocaleString("id-ID")}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
         </div>
-        <button onclick="handleInquireUnit('${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">
+        <button onclick="handleInquireUnit(event, '${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">
           Tanya Unit
         </button>
       </div>
@@ -96,23 +96,58 @@ function initDynamicUnits() {
   `).join("");
 }
 
-// 3. Sinkronisasi Tombol WhatsApp
+// 3. Sinkronisasi & Penanganan Tombol WhatsApp (Anti-Double Text Guard)
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
+function buildSingleWaLink(unitName = "") {
+  const baseWaNumber = String(targetAdminWa).replace(/\D/g, "") || "628135600058";
+  const cleanUnit = (typeof unitName === "string" && unitName.trim() && unitName !== "[object MouseEvent]") ? unitName.trim() : "";
+  
+  const textMessage = cleanUnit 
+    ? `Halo Admin Kusuma Properti, saya tertarik dengan unit ${cleanUnit} di Kalibata City. Apakah masih tersedia?`
+    : "Halo Admin Kusuma Properti, saya ingin konsultasi seputar sewa unit di Kalibata City.";
+    
+  return `https://wa.me/${baseWaNumber}?text=${encodeURIComponent(textMessage)}`;
+}
+
+function openCleanWhatsApp(e, unitName = "") {
+  if (e && typeof e.preventDefault === "function") {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  const url = buildSingleWaLink(unitName);
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 function initWhatsAppButtons() {
+  const btnHeaderWa = document.getElementById("header-btn-wa");
   const btnFloatingWa = document.getElementById("floating-btn-wa");
   const btnWidgetWa = document.getElementById("widget-btn-wa");
 
-  const openWa = (unitName = "") => {
-    const text = unitName 
-      ? `Halo Admin Kusuma Properti, saya tertarik dengan unit ${unitName} di Kalibata City. Apakah masih tersedia?`
-      : "Halo Admin Kusuma Properti, saya ingin konsultasi seputar sewa unit di Kalibata City.";
-    window.open(`https://wa.me/${targetAdminWa}?text=${encodeURIComponent(text)}`, "_blank");
-  };
+  // Hapus listener duplikat dan pasang handler tunggal
+  if (btnHeaderWa) {
+    btnHeaderWa.removeAttribute("href");
+    btnHeaderWa.onclick = (e) => openCleanWhatsApp(e, "");
+  }
+  if (btnFloatingWa) {
+    btnFloatingWa.removeAttribute("href");
+    btnFloatingWa.onclick = (e) => openCleanWhatsApp(e, "");
+  }
+  if (btnWidgetWa) {
+    btnWidgetWa.removeAttribute("href");
+    btnWidgetWa.onclick = (e) => openCleanWhatsApp(e, "");
+  }
 
-  if (btnFloatingWa) btnFloatingWa.onclick = () => openWa();
-  if (btnWidgetWa) btnWidgetWa.onclick = () => openWa();
-  window.handleInquireUnit = openWa;
+  // Tautkan ke scope global secara aman
+  window.handleInquireUnit = (e, uName) => {
+    // Tangani kemungkinan passing parameter terbalik atau tanpa event
+    if (typeof e === "string" && !uName) {
+      openCleanWhatsApp(null, e);
+    } else {
+      openCleanWhatsApp(e, uName);
+    }
+  };
 }
 
 // 4. Prompt System & Knowledge Base Kalibata City
