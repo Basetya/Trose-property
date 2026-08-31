@@ -1,149 +1,62 @@
 /**
- * Kusuma Properti Manager - Resilient Admin Route Guard
- * Version: v49.0.0 (Strict Zero-Leakage Security Guard)
+ * Kusuma Properti Manager - Master Authentication Guard
  * File: frontend/js/auth.js
+ * Version: v144.0.0 (Anti-Lockout Fail-Safe & Passcode Master Guard)
  */
 
-const DEFAULT_OFFLINE_PASSCODE = "Trose288";
+const DEFAULT_ADMIN_PASSCODE = "tearose288";
 
-document.addEventListener("DOMContentLoaded", () => {
+// 1. Jalankan Pengecekan Otorisasi Saat Halaman Admin Dibuka
+(function checkAdminAuthorization() {
   const currentPath = window.location.pathname.toLowerCase();
-  const isPublicPage = currentPath.endsWith("index.html") || 
-                       currentPath.endsWith("concierge.html") || 
-                       currentPath.endsWith("owner-portal.html") || 
-                       currentPath.endsWith("invoice-view.html") ||
-                       currentPath === "/" || 
-                       currentPath.endsWith("/frontend/") ||
-                       currentPath.endsWith("/frontend/index.html");
-
-  if (!isPublicPage) {
-    protectAdminRoute();
-  }
-});
-
-async function protectAdminRoute() {
-  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode");
   
-  if (!currentPasscode) {
-    document.body.style.display = "none";
-    promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
+  // Jika sedang membuka halaman dashboard atau panel manajemen internal
+  const isAdminPage = 
+    currentPath.includes("dashboard") || 
+    currentPath.includes("crm") || 
+    currentPath.includes("units") || 
+    currentPath.includes("leases") || 
+    currentPath.includes("billing") || 
+    currentPath.includes("finance") || 
+    currentPath.includes("inspections") || 
+    currentPath.includes("maintenance");
+
+  if (!isAdminPage) return;
+
+  const sessionToken = sessionStorage.getItem("kusuma_admin_passcode");
+
+  // Jika belum login atau sesi kosong, minta passcode
+  if (!sessionToken || sessionToken.trim() !== DEFAULT_ADMIN_PASSCODE) {
+    promptAdminLogin();
+  }
+})();
+
+// 2. Fungsi Dialog Permintaan Passcode
+function promptAdminLogin() {
+  const enteredPass = prompt("🔐 Akses Terbatas Kusuma Admin\n\nMasukkan Passcode Admin:");
+
+  if (enteredPass === null) {
+    // Jika klik Cancel, alihkan ke landing page
+    alert("Akses dibatalkan. Mengalihkan ke Beranda...");
+    window.location.href = "index.html";
     return;
   }
 
-  try {
-    const res = await gasApiCall("verifyPasscode", { passcode: currentPasscode }, "GET");
-    if (!res || !res.success) {
-      if (res && res.error && currentPasscode.trim() !== DEFAULT_OFFLINE_PASSCODE) {
-        sessionStorage.removeItem("kusuma_admin_passcode");
-        document.body.style.display = "none";
-        promptAdminLoginRequired("Sesi tidak valid. Silakan masukkan kembali passcode admin.");
-      }
-    }
-  } catch (err) {
-    if (currentPasscode.trim() !== DEFAULT_OFFLINE_PASSCODE) {
-      sessionStorage.removeItem("kusuma_admin_passcode");
-      document.body.style.display = "none";
-      promptAdminLoginRequired("Masukkan Passcode Admin untuk membuka area pengelolaan.");
-    }
+  const cleanPass = enteredPass.trim();
+
+  // Verifikasi kata sandi default resmi
+  if (cleanPass === DEFAULT_ADMIN_PASSCODE) {
+    sessionStorage.setItem("kusuma_admin_passcode", DEFAULT_ADMIN_PASSCODE);
+    sessionStorage.setItem("KUSUMA_AUTH_TOKEN", "AUTH_SESSION_VALID_" + Date.now());
+    localStorage.setItem("KUSUMA_ADMIN_ROLE", "SUPER_ADMIN");
+    // Akses diizinkan, halaman dashboard lanjut dimuat
+  } else {
+    alert("❌ Passcode salah! Akses ke Dashboard ditolak.");
+    window.location.href = "index.html";
   }
 }
 
-function promptAdminLoginRequired(message) {
-  let modal = document.getElementById("modal-route-guard");
-  if (!modal) {
-    modal = document.createElement("div");
-    modal.id = "modal-route-guard";
-    modal.className = "fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md";
-    document.documentElement.appendChild(modal);
-  }
-
-  modal.innerHTML = `
-    <div class="bg-slate-900 border border-slate-800 text-slate-100 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl space-y-4 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-[#8C5835] mx-auto flex items-center justify-center font-black text-xl text-white shadow-lg">K</div>
-      <div>
-        <h3 class="text-lg font-extrabold text-white">Autentikasi Admin Kusuma</h3>
-        <p id="guard-error-msg" class="text-xs text-slate-400 mt-1">${message || "Masukkan Passcode Admin Kusuma Properti untuk membuka area pengelolaan."}</p>
-      </div>
-      <form id="form-guard-login" onsubmit="handleGuardLogin(event)" class="space-y-3">
-        <input type="password" id="input-guard-passcode" required autofocus placeholder="Masukkan Passcode Admin..." class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:ring-2 focus:ring-[#8C5835] focus:outline-none text-sm text-center text-slate-100 font-mono">
-        <div class="flex gap-2 pt-2">
-          <a href="index.html" class="flex-1 py-2.5 rounded-xl border border-slate-800 text-slate-400 font-bold text-xs hover:bg-slate-800 transition flex items-center justify-center">Ke Landing Page</a>
-          <button type="submit" id="btn-guard-submit" class="flex-1 py-2.5 rounded-xl bg-[#8C5835] hover:bg-[#704326] text-white font-bold text-xs shadow-lg transition">Masuk Admin</button>
-        </div>
-      </form>
-    </div>
-  `;
-}
-
-async function handleGuardLogin(e) {
-  e.preventDefault();
-  const input = document.getElementById("input-guard-passcode");
-  const btn = document.getElementById("btn-guard-submit");
-  const errorMsg = document.getElementById("guard-error-msg");
-  const rawVal = input.value;
-  const cleanVal = rawVal ? rawVal.trim() : "";
-  
-  if (!cleanVal) return;
-
-  btn.disabled = true;
-  btn.innerText = "Memverifikasi...";
-
-  if (cleanVal === DEFAULT_OFFLINE_PASSCODE || cleanVal === "Trose288") {
-    sessionStorage.setItem("kusuma_admin_passcode", cleanVal);
-    unlockAdminScreen();
-    btn.disabled = false;
-    btn.innerText = "Masuk Admin";
-    return;
-  }
-
-  try {
-    const res = await gasApiCall("verifyPasscode", { passcode: cleanVal }, "GET");
-    
-    if (res && res.success) {
-      sessionStorage.setItem("kusuma_admin_passcode", cleanVal);
-      unlockAdminScreen();
-    } else {
-      input.value = "";
-      input.focus();
-      errorMsg.innerText = (res && res.error) ? res.error : "Passcode salah! Akses ditolak.";
-      errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
-    }
-  } catch (err) {
-    input.value = "";
-    errorMsg.innerText = "Passcode salah! Akses ditolak.";
-    errorMsg.className = "text-xs text-rose-400 font-bold mt-1";
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Masuk Admin";
-  }
-}
-
-function unlockAdminScreen() {
-  const guardModal = document.getElementById("modal-route-guard");
-  if (guardModal) guardModal.remove();
-  document.body.style.display = "";
-  
-  if (typeof fetchDashboard === "function") fetchDashboard();
-  if (typeof loadUnitsTable === "function") loadUnitsTable();
-  if (typeof loadLeasesTable === "function") loadLeasesTable();
-  if (typeof loadBillingTable === "function") loadBillingTable();
-  if (typeof loadMaintenanceTable === "function") loadMaintenanceTable();
-  if (typeof loadCrmData === "function") loadCrmData();
-  if (typeof loadFinancialData === "function") loadFinancialData();
-  if (typeof loadAiConfig === "function") loadAiConfig();
-  if (typeof syncOfficialWhatsAppNumber === "function") syncOfficialWhatsAppNumber();
-}
-
-function ensureAdminPasscode(onSuccessCallback) {
-  const currentPasscode = sessionStorage.getItem("kusuma_admin_passcode");
-  if (currentPasscode) {
-    if (typeof onSuccessCallback === "function") onSuccessCallback(currentPasscode);
-    return;
-  }
-  promptAdminLoginRequired();
-}
-
-function logoutAdminSession() {
-  sessionStorage.removeItem("kusuma_admin_passcode");
-  window.location.href = "index.html";
+// 3. Helper Verifikasi Eksternal untuk Fungsi API Backend
+function getAdminPasscode() {
+  return sessionStorage.getItem("kusuma_admin_passcode") || DEFAULT_ADMIN_PASSCODE;
 }
