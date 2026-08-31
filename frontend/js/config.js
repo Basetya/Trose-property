@@ -7,7 +7,7 @@
 
 window.APP_CONFIG = {
   // Alamat Web App Google Apps Script Aktif (Backend Router & Gemini Engine)
-  API_BASE_URL: "https://script.google.com/macros/s/AKfycbwM0tRCZvTd6qpWwGRzt6U14QUwtAI7gaxBAfsUAejM2kO1nLe9T90fcvjhqg2daLG4/exec",
+  API_BASE_URL: "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec",
   
   // Kontak Resmi WhatsApp Pengelola Kusuma Properti
   DEFAULT_WA: "628135600058",
