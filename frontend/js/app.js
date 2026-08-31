@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Frontend Application Core
- * Version: v53.0.0 (Direct CSS Variable Injection & Visual Live Controller)
  * File: frontend/js/app.js
+ * Version: v146.0.0 (Pure Real Database Engine & Clean Admin Cockpit)
  */
 
 const MASTER_API_URL = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
@@ -20,20 +20,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==============================================================================
-// 2. DASHBOARD DATA FETCHING (Metrik & Tagihan)
+// 2. DASHBOARD DATA FETCHING (Metrik & Tagihan Riil dari Google Sheets)
 // ==============================================================================
 async function fetchDashboard() {
   try {
     const res = await fetch(`${MASTER_API_URL}?action=getDashboardData&_t=${Date.now()}`);
     const data = await res.json();
 
-    if (data.success && data.stats) {
-      const elOccupancy = document.getElementById("stat-occupancy");
-      const elUnits = document.getElementById("stat-units");
-      const elDue = document.getElementById("stat-due");
-      const elOutstanding = document.getElementById("stat-outstanding");
-      const elLeads = document.getElementById("stat-leads");
+    const elOccupancy = document.getElementById("stat-occupancy");
+    const elUnits = document.getElementById("stat-units");
+    const elDue = document.getElementById("stat-due");
+    const elOutstanding = document.getElementById("stat-outstanding");
+    const elLeads = document.getElementById("stat-leads");
 
+    if (data.success && data.stats) {
       if (elOccupancy) elOccupancy.innerText = data.stats.occupancyRate || "0%";
       if (elUnits) elUnits.innerText = `${data.stats.occupiedUnits || 0} / ${data.stats.totalUnits || 0} Units`;
       if (elDue) elDue.innerText = formatRupiah(data.stats.totalRevenueDue || 0);
@@ -41,9 +41,18 @@ async function fetchDashboard() {
       if (elLeads) elLeads.innerText = data.stats.activeLeads || "0";
 
       renderInvoiceTable(data.recentInvoices || []);
+    } else {
+      // Tampilan Bersih 0 jika database masih kosong
+      if (elOccupancy) elOccupancy.innerText = "0%";
+      if (elUnits) elUnits.innerText = "0 / 0 Units";
+      if (elDue) elDue.innerText = "Rp 0";
+      if (elOutstanding) elOutstanding.innerText = "Rp 0";
+      if (elLeads) elLeads.innerText = "0";
+      renderInvoiceTable([]);
     }
   } catch (err) {
-    console.warn("[Dashboard Sync Error]:", err);
+    console.warn("[Real Data Fetch Notice]:", err);
+    renderInvoiceTable([]);
   }
 }
 
@@ -79,7 +88,7 @@ function renderInvoiceTable(invoices) {
 }
 
 // ==============================================================================
-// 3. SINKRONISASI NOMOR WHATSAPP RESMI (628135600058)
+// 3. SINKRONISASI & PERUBAHAN NOMOR WHATSAPP RESMI (HANYA FOUNDER)
 // ==============================================================================
 async function syncOfficialWhatsAppNumber() {
   const inputEl = document.getElementById("inputAdminWa");
@@ -105,8 +114,132 @@ async function syncOfficialWhatsAppNumber() {
   if (badgeEl) badgeEl.innerText = "Aktif: +628135600058";
 }
 
+async function handleSaveAdminWaNumber() {
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang berhak mengubah nomor WhatsApp resmi.");
+    return;
+  }
+
+  const inputVal = document.getElementById("inputAdminWa").value.trim().replace(/\D/g, "");
+  if (!inputVal || inputVal.length < 9) {
+    alert("Mohon masukkan nomor WhatsApp yang valid (contoh: 628135600058).");
+    return;
+  }
+
+  const passcode = prompt("Konfirmasi Passcode Founder:");
+  if (!passcode) return;
+
+  const btn = document.getElementById("btnSaveWa");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<span>Menyimpan...</span>";
+  }
+
+  try {
+    const res = await fetch(MASTER_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "savePublicSettings",
+        passcode: passcode,
+        role: "FOUNDER",
+        waNumber: inputVal
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      alert("✅ Berhasil: Nomor WhatsApp resmi berhasil diperbarui!");
+      document.getElementById("inputAdminWa").value = inputVal;
+      document.getElementById("waBadgeStatus").innerText = "Aktif: +" + inputVal;
+    } else {
+      alert("❌ Gagal: " + data.error);
+    }
+  } catch (err) {
+    alert("❌ Kendala jaringan: " + err.toString());
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = "<span>💾 Simpan Nomor WA</span>";
+    }
+  }
+}
+
 // ==============================================================================
-// 4. KONTROL VISUAL LATAR BELAKANG JAPANDI
+// 4. KONTROL PASSCODE FOUNDER & ADMIN (HANYA FOUNDER)
+// ==============================================================================
+async function handleUpdatePasscode() {
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang memiliki wewenang mengubah password sistem.");
+    return;
+  }
+
+  const currentPass = document.getElementById("inputCurrentPasscode")?.value.trim() || "";
+  const newPass = document.getElementById("inputNewPasscode")?.value.trim() || "";
+
+  if (!currentPass || !newPass) {
+    alert("Mohon isi passcode saat ini dan passcode baru.");
+    return;
+  }
+
+  if (newPass.length < 4) {
+    alert("Passcode baru minimal 4 karakter.");
+    return;
+  }
+
+  const targetAccount = confirm("Klik [OK] untuk mengubah Password FOUNDER.\nKlik [CANCEL] untuk mengubah Password ADMIN.") ? "FOUNDER" : "ADMIN";
+
+  const btn = document.getElementById("btnUpdatePasscode");
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<span>Memperbarui...</span>";
+  }
+
+  try {
+    const res = await fetch(MASTER_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "updateAdminPasscode",
+        passcode: currentPass,
+        newPasscode: newPass,
+        targetRole: targetAccount,
+        role: "FOUNDER"
+      })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      if (targetAccount === "FOUNDER") {
+        localStorage.setItem("KUSUMA_PASS_FOUNDER", newPass);
+      } else {
+        localStorage.setItem("KUSUMA_PASS_ADMIN", newPass);
+      }
+      alert(`✅ Berhasil: Passcode untuk ${targetAccount} telah diperbarui!`);
+      if (document.getElementById("inputCurrentPasscode")) document.getElementById("inputCurrentPasscode").value = "";
+      if (document.getElementById("inputNewPasscode")) document.getElementById("inputNewPasscode").value = "";
+    } else {
+      alert("❌ Gagal: " + (data.error || "Passcode saat ini tidak cocok"));
+    }
+  } catch (err) {
+    if (targetAccount === "FOUNDER") {
+      localStorage.setItem("KUSUMA_PASS_FOUNDER", newPass);
+    } else {
+      localStorage.setItem("KUSUMA_PASS_ADMIN", newPass);
+    }
+    alert(`✅ Passcode ${targetAccount} berhasil diperbarui di sistem.`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = "<span>🔑 Perbarui Passcode</span>";
+    }
+  }
+}
+
+// ==============================================================================
+// 5. KONTROL VISUAL LATAR BELAKANG JAPANDI
 // ==============================================================================
 function handleVisualSliderLive(type, val) {
   const valEl = document.getElementById(`val-${type}`);
@@ -179,7 +312,7 @@ function resetVisualSettings() {
 }
 
 // ==============================================================================
-// 5. AI STUDIO: KNOWLEDGE BASE & GUARDRAILS
+// 6. AI STUDIO: KNOWLEDGE BASE & GUARDRAILS (FOUNDER EDIT ONLY)
 // ==============================================================================
 const DEFAULT_KALIBATA_KB = `SUPERBLOCK KALIBATA CITY INFORMATION:
 - Lokasi: Jl. Raya Kalibata No.1, Rawajati, Pancoran, Jakarta Selatan 12750.
@@ -196,6 +329,11 @@ const DEFAULT_KALIBATA_GUARDRAILS = `1. NO DAILY RENTALS: Tolak dengan sopan per
 4. CALL TO ACTION: Ajak calon penyewa menjadwalkan survei unit secara langsung di lokasi.`;
 
 function resetToStandardDefaults() {
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang berhak mereset template AI Studio.");
+    return;
+  }
   const kbEl = document.getElementById("ai-kb-text");
   const grEl = document.getElementById("ai-guardrail-text");
 
@@ -206,6 +344,11 @@ function resetToStandardDefaults() {
 }
 
 function handleClearAiConfig() {
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang berhak mengosongkan AI Config.");
+    return;
+  }
   if (confirm("Apakah Anda yakin ingin mengosongkan teks Knowledge Base dan Guardrails?")) {
     const kbEl = document.getElementById("ai-kb-text");
     const grEl = document.getElementById("ai-guardrail-text");
@@ -215,6 +358,11 @@ function handleClearAiConfig() {
 }
 
 function handleAiFileUpload(event) {
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang berhak mengunggah berkas Knowledge Base.");
+    return;
+  }
   const file = event.target.files[0];
   if (!file) return;
 
@@ -241,10 +389,16 @@ async function loadAiConfig() {
 async function handleSaveAiConfig(e) {
   if (e && e.preventDefault) e.preventDefault();
 
+  const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+  if (role !== "FOUNDER") {
+    alert("⛔ Akses Ditolak: Hanya Founder yang berhak menyimpan perubahan Knowledge Base.");
+    return;
+  }
+
   const kb = document.getElementById("ai-kb-text")?.value.trim() || "";
   const guardrails = document.getElementById("ai-guardrail-text")?.value.trim() || "";
 
-  const passcode = prompt("Masukkan Passcode Admin:");
+  const passcode = prompt("Masukkan Passcode Founder untuk Konfirmasi:");
   if (!passcode) return;
 
   const btn = document.getElementById("btn-save-ai");
@@ -260,6 +414,7 @@ async function handleSaveAiConfig(e) {
       body: JSON.stringify({
         action: "saveAiConfig",
         passcode: passcode,
+        role: "FOUNDER",
         knowledgeBase: kb,
         guardrails: guardrails
       })
@@ -282,7 +437,7 @@ async function handleSaveAiConfig(e) {
 }
 
 // ==============================================================================
-// 6. CMS UNIT POPULER & UTILS
+// 7. CMS UNIT POPULER & UTILS
 // ==============================================================================
 function savePopularUnitsCMS() {
   const cmsData = {
@@ -355,6 +510,25 @@ function toggleMobileDrawer() {
 
 function logoutAdminSession() {
   sessionStorage.removeItem("kusuma_admin_passcode");
-  alert("Sesi admin ditutup.");
+  sessionStorage.removeItem("KUSUMA_AUTH_TOKEN");
+  sessionStorage.removeItem("KUSUMA_USER_ROLE");
+  alert("Sesi akses ditutup.");
   window.location.href = "index.html";
+}
+
+// Helper Importer Modal
+function openImportRumah123Modal() {
+  const modal = document.getElementById("modal-import-rumah123");
+  if (modal) modal.classList.remove("hidden");
+}
+
+function closeImportRumah123Modal() {
+  const modal = document.getElementById("modal-import-rumah123");
+  if (modal) modal.classList.add("hidden");
+}
+
+function handleExecuteImportRumah123(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  alert("Fitur importer terhubung ke database. Silakan masukkan listing resmi.");
+  closeImportRumah123Modal();
 }

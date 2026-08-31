@@ -125,7 +125,7 @@
           <p class="font-mono text-[#3A5A40] font-bold mt-0.5">Google Sheets Active</p>
         </div>
         <button onclick="logoutAdminSession()" class="w-full text-xs text-[#737370] hover:text-[#B35436] p-2 text-center rounded-xl hover:bg-[#F4EFE6] transition font-bold">
-          Clear Passcode Session
+          Keluar Sesi Admin
         </button>
       </div>
     </aside>
@@ -144,36 +144,33 @@
             <button onclick="openImportRumah123Modal()" class="px-4 py-2 japandi-btn-moss text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5">
               <span>+ Impor Rumah123</span>
             </button>
-            <button onclick="handleWipeDatabase()" class="px-3.5 py-2 bg-[#F8ECE8] hover:bg-[#F0D5CD] text-[#B35436] border border-[#F0D5CD] text-xs font-bold rounded-xl transition">
-              Wipe Mockup
-            </button>
-            <button onclick="fetchDashboard()" class="px-3.5 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm">
-              Refresh
+            <button onclick="fetchDashboard()" class="px-3.5 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm flex items-center gap-1.5">
+              <span>🔄 Refresh Data</span>
             </button>
           </div>
         </div>
 
-        <!-- Metrics Grid -->
+        <!-- Metrics Grid (Real Database Connected) -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
             <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Occupancy</span>
             <h3 id="stat-occupancy" class="text-xl md:text-3xl font-extrabold text-[#2C2C2A] mt-1 font-serif">0%</h3>
-            <p id="stat-units" class="text-xs text-[#8C5835] mt-1 font-semibold">0 Units</p>
+            <p id="stat-units" class="text-xs text-[#8C5835] mt-1 font-semibold">0 / 0 Units</p>
           </div>
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
             <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Rent Due</span>
             <h3 id="stat-due" class="text-lg md:text-2xl font-extrabold text-[#2C2C2A] mt-1 font-serif">Rp 0</h3>
-            <p id="stat-breakdown" class="text-[10px] md:text-[11px] text-[#737370] mt-1 truncate">Direct vs Mgmt</p>
+            <p id="stat-breakdown" class="text-[10px] md:text-[11px] text-[#737370] mt-1 truncate">Tagihan Berjalan</p>
           </div>
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
             <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Outstanding</span>
             <h3 id="stat-outstanding" class="text-lg md:text-2xl font-extrabold text-[#B35436] mt-1 font-serif">Rp 0</h3>
-            <p class="text-[10px] md:text-[11px] text-[#B35436] mt-1 font-medium">Menunggu Verifikasi</p>
+            <p class="text-[10px] md:text-[11px] text-[#B35436] mt-1 font-medium">Belum Lunas</p>
           </div>
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
-            <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Active Pipeline</span>
+            <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Active Leads</span>
             <h3 id="stat-leads" class="text-xl md:text-3xl font-extrabold text-[#3A5A40] mt-1 font-serif">0</h3>
-            <p id="stat-maintenance" class="text-xs text-[#737370] mt-1">0 Open Tickets</p>
+            <p id="stat-maintenance" class="text-xs text-[#737370] mt-1">Calon Penyewa Aktif</p>
           </div>
         </div>
 
@@ -221,22 +218,22 @@
           </div>
         </div>
 
-        <!-- 🔐 KARTU PENGATURAN PASSCODE ADMIN -->
+        <!-- 🔐 KARTU PENGATURAN PASSCODE ADMIN & FOUNDER -->
         <div class="japandi-card p-5 md:p-6 rounded-3xl space-y-4 border border-[#E8DFD3]">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 class="font-extrabold text-sm md:text-base text-[#2C2C2A] flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-[#8C5835]"></span>
-                Keamanan & Passcode Akses Admin
+                Keamanan & Passcode Akses (Founder Authority)
               </h3>
-              <p class="text-xs text-[#737370]">Perbarui passcode admin secara berkala untuk menjaga keamanan data properti.</p>
+              <p class="text-xs text-[#737370]">Perbarui passcode Founder atau Admin secara aman langsung dari panel ini.</p>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end pt-1">
             <div class="space-y-1">
-              <label for="inputCurrentPasscode" class="block text-[10px] font-bold text-[#737370] uppercase">Passcode Saat Ini</label>
-              <input type="password" id="inputCurrentPasscode" placeholder="Masukkan Passcode Lama" class="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#E8DFD3] rounded-xl text-xs text-[#2C2C2A] font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              <label for="inputCurrentPasscode" class="block text-[10px] font-bold text-[#737370] uppercase">Passcode Founder Saat Ini</label>
+              <input type="password" id="inputCurrentPasscode" placeholder="Masukkan Passcode Founder" class="w-full px-3.5 py-2 bg-[#FAF7F2] border border-[#E8DFD3] rounded-xl text-xs text-[#2C2C2A] font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
             </div>
             <div class="space-y-1">
               <label for="inputNewPasscode" class="block text-[10px] font-bold text-[#737370] uppercase">Passcode Baru</label>
@@ -419,7 +416,7 @@
           </form>
         </div>
 
-        <!-- Tagihan & Rekonsiliasi Terkini -->
+        <!-- Tagihan & Rekonsiliasi Terkini (Real Data) -->
         <div class="japandi-card p-5 md:p-7 rounded-3xl">
           <h3 class="font-extrabold text-base md:text-lg text-[#2C2C2A] mb-4">Tagihan & Rekonsiliasi Terkini</h3>
           <div class="overflow-x-auto">
@@ -430,7 +427,7 @@
                   <th class="py-3 px-3">Unit</th>
                   <th class="py-3 px-3">Nominal</th>
                   <th class="py-3 px-3">Status</th>
-                  <th class="py-3 px-3 text-right">Aksi</th>
+                  <th class="py-3 px-3 text-right">Periode</th>
                 </tr>
               </thead>
               <tbody id="table-invoices-body">
@@ -472,98 +469,5 @@
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
-  
-  <!-- SKRIP MUTASI NOMOR WA & PASSCODE -->
-  <script>
-    const API_MASTER_ENDPOINT = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) 
-      ? window.APP_CONFIG.API_BASE_URL 
-      : "https://script.google.com/macros/s/AKfycbxZ7ctf2V1Peo969s3UPBQxoHkaSyZMdstGosy8V1ZGL_fF-xSP0wf7L9Gv3qMhJOQ_nQ/exec";
-
-    async function handleSaveAdminWaNumber() {
-      const inputVal = document.getElementById("inputAdminWa").value.trim().replace(/\D/g, "");
-      if (!inputVal || inputVal.length < 9) {
-        alert("Mohon masukkan nomor WhatsApp yang valid (contoh: 628135600058).");
-        return;
-      }
-
-      const passcode = prompt("Masukkan Passcode Admin:");
-      if (!passcode) return;
-
-      const btn = document.getElementById("btnSaveWa");
-      btn.disabled = true;
-      btn.innerHTML = "<span>Menyimpan...</span>";
-
-      try {
-        const res = await fetch(API_MASTER_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "savePublicSettings",
-            passcode: passcode,
-            waNumber: inputVal
-          })
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          alert("✅ Berhasil: " + data.message);
-          document.getElementById("inputAdminWa").value = inputVal;
-          document.getElementById("waBadgeStatus").innerText = "Aktif: +" + inputVal;
-        } else {
-          alert("❌ Gagal: " + data.error);
-        }
-      } catch (err) {
-        alert("❌ Terjadi kendala jaringan: " + err.toString());
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = "<span>💾 Simpan Nomor WA</span>";
-      }
-    }
-
-    async function handleUpdatePasscode() {
-      const currentPass = document.getElementById("inputCurrentPasscode").value.trim();
-      const newPass = document.getElementById("inputNewPasscode").value.trim();
-
-      if (!currentPass || !newPass) {
-        alert("Mohon isi passcode saat ini dan passcode baru.");
-        return;
-      }
-
-      if (newPass.length < 4) {
-        alert("Passcode baru minimal 4 karakter.");
-        return;
-      }
-
-      const btn = document.getElementById("btnUpdatePasscode");
-      btn.disabled = true;
-      btn.innerHTML = "<span>Memperbarui...</span>";
-
-      try {
-        const res = await fetch(API_MASTER_ENDPOINT, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "updateAdminPasscode",
-            passcode: currentPass,
-            newPasscode: newPass
-          })
-        });
-
-        const data = await res.json();
-        if (data.success) {
-          alert("✅ Berhasil: " + data.message);
-          document.getElementById("inputCurrentPasscode").value = "";
-          document.getElementById("inputNewPasscode").value = "";
-        } else {
-          alert("❌ Gagal: " + data.error);
-        }
-      } catch (err) {
-        alert("❌ Kendala jaringan: " + err.toString());
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = "<span>🔑 Perbarui Passcode</span>";
-      }
-    }
-  </script>
 </body>
 </html>
