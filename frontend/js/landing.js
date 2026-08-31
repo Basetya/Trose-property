@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v140.0.0 (Zero-Regression Edge AI & Surgical Copy Engine)
+ * Version: v141.0.0 (Zero-Regression Edge AI Knowledge & Intent Lexicon Engine)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -115,37 +115,118 @@ function initWhatsAppButtons() {
   window.handleInquireUnit = openWa;
 }
 
-// 4. Knowledge Engine Kusuma AI (Edge Realtime Intelligence)
+// 4. Knowledge Engine Kusuma AI (Edge Realtime Intelligence + Intent Matrix)
 function generateInstantAIReply(promptText) {
   const query = String(promptText || "").toLowerCase().trim();
 
-  // A. Pertanyaan Mengenai Tarif & Tipe Studio
-  if (query.includes("studio") || (query.includes("tarif") && !query.includes("2br") && !query.includes("parkir")) || query.includes("1 kamar")) {
-    return "Untuk unit tipe Studio (luas 21 m²) di Apartemen Kalibata City, tarif sewa berkisar antara **Rp 2.800.000 hingga Rp 3.500.000 / bulan** untuk kondisi Full Furnished siap huni.\n\nFasilitas unit sudah lengkap dengan AC, spring bed, lemari pakaian, kitchen set, kulkas, dan kamar mandi. Anda dapat langsung survei unit ke kantor kami di **Tower Flamboyan Lt. GF** atau klik tombol WhatsApp untuk konfirmasi ketersediaan.";
+  // Pola A: Pertanyaan Unit Termurah / Budget / Harga Paling Rendah / Hemat
+  if (
+    query.includes("murah") || 
+    query.includes("termurah") || 
+    query.includes("paling murah") || 
+    query.includes("budget") || 
+    query.includes("terjangkau") || 
+    query.includes("hemat") ||
+    query.includes("paling rendah") ||
+    query.includes("start from") ||
+    query.includes("harga terendah")
+  ) {
+    return "Pilihan unit sewa **paling murah dan terjangkau** di Apartemen Kalibata City adalah **Tipe Studio (luas 21 m²)** dengan tarif sewa mulai dari **Rp 2.800.000 hingga Rp 3.500.000 per bulan**.\n\nUnit ini sudah dalam kondisi **Full Furnished siap huni** (dilengkapi tempat tidur, AC, lemari pakaian, kitchen set, kulkas, dan kamar mandi).\n\nUntuk sewa tipe keluarga (2 Kamar / 2BR), tarif termurahnya mulai dari **Rp 3.800.000 / bulan**.\n\nAnda dapat langsung berkunjung untuk cek kondisi unit langsung di kantor kami di **Tower Flamboyan Lt. GF** atau klik tombol WhatsApp resmi kami di **08135600058**.";
   }
 
-  // B. Pertanyaan Mengenai Parkir Mobil / Motor
-  if (query.includes("parkir") || query.includes("mobil") || query.includes("motor") || query.includes("kendaraan")) {
+  // Pola B: Pertanyaan Mengenai Tarif & Tipe Studio
+  if (
+    query.includes("studio") || 
+    query.includes("1 kamar") || 
+    query.includes("1 room") || 
+    query.includes("single") ||
+    (query.includes("tarif") && !query.includes("2br") && !query.includes("parkir") && !query.includes("jual")) ||
+    (query.includes("harga") && !query.includes("2br") && !query.includes("parkir") && !query.includes("jual")) ||
+    (query.includes("biaya") && !query.includes("parkir") && !query.includes("ipl"))
+  ) {
+    return "Untuk unit tipe **Studio (luas 21 m²)** di Apartemen Kalibata City, tarif sewa berkisar antara **Rp 2.800.000 hingga Rp 3.500.000 / bulan** untuk kondisi Full Furnished siap huni.\n\nFasilitas unit sudah lengkap dengan AC, spring bed, lemari pakaian, kitchen set, kulkas, dan kamar mandi. Anda dapat langsung survei unit ke kantor kami di **Tower Flamboyan Lt. GF** atau klik tombol WhatsApp untuk konfirmasi ketersediaan.";
+  }
+
+  // Pola C: Pertanyaan Mengenai Parkir Mobil / Motor
+  if (
+    query.includes("parkir") || 
+    query.includes("mobil") || 
+    query.includes("motor") || 
+    query.includes("kendaraan") || 
+    query.includes("basement") ||
+    query.includes("stiker parkir") ||
+    query.includes("member parkir")
+  ) {
     return "Fasilitas parkir di kawasan Apartemen Kalibata City terbagi menjadi dua area:\n\n1. **Parkir Mobil**: Berada di area basement gedung yang luas dan aman. Tersedia sistem tarif harian/berkala serta langganan kartu member bulanan khusus penghuni.\n2. **Parkir Motor**: Disediakan gedung parkir bertingkat khusus roda dua.\n\nUntuk pengurusan stiker/kartu akses member parkir dan reservasi unit hunian, Anda bisa langsung berkonsultasi di kantor kami di **Tower Flamboyan Lt. GF** atau hubungi WhatsApp pengelola di **08135600058**.";
   }
 
-  // C. Pertanyaan Mengenai Unit 2 Bedroom (2BR) & Survei
-  if (query.includes("2br") || query.includes("2 kamar") || query.includes("survei") || query.includes("lihat unit")) {
+  // Pola D: Pertanyaan Mengenai Unit 2 Bedroom (2BR) & Survei
+  if (
+    query.includes("2br") || 
+    query.includes("2 kamar") || 
+    query.includes("dua kamar") || 
+    query.includes("survei") || 
+    query.includes("survey") || 
+    query.includes("lihat unit") || 
+    query.includes("kunjungan") ||
+    query.includes("janji temu")
+  ) {
     return "Unit tipe **2 Bedroom (luas 33 m²)** merupakan tipe paling favorit untuk keluarga kecil maupun sharing bersama teman. Tarif sewa berkisar antara **Rp 3.800.000 hingga Rp 4.800.000 / bulan** (Full Furnished).\n\nLayout unit mencakup 2 kamar tidur terpisah, ruang keluarga yang nyaman, area dapur lengkap, dan balkon pribadi.\n\nKantor kami di **Tower Flamboyan Lt. GF** buka setiap hari untuk jadwal survei langsung. Silakan hubungi WhatsApp kami di **08135600058** untuk menentukan jam kunjungan survei hari ini!";
   }
 
-  // D. Pertanyaan Mengenai Fasilitas & Lokasi Kalibata City
-  if (query.includes("fasilitas") || query.includes("mall") || query.includes("kolam") || query.includes("stasiun") || query.includes("lokasi") || query.includes("akses")) {
+  // Pola E: Pertanyaan Mengenai Fasilitas & Lokasi Kalibata City
+  if (
+    query.includes("fasilitas") || 
+    query.includes("mall") || 
+    query.includes("kolam") || 
+    query.includes("renang") || 
+    query.includes("gym") || 
+    query.includes("fitness") || 
+    query.includes("stasiun") || 
+    query.includes("krl") || 
+    query.includes("lokasi") || 
+    query.includes("alamat") || 
+    query.includes("akses")
+  ) {
     return "Tinggal di Kalibata City memberikan kemudahan akses hidup lengkap:\n\n- **Konektivitas**: Hanya 5 menit jalan kaki ke Stasiun KRL Duren Kalibata dan akses cepat menuju Kuningan / Gatot Subroto.\n- **Pusat Belanja**: Terhubung langsung ke Mall Kalibata City Square (KCS), Farmers Market, Bioskop Cinema XXI, dan beragam gerai kuliner.\n- **Fasilitas Rekreasi**: Kolam renang tematik (di tower Green Palace), lapangan basket, tenis, futsal, jogging track, dan gym indoor.\n\nTim Kusuma Properti berkantor langsung di lokasi (**Tower Flamboyan Lt. GF**) sehingga siap mendampingi Anda kapan saja.";
   }
 
-  // E. Pertanyaan Mengenai Tipe 3 Bedroom / Green Palace
-  if (query.includes("3br") || query.includes("3 kamar") || query.includes("green palace") || query.includes("resort")) {
-    return "Untuk hunian yang lebih luas atau nuansa resort di **Green Palace Kalibata**, tarif sewa unit tipe 2BR Executive dan 3 Bedroom berkisar antara **Rp 5.000.000 hingga Rp 6.500.000 / bulan**.\n\nPenghuni Green Palace mendapatkan akses eksklusif ke kolam renang tematik resort, gym indoor, dan lingkungan taman yang lebih privat. Hubungi kami via WhatsApp untuk mengecek unit kosong siap sewa.";
+  // Pola F: Pertanyaan Mengenai Tipe 3 Bedroom / Green Palace
+  if (
+    query.includes("3br") || 
+    query.includes("3 kamar") || 
+    query.includes("tiga kamar") || 
+    query.includes("green palace") || 
+    query.includes("resort")
+  ) {
+    return "Untuk hunian yang lebih luas atau nuansa resort di **Green Palace Kalibata**, tarif sewa unit tipe 2BR Executive dan 3 Bedroom berkisar antara **Rp 5.000.000 hingga Rp 6.500.000 / bulan**.\n\nPenghuni Green Palace mendapatkan akses eksklusif ke kolam renang tematik resort, gym indoor, dan lingkungan taman yang lebih privat. Hubungi kami via WhatsApp di **08135600058** untuk mengecek unit kosong siap sewa.";
   }
 
-  // F. Respon Sambutan Umum
-  return "Halo! Selamat datang di **Kusuma Properti** Kalibata City. 🙏\n\nKami mengelola puluhan unit sewa bulanan dan tahunan mulai dari tipe **Studio, 2BR, hingga 3BR** (siap huni & full furnished).\n\nAda yang bisa kami bantu seputar tarif sewa, fasilitas parkir, atau pendaftaran jadwal survei ke kantor kami di **Tower Flamboyan Lt. GF**?";
+  // Pola G: Pertanyaan Mengenai Jual / Beli Unit
+  if (
+    query.includes("jual") || 
+    query.includes("beli") || 
+    query.includes("dijual") || 
+    query.includes("investasi") || 
+    query.includes("take over")
+  ) {
+    return "Selain unit sewa, Kusuma Properti juga melayani transaksi **Jual & Beli Unit Apartemen Kalibata City** dengan legalitas terjamin dan pendampingan notaris resmi:\n\n- **Tipe Studio**: Kisaran harga jual mulai Rp 250 Juta - Rp 350 Juta (tergantung tower & furnishing).\n- **Tipe 2 Bedroom**: Kisaran harga jual mulai Rp 370 Juta - Rp 550 Juta.\n\nSilakan konsultasikan budget dan rencana pembelian Anda langsung dengan tim kami di **Tower Flamboyan Lt. GF** atau WhatsApp **08135600058**.";
+  }
+
+  // Pola H: Pertanyaan Mengenai IPL / Service Charge / Listrik / Air
+  if (
+    query.includes("ipl") || 
+    query.includes("service charge") || 
+    query.includes("maintenance") || 
+    query.includes("listrik") || 
+    query.includes("air") || 
+    query.includes("deposit")
+  ) {
+    return "Untuk ketentuan sewa unit di Apartemen Kalibata City:\n\n- **Biaya Listrik & Air**: Menggunakan sistem meteran resmi pemakaian bulanan.\n- **IPL / Maintenance**: Umumnya sudah termasuk atau disepakati sesuai perjanjian sewa bersama pemilik.\n- **Uang Jaminan (Deposit)**: Dikenakan deposit refundable yang akan dikembalikan utuh di akhir masa sewa.\n\nUntuk detail simulasi biaya sewa bulanan/tahunan secara transparan, silakan chat tim kami via WhatsApp di **08135600058**.";
+  }
+
+  // Pola I: Respon Sambutan Umum (Fallback Interaktif)
+  return "Halo! Selamat datang di **Kusuma Properti** Kalibata City. 🙏\n\nKami mengelola puluhan unit sewa bulanan dan tahunan mulai dari tipe **Studio, 2BR, hingga 3BR** (siap huni & full furnished).\n\nAda yang bisa kami bantu seputar tarif sewa, unit termurah, fasilitas parkir, atau jadwal survei ke kantor kami di **Tower Flamboyan Lt. GF**?";
 }
 
 // 5. Widget Chatbot AI Controller
@@ -192,8 +273,8 @@ function initLandingChatbot() {
       messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
-    // Simulasi jeda alami 400ms
-    await new Promise(resolve => setTimeout(resolve, 400));
+    // Simulasi jeda alami 350ms
+    await new Promise(resolve => setTimeout(resolve, 350));
 
     // Eksekusi jawaban cerdas real-time
     const reply = generateInstantAIReply(text);
