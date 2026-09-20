@@ -66,26 +66,27 @@ function initDynamicUnits() {
       mediaUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
     },
     {
-      badge: "Green Palace Resort",
-      title: "3 Bedroom Executive",
-      desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Japandi Modern.",
-      price: 5000000,
+      badge: "Green Palace",
+      title: "3 Bedroom",
+      desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Modern+ ev charger",
+      price: 4000000,
       mediaUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
     }
   ];
 
   var units = defaultUnits;
-  var savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
-  if (savedCMS) {
+  var rawCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  if (rawCMS) {
     try {
-      var d = JSON.parse(savedCMS);
+      var d = JSON.parse(rawCMS);
       units = defaultUnits.map(function(def, idx) {
-        var u = d["u" + (idx + 1)] || {};
+        var u = d["u" + (idx + 1)];
+        if (!u) return def;
         var validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
         return {
-          badge: (u.badge && u.badge.trim()) ? u.badge.trim() : def.badge,
-          title: (u.title && u.title.trim()) ? u.title.trim() : def.title,
-          desc: (u.desc && u.desc.trim()) ? u.desc.trim() : def.desc,
+          badge: (u.badge && u.badge.trim() !== "") ? u.badge.trim() : def.badge,
+          title: (u.title && u.title.trim() !== "") ? u.title.trim() : def.title,
+          desc: (u.desc && u.desc.trim() !== "") ? u.desc.trim() : def.desc,
           price: (u.price !== undefined && u.price !== "") ? Number(u.price) : def.price,
           mediaUrl: validMedia
         };
@@ -343,6 +344,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
