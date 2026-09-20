@@ -75,13 +75,12 @@ function initDynamicUnits() {
   ];
 
   var units = defaultUnits;
-  var rawCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
-  if (rawCMS) {
+  var savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  if (savedCMS) {
     try {
-      var d = JSON.parse(rawCMS);
+      var d = JSON.parse(savedCMS);
       units = defaultUnits.map(function(def, idx) {
-        var u = d["u" + (idx + 1)];
-        if (!u) return def;
+        var u = d["u" + (idx + 1)] || {};
         var validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
         return {
           badge: (u.badge && u.badge.trim() !== "") ? u.badge.trim() : def.badge,
@@ -344,6 +343,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
