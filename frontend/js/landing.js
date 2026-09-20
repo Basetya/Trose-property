@@ -35,14 +35,6 @@ function initVisualTheme() {
 
 // 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video
 function initDynamicUnits() {
-  // Bersihkan data corrupt lokal jika mediaUrl kosong
-  try {
-    const raw = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
-    if (raw && (!raw.includes("http") && !raw.includes("data:image"))) {
-      localStorage.removeItem("KUSUMA_POPULAR_UNITS_CMS");
-    }
-  } catch (e) {}
-
   let target = null;
   const els = document.querySelectorAll("*");
   for (let i = 0; i < els.length; i++) {
@@ -88,15 +80,14 @@ function initDynamicUnits() {
     try {
       const d = JSON.parse(savedCMS);
       units = defaultUnits.map((def, idx) => {
-        const u = d["u" + (idx + 1)];
-        if (!u) return def;
-        const hasValidMedia = u.mediaUrl && u.mediaUrl.trim().length > 15;
+        const u = d["u" + (idx + 1)] || {};
+        const validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
         return {
-          badge: u.badge || def.badge,
-          title: u.title || def.title,
-          desc: u.desc || def.desc,
-          price: (u.price && !isNaN(u.price)) ? Number(u.price) : def.price,
-          mediaUrl: hasValidMedia ? u.mediaUrl.trim() : def.mediaUrl
+          badge: (u.badge && u.badge.trim()) ? u.badge.trim() : def.badge,
+          title: (u.title && u.title.trim()) ? u.title.trim() : def.title,
+          desc: (u.desc && u.desc.trim()) ? u.desc.trim() : def.desc,
+          price: (u.price !== undefined && u.price !== "") ? Number(u.price) : def.price,
+          mediaUrl: validMedia
         };
       });
     } catch (e) {
@@ -106,7 +97,7 @@ function initDynamicUnits() {
 
   target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
   target.innerHTML = units.map((u, idx) => {
-    const rawMedia = u.mediaUrl || defaultUnits[idx].mediaUrl;
+    const rawMedia = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : defaultUnits[idx].mediaUrl;
     const isVideo = rawMedia.startsWith("data:video") || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
     
     let mediaHtml = "";
@@ -130,10 +121,10 @@ function initDynamicUnits() {
           ${mediaHtml}
           <div class="space-y-1.5">
             <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#F4EFE6] text-[#8C5835] border border-[#DDD3C2]">
-              ${u.badge || "Tersedia"}
+              ${u.badge}
             </span>
-            <h4 class="text-lg font-bold text-[#2C2C2A]">${u.title || "Unit Kalibata"}</h4>
-            <p class="text-xs text-[#737370] leading-relaxed">${u.desc || ""}</p>
+            <h4 class="text-lg font-bold text-[#2C2C2A]">${u.title}</h4>
+            <p class="text-xs text-[#737370] leading-relaxed">${u.desc}</p>
           </div>
         </div>
         <div class="pt-3 border-t border-[#E8DFD3] flex items-center justify-between">
@@ -360,6 +351,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
