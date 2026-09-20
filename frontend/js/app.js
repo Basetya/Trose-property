@@ -70,3 +70,54 @@ if (document.readyState === 'loading') {
 } else {
   loadKusumaAIStudio();
 }
+function saveKnowledge() {
+  var tas = document.querySelectorAll('textarea');
+  if (tas.length >= 2) {
+    localStorage.setItem('KUSUMA_AI_KB', tas[0].value.trim());
+    localStorage.setItem('KUSUMA_AI_GUARDRAILS', tas[1].value.trim());
+    alert('✅ Knowledge Base & Guardrails berhasil disimpan ke browser!');
+  }
+}
+
+// ==========================================
+// KUSUMA AI STUDIO CONTROLLER (PERSISTENT & ANTI-RELOAD)
+// ==========================================
+var DEFAULT_KB_STATIC = $kbText;
+var DEFAULT_GR_STATIC = $grText;
+
+function handleSaveKnowledge(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  var kbEl = document.getElementById('ai-kb-input');
+  var grEl = document.getElementById('ai-gr-input');
+  if (kbEl && grEl) {
+    localStorage.setItem('KUSUMA_AI_KB', kbEl.value.trim());
+    localStorage.setItem('KUSUMA_AI_GUARDRAILS', grEl.value.trim());
+    alert('✅ Berhasil! Knowledge Base & Guardrails tersimpan aman di sistem.');
+  }
+}
+
+function handleResetKnowledge(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  var kbEl = document.getElementById('ai-kb-input');
+  var grEl = document.getElementById('ai-gr-input');
+  if (kbEl) kbEl.value = DEFAULT_KB_STATIC;
+  if (grEl) grEl.value = DEFAULT_GR_STATIC;
+  localStorage.setItem('KUSUMA_AI_KB', DEFAULT_KB_STATIC);
+  localStorage.setItem('KUSUMA_AI_GUARDRAILS', DEFAULT_GR_STATIC);
+  alert('Template resmi berhasil dimuat ulang!');
+}
+
+function hydrateSavedKnowledge() {
+  var savedKB = localStorage.getItem('KUSUMA_AI_KB');
+  var savedGR = localStorage.getItem('KUSUMA_AI_GUARDRAILS');
+  var kbEl = document.getElementById('ai-kb-input');
+  var grEl = document.getElementById('ai-gr-input');
+  if (kbEl && savedKB && savedKB.trim() !== '') kbEl.value = savedKB;
+  if (grEl && savedGR && savedGR.trim() !== '') grEl.value = savedGR;
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', hydrateSavedKnowledge);
+} else {
+  hydrateSavedKnowledge();
+}
