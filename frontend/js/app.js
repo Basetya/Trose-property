@@ -557,3 +557,50 @@ function executeSelfHealingHydration() {
 document.addEventListener('DOMContentLoaded', executeSelfHealingHydration);
 window.addEventListener('load', executeSelfHealingHydration);
 setInterval(executeSelfHealingHydration, 500);
+
+// =====================================================
+// KUSUMA AI STUDIO: PERMANENT FILE-BACKED ENGINE (v204.0)
+// =====================================================
+var KUSUMA_STATIC_KB = $(Get-Content "D:\Projects\Kusuma Properti/backend/ai-data/kb.txt" -Raw -Encoding UTF8);
+var KUSUMA_STATIC_GR = $(Get-Content "D:\Projects\Kusuma Properti/backend/ai-data/guardrails.txt" -Raw -Encoding UTF8);
+
+function handleSaveKnowledge(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  var tas = document.querySelectorAll('textarea');
+  if (tas.length >= 2) {
+    var kbVal = tas[0].value.trim();
+    var grVal = tas[1].value.trim();
+    localStorage.setItem('KUSUMA_AI_KB_PERMANENT', kbVal);
+    localStorage.setItem('KUSUMA_AI_GR_PERMANENT', grVal);
+    alert('✅ Sukses! Knowledge Base & Guardrails berhasil disimpan secara permanen.');
+  } else {
+    alert('❌ Gagal: Kotak input teks tidak ditemukan.');
+  }
+}
+
+function handleResetKnowledge(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  var tas = document.querySelectorAll('textarea');
+  if (tas.length >= 2) {
+    tas[0].value = KUSUMA_STATIC_KB;
+    tas[1].value = KUSUMA_STATIC_GR;
+    localStorage.setItem('KUSUMA_AI_KB_PERMANENT', KUSUMA_STATIC_KB);
+    localStorage.setItem('KUSUMA_AI_GR_PERMANENT', KUSUMA_STATIC_GR);
+    alert('🔄 Template resmi berhasil dimuat ulang!');
+  }
+}
+
+function renderPermanentAIStudio() {
+  var tas = document.querySelectorAll('textarea');
+  if (tas.length >= 2) {
+    var savedKB = localStorage.getItem('KUSUMA_AI_KB_PERMANENT');
+    var savedGR = localStorage.getItem('KUSUMA_AI_GR_PERMANENT');
+    
+    tas[0].value = (savedKB && savedKB.trim() !== '') ? savedKB : KUSUMA_STATIC_KB;
+    tas[1].value = (savedGR && savedGR.trim() !== '') ? savedGR : KUSUMA_STATIC_GR;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderPermanentAIStudio);
+window.addEventListener('load', renderPermanentAIStudio);
+setInterval(renderPermanentAIStudio, 400);
