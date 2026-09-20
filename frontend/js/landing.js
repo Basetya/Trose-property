@@ -92,7 +92,7 @@ function initDynamicUnits() {
           <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
         </div>`;
     } else {
-      const imgUrl = u.mediaUrl || defaultUnits[0].mediaUrl;
+      const imgUrl = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : (defaultUnits[idx] ? defaultUnits[idx].mediaUrl : defaultUnits[0].mediaUrl);
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
           <img src="${imgUrl}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105">
@@ -336,4 +336,5 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
