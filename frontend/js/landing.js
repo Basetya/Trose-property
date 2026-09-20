@@ -44,7 +44,6 @@ function initDynamicUnits() {
       break;
     }
   }
-
   if (!target) {
     target = document.getElementById("dynamic-unit-catalog") || document.getElementById("popular-units-grid");
   }
@@ -80,13 +79,15 @@ function initDynamicUnits() {
     try {
       const d = JSON.parse(savedCMS);
       units = defaultUnits.map((def, idx) => {
-        const u = d["u" + (idx + 1)] || {};
+        const u = d["u" + (idx + 1)];
+        if (!u) return def;
+        const validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
         return {
           badge: (u.badge && u.badge.trim()) ? u.badge.trim() : def.badge,
           title: (u.title && u.title.trim()) ? u.title.trim() : def.title,
           desc: (u.desc && u.desc.trim()) ? u.desc.trim() : def.desc,
           price: (u.price !== undefined && u.price !== "") ? Number(u.price) : def.price,
-          mediaUrl: (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl
+          mediaUrl: validMedia
         };
       });
     } catch (e) {
@@ -96,7 +97,7 @@ function initDynamicUnits() {
 
   target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
   target.innerHTML = units.map((u, idx) => {
-    const rawMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : defaultUnits[idx].mediaUrl;
+    const rawMedia = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : defaultUnits[idx].mediaUrl;
     const isVideo = rawMedia.startsWith("data:video") || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
     
     let mediaHtml = "";
@@ -350,6 +351,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
