@@ -35,22 +35,20 @@ function initVisualTheme() {
 
 // 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video
 function initDynamicUnits() {
-  // Multi-Container Resolver: Cari kontainer berdasarkan ID atau teks loader placeholder
-  let catalogEl = document.getElementById("dynamic-unit-catalog") 
-               || document.getElementById("popular-units-grid")
-               || document.getElementById("unit-catalog-container");
-
-  if (!catalogEl) {
-    const allDivs = document.querySelectorAll("div, section");
-    for (let el of allDivs) {
-      if (el.textContent && el.textContent.includes("Memuat katalog unit siap huni...")) {
-        catalogEl = el;
-        break;
-      }
+  let target = null;
+  const els = document.querySelectorAll("*");
+  for (let i = 0; i < els.length; i++) {
+    const el = els[i];
+    if (el.children.length === 0 && el.textContent && el.textContent.trim() === "Memuat katalog unit siap huni...") {
+      target = el.parentElement || el;
+      break;
     }
   }
 
-  if (!catalogEl) return;
+  if (!target) {
+    target = document.getElementById("dynamic-unit-catalog") || document.getElementById("popular-units-grid");
+  }
+  if (!target) return;
 
   const defaultUnits = [
     {
@@ -58,7 +56,6 @@ function initDynamicUnits() {
       title: "Studio Deluxe",
       desc: "Luas 21 m² • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV.",
       price: 3000000,
-      mediaType: "image",
       mediaUrl: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80"
     },
     {
@@ -66,7 +63,6 @@ function initDynamicUnits() {
       title: "2 Bedroom Standard",
       desc: "Luas 33 m² • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon.",
       price: 4200000,
-      mediaType: "image",
       mediaUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80"
     },
     {
@@ -74,28 +70,41 @@ function initDynamicUnits() {
       title: "2 Bedroom Executive",
       desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Japandi Modern.",
       price: 5500000,
-      mediaType: "image",
       mediaUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
     }
   ];
 
   let units = defaultUnits;
+  const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  if (savedCMS) {
+    try {
+      const d = JSON.parse(savedCMS);
+      units = [
+        { ...defaultUnits[0], ...(d.u1 || {}), mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim()) ? d.u1.mediaUrl : defaultUnits[0].mediaUrl },
+        { ...defaultUnits[1], ...(d.u2 || {}), mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim()) ? d.u2.mediaUrl : defaultUnits[1].mediaUrl },
+        { ...defaultUnits[2], ...(d.u3 || {}), mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim()) ? d.u3.mediaUrl : defaultUnits[2].mediaUrl }
+      ];
+    } catch (e) {
+      units = defaultUnits;
+    }
   }
 
-  catalogEl.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8";
-  catalogEl.innerHTML = units.map(u => {
+  target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
+  target.innerHTML = units.map((u, idx) => {
+    const rawMedia = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : defaultUnits[idx].mediaUrl;
+    const isVideo = rawMedia.startsWith("data:video") || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
+    
     let mediaHtml = "";
-    if (u.mediaType === "video" && u.mediaUrl) {
+    if (isVideo) {
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-black">
-          <video src="${u.mediaUrl}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+          <video src="${rawMedia}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
           <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
         </div>`;
     } else {
-      const imgUrl = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : (defaultUnits[idx] ? defaultUnits[idx].mediaUrl : defaultUnits[0].mediaUrl);
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
-          <img src="${imgUrl}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+          <img src="${rawMedia}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105">
           <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
         </div>`;
     }
@@ -336,5 +345,6 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
