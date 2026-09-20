@@ -50,7 +50,7 @@ function initDynamicUnits() {
   }
   if (!target) return;
 
-  const defaultUnits = [
+    const defaultUnits = [
     {
       badge: "Single / Eksekutif",
       title: "Studio Deluxe",
@@ -69,39 +69,28 @@ function initDynamicUnits() {
       badge: "Green Palace Resort",
       title: "2 Bedroom Executive",
       desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Japandi Modern.",
-      price: 5500000,
+      price: 5000000,
       mediaUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
     }
   ];
 
-    let units = defaultUnits;
+  let units = defaultUnits;
   const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
   if (savedCMS) {
     try {
       const d = JSON.parse(savedCMS);
-      units = [
-        {
-          badge: (d.u1 && d.u1.badge) ? d.u1.badge : defaultUnits[0].badge,
-          title: (d.u1 && d.u1.title) ? d.u1.title : defaultUnits[0].title,
-          desc: (d.u1 && d.u1.desc) ? d.u1.desc : defaultUnits[0].desc,
-          price: (d.u1 && d.u1.price !== undefined && d.u1.price !== "") ? Number(d.u1.price) : defaultUnits[0].price,
-          mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim()) ? d.u1.mediaUrl : defaultUnits[0].mediaUrl
-        },
-        {
-          badge: (d.u2 && d.u2.badge) ? d.u2.badge : defaultUnits[1].badge,
-          title: (d.u2 && d.u2.title) ? d.u2.title : defaultUnits[1].title,
-          desc: (d.u2 && d.u2.desc) ? d.u2.desc : defaultUnits[1].desc,
-          price: (d.u2 && d.u2.price !== undefined && d.u2.price !== "") ? Number(d.u2.price) : defaultUnits[1].price,
-          mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim()) ? d.u2.mediaUrl : defaultUnits[1].mediaUrl
-        },
-        {
-          badge: (d.u3 && d.u3.badge) ? d.u3.badge : defaultUnits[2].badge,
-          title: (d.u3 && d.u3.title) ? d.u3.title : defaultUnits[2].title,
-          desc: (d.u3 && d.u3.desc) ? d.u3.desc : defaultUnits[2].desc,
-          price: (d.u3 && d.u3.price !== undefined && d.u3.price !== "") ? Number(d.u3.price) : defaultUnits[2].price,
-          mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim()) ? d.u3.mediaUrl : defaultUnits[2].mediaUrl
-        }
-      ];
+      units = defaultUnits.map((def, idx) => {
+        const uKey = "u" + (idx + 1);
+        const item = d[uKey] || {};
+        const validMedia = (item.mediaUrl && item.mediaUrl.trim().length > 10) ? item.mediaUrl.trim() : def.mediaUrl;
+        return {
+          badge: item.badge || def.badge,
+          title: item.title || def.title,
+          desc: item.desc || def.desc,
+          price: (item.price !== undefined && item.price !== "") ? Number(item.price) : def.price,
+          mediaUrl: validMedia
+        };
+      });
     } catch (e) {
       units = defaultUnits;
     }
@@ -367,6 +356,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
