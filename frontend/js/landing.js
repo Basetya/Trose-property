@@ -108,9 +108,10 @@ function initDynamicUnits() {
   }
   }
 
-  target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
-  target.innerHTML = units.map((u, idx) => {
-    const rawMedia = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : defaultUnits[idx].mediaUrl;
+      catalogEl.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
+  catalogEl.innerHTML = units.map((u, idx) => {
+    // Kunci gambar: jika u.mediaUrl kosong, selalu gunakan foto default bawaan
+    const rawMedia = (u.mediaUrl && u.mediaUrl.trim() !== "") ? u.mediaUrl.trim() : defaultUnits[idx].mediaUrl;
     const isVideo = rawMedia.startsWith("data:video") || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
     
     let mediaHtml = "";
@@ -123,10 +124,12 @@ function initDynamicUnits() {
     } else {
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
-          <img src="${rawMedia}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105">
+          <img src="${rawMedia}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.src='${defaultUnits[idx].mediaUrl}'">
           <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
         </div>`;
     }
+
+    const priceNum = (u.price !== undefined && u.price !== "") ? Number(u.price) : defaultUnits[idx].price;
 
     return `
       <div class="japandi-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between space-y-3 bg-white/90 border border-[#E8DFD3] shadow-sm hover:shadow-md transition">
@@ -143,7 +146,7 @@ function initDynamicUnits() {
         <div class="pt-3 border-t border-[#E8DFD3] flex items-center justify-between">
           <div>
             <span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>
-            <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${Number(u.price || 0).toLocaleString("id-ID")}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
+            <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${priceNum.toLocaleString("id-ID")}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
           </div>
           <button onclick="handleInquireUnit(event, '${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">
             Tanya Unit
@@ -364,6 +367,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
