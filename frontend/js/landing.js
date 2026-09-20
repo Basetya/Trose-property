@@ -35,21 +35,22 @@ function initVisualTheme() {
 
 // 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video
 function initDynamicUnits() {
-  let target = null;
-  const els = document.querySelectorAll("*");
-  for (let i = 0; i < els.length; i++) {
-    const el = els[i];
-    if (el.children.length === 0 && el.textContent && el.textContent.trim().includes("Memuat katalog unit siap huni")) {
+  var target = null;
+  var els = document.querySelectorAll("*");
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    if (el.children.length === 0 && el.textContent && el.textContent.trim().indexOf("Memuat katalog unit siap huni") !== -1) {
       target = el.parentElement || el;
       break;
     }
   }
+
   if (!target) {
     target = document.getElementById("dynamic-unit-catalog") || document.getElementById("popular-units-grid");
   }
   if (!target) return;
 
-  const defaultUnits = [
+  var defaultUnits = [
     {
       badge: "Single / Eksekutif",
       title: "Studio Deluxe",
@@ -73,72 +74,75 @@ function initDynamicUnits() {
     }
   ];
 
-  let units = defaultUnits;
-  const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  var units = defaultUnits;
+  var savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
   if (savedCMS) {
     try {
-      const d = JSON.parse(savedCMS);
-      units = defaultUnits.map((def, idx) => {
-        const u = d["u" + (idx + 1)];
-        if (!u) return def;
-        const validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
-        return {
-          badge: (u.badge && u.badge.trim()) ? u.badge.trim() : def.badge,
-          title: (u.title && u.title.trim()) ? u.title.trim() : def.title,
-          desc: (u.desc && u.desc.trim()) ? u.desc.trim() : def.desc,
-          price: (u.price !== undefined && u.price !== "") ? Number(u.price) : def.price,
-          mediaUrl: validMedia
-        };
-      });
+      var d = JSON.parse(savedCMS);
+      units = [
+        {
+          badge: (d.u1 && d.u1.badge && d.u1.badge.trim()) ? d.u1.badge.trim() : defaultUnits[0].badge,
+          title: (d.u1 && d.u1.title && d.u1.title.trim()) ? d.u1.title.trim() : defaultUnits[0].title,
+          desc: (d.u1 && d.u1.desc && d.u1.desc.trim()) ? d.u1.desc.trim() : defaultUnits[0].desc,
+          price: (d.u1 && d.u1.price !== undefined && d.u1.price !== "") ? Number(d.u1.price) : defaultUnits[0].price,
+          mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim().length > 10) ? d.u1.mediaUrl.trim() : defaultUnits[0].mediaUrl
+        },
+        {
+          badge: (d.u2 && d.u2.badge && d.u2.badge.trim()) ? d.u2.badge.trim() : defaultUnits[1].badge,
+          title: (d.u2 && d.u2.title && d.u2.title.trim()) ? d.u2.title.trim() : defaultUnits[1].title,
+          desc: (d.u2 && d.u2.desc && d.u2.desc.trim()) ? d.u2.desc.trim() : defaultUnits[1].desc,
+          price: (d.u2 && d.u2.price !== undefined && d.u2.price !== "") ? Number(d.u2.price) : defaultUnits[1].price,
+          mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim().length > 10) ? d.u2.mediaUrl.trim() : defaultUnits[1].mediaUrl
+        },
+        {
+          badge: (d.u3 && d.u3.badge && d.u3.badge.trim()) ? d.u3.badge.trim() : defaultUnits[2].badge,
+          title: (d.u3 && d.u3.title && d.u3.title.trim()) ? d.u3.title.trim() : defaultUnits[2].title,
+          desc: (d.u3 && d.u3.desc && d.u3.desc.trim()) ? d.u3.desc.trim() : defaultUnits[2].desc,
+          price: (d.u3 && d.u3.price !== undefined && d.u3.price !== "") ? Number(d.u3.price) : defaultUnits[2].price,
+          mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim().length > 10) ? d.u3.mediaUrl.trim() : defaultUnits[2].mediaUrl
+        }
+      ];
     } catch (e) {
       units = defaultUnits;
     }
   }
 
   target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
-  target.innerHTML = units.map((u, idx) => {
-    const rawMedia = (u.mediaUrl && u.mediaUrl.trim()) ? u.mediaUrl : defaultUnits[idx].mediaUrl;
-    const isVideo = rawMedia.startsWith("data:video") || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
+  target.innerHTML = units.map(function(u, idx) {
+    var rawMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : defaultUnits[idx].mediaUrl;
+    var isVideo = rawMedia.indexOf("data:video") === 0 || rawMedia.endsWith(".mp4") || rawMedia.endsWith(".webm");
     
-    let mediaHtml = "";
+    var mediaHtml = "";
     if (isVideo) {
-      mediaHtml = `
-        <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-black">
-          <video src="${rawMedia}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
-          <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
-        </div>`;
+      mediaHtml = '<div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-black"><video src="' + rawMedia + '" autoplay muted loop playsinline class="w-full h-full object-cover"></video><span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span></div>';
     } else {
-      mediaHtml = `
-        <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
-          <img src="${rawMedia}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.src='${defaultUnits[idx].mediaUrl}'">
-          <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
-        </div>`;
+      mediaHtml = '<div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]"><img src="' + rawMedia + '" alt="' + u.title + '" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.src=\'' + defaultUnits[idx].mediaUrl + '\'"><span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span></div>';
     }
 
-    return `
-      <div class="japandi-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between space-y-3 bg-white/90 border border-[#E8DFD3] shadow-sm hover:shadow-md transition">
-        <div>
-          ${mediaHtml}
-          <div class="space-y-1.5">
-            <span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#F4EFE6] text-[#8C5835] border border-[#DDD3C2]">
-              ${u.badge}
-            </span>
-            <h4 class="text-lg font-bold text-[#2C2C2A]">${u.title}</h4>
-            <p class="text-xs text-[#737370] leading-relaxed">${u.desc}</p>
-          </div>
-        </div>
-        <div class="pt-3 border-t border-[#E8DFD3] flex items-center justify-between">
-          <div>
-            <span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>
-            <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${Number(u.price).toLocaleString("id-ID")}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
-          </div>
-          <button onclick="handleInquireUnit(event, '${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">
-            Tanya Unit
-          </button>
-        </div>
-      </div>
-    `;
+    return '<div class="japandi-card p-5 sm:p-6 rounded-3xl flex flex-col justify-between space-y-3 bg-white/90 border border-[#E8DFD3] shadow-sm hover:shadow-md transition">' +
+      '<div>' +
+        mediaHtml +
+        '<div class="space-y-1.5">' +
+          '<span class="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-[#F4EFE6] text-[#8C5835] border border-[#DDD3C2]">' + u.badge + '</span>' +
+          '<h4 class="text-lg font-bold text-[#2C2C2A]">' + u.title + '</h4>' +
+          '<p class="text-xs text-[#737370] leading-relaxed">' + u.desc + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pt-3 border-t border-[#E8DFD3] flex items-center justify-between">' +
+        '<div>' +
+          '<span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>' +
+          '<p class="text-base font-bold font-mono text-[#8C5835]">Rp ' + Number(u.price).toLocaleString("id-ID") + '<span class="text-xs font-normal text-[#737370]">/bln</span></p>' +
+        '</div>' +
+        '<button onclick="handleInquireUnit(event, \'' + u.title + '\')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">Tanya Unit</button>' +
+      '</div>' +
+    '</div>';
   }).join("");
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initDynamicUnits);
+} else {
+  initDynamicUnits();
 }
 
 // 3. Sinkronisasi & Penanganan Tombol WhatsApp
