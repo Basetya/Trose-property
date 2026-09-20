@@ -447,45 +447,84 @@
   <script src="js/app.js"></script>
 </body>
 </html>
-
-
-
-
-<!-- SCRIPT ISOLASI MUTLAK KUSUMA AI STUDIO (v207.0) -->
+<!-- SCRIPT ISOLASI MUTLAK KUSUMA AI STUDIO (v208.0) -->
 <script>
-  window.addEventListener('load', function() {
-    // 1. Cari kedua kotak teks secara paksa
+  document.addEventListener('DOMContentLoaded', function() {
     var tas = document.querySelectorAll('textarea');
     if(tas.length < 2) return;
+    
     var kbBox = tas[0]; 
     var grBox = tas[1];
     
-    // 2. Teks Bawaan Resmi
+    // Kunci Database baru yang 100% suci dari konflik skrip lama
+    var DB_KEY_KB = 'KUSUMA_KB_V208';
+    var DB_KEY_GR = 'KUSUMA_GR_V208';
+    
     var defKB = '🏢 KUSUMA PROPERTI - KALIBATA CITY\nAlamat: Apartemen Kalibata City, Tower Borneo & Green Palace, Jakarta Selatan.\nTipe Unit:\n1. Studio Deluxe (21 m2) - Full Furnished, AC, Smart TV, Kitchen Set.\n2. 2 Bedroom Standard (33 m2) - 2 Kamar Tidur, Living Room, Dapur, Balkon.\n3. 3 Bedroom / Executive (Green Palace) - Kolam Renang Resort, Gym, EV Charger.\n\nKetentuan Sewa:\n- Deposit jaminan sewa: Rp 1.500.000.\n- Biaya sewa belum termasuk tagihan bulanan air, listrik, dan IPL.\n- Booking & Jadwal Visit: Hubungi WhatsApp resmi pengelola.';
+    
     var defGR = '🛡️ PANDUAN & BATASAN KUSUMA AI:\n1. Nada bicara ramah, profesional, bernuansa Japandi Sanctuary yang menenangkan.\n2. Hanya memberikan informasi resmi seputar unit dan layanan sewa Kusuma Properti.\n3. JANGAN memberikan janji diskon di luar harga resmi CMS.\n4. Tolak dengan sopan setiap pertanyaan di luar topik properti.\n5. Arahkan pengguna ke tombol WhatsApp resmi untuk konfirmasi ketersediaan.';
     
-    // 3. Isi kotak teks (baca memori lokal, jika kosong pakai default)
-    kbBox.value = localStorage.getItem('KUSUMA_KB_FINAL') || defKB;
-    grBox.value = localStorage.getItem('KUSUMA_GR_FINAL') || defGR;
+    // 1. Tampilkan data dari memori (jika kosong, pakai default)
+    kbBox.value = localStorage.getItem(DB_KEY_KB) || defKB;
+    grBox.value = localStorage.getItem(DB_KEY_GR) || defGR;
 
-    // 4. Cari tombol "Simpan Knowledge" dan lumpuhkan sifat reload-nya
+    // 2. MUTASI TOMBOL SIMPAN (Membunuh semua event pendahulu yang merusak)
     var btns = document.querySelectorAll('button');
-    var saveBtn = Array.from(btns).find(b => b.textContent.includes('Simpan Knowledge'));
+    var saveBtn = null;
+    for (var i=0; i<btns.length; i++) {
+        if (btns[i].textContent.includes('Simpan Knowledge')) {
+            saveBtn = btns[i];
+            break;
+        }
+    }
     
     if(saveBtn) {
-      saveBtn.type = 'button'; // Wajib agar form tidak me-reload halaman!
-      saveBtn.onclick = function(e) {
+      // Kloning tombol untuk mematikan sifat "Auto-Reload Form" secara paksa
+      var newSaveBtn = saveBtn.cloneNode(true);
+      saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+      
+      newSaveBtn.type = 'button';
+      newSaveBtn.onclick = function(e) {
         e.preventDefault();
-        localStorage.setItem('KUSUMA_KB_FINAL', kbBox.value);
-        localStorage.setItem('KUSUMA_GR_FINAL', grBox.value);
+        e.stopPropagation(); // Hentikan form submission
         
-        saveBtn.textContent = '✅ Tersimpan!';
-        saveBtn.style.backgroundColor = '#4A7C59';
+        localStorage.setItem(DB_KEY_KB, kbBox.value);
+        localStorage.setItem(DB_KEY_GR, grBox.value);
+        
+        var originalText = newSaveBtn.textContent;
+        newSaveBtn.textContent = '✅ Berhasil Tersimpan!';
+        newSaveBtn.style.backgroundColor = '#4A7C59';
+        newSaveBtn.style.color = '#fff';
+        
+        // Kembalikan visual tombol setelah 2 detik
         setTimeout(function(){ 
-            saveBtn.textContent = 'Simpan Knowledge'; 
-            saveBtn.style.backgroundColor = '';
+            newSaveBtn.textContent = originalText; 
+            newSaveBtn.style.backgroundColor = '';
         }, 2000);
       };
+    }
+
+    // 3. MUTASI TOMBOL RESET
+    var links = document.querySelectorAll('a');
+    var resetBtn = null;
+    for (var j=0; j<links.length; j++) {
+        if (links[j].textContent.includes('Template Default')) {
+            resetBtn = links[j];
+            break;
+        }
+    }
+
+    if (resetBtn) {
+        var newResetBtn = resetBtn.cloneNode(true);
+        resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+        newResetBtn.onclick = function(e) {
+            e.preventDefault();
+            kbBox.value = defKB;
+            grBox.value = defGR;
+            localStorage.setItem(DB_KEY_KB, defKB);
+            localStorage.setItem(DB_KEY_GR, defGR);
+            alert('🔄 Template resmi dipulihkan!');
+        }
     }
   });
 </script>
