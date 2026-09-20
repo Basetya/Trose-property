@@ -67,7 +67,7 @@ function initDynamicUnits() {
     },
     {
       badge: "Green Palace Resort",
-      title: "2 Bedroom Executive",
+      title: "3 Bedroom Executive",
       desc: "Akses Kolam Renang Tematik • Gym Indoor • Interior Japandi Modern.",
       price: 5000000,
       mediaUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80"
@@ -79,29 +79,17 @@ function initDynamicUnits() {
   if (savedCMS) {
     try {
       var d = JSON.parse(savedCMS);
-      units = [
-        {
-          badge: (d.u1 && d.u1.badge && d.u1.badge.trim()) ? d.u1.badge.trim() : defaultUnits[0].badge,
-          title: (d.u1 && d.u1.title && d.u1.title.trim()) ? d.u1.title.trim() : defaultUnits[0].title,
-          desc: (d.u1 && d.u1.desc && d.u1.desc.trim()) ? d.u1.desc.trim() : defaultUnits[0].desc,
-          price: (d.u1 && d.u1.price !== undefined && d.u1.price !== "") ? Number(d.u1.price) : defaultUnits[0].price,
-          mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim().length > 10) ? d.u1.mediaUrl.trim() : defaultUnits[0].mediaUrl
-        },
-        {
-          badge: (d.u2 && d.u2.badge && d.u2.badge.trim()) ? d.u2.badge.trim() : defaultUnits[1].badge,
-          title: (d.u2 && d.u2.title && d.u2.title.trim()) ? d.u2.title.trim() : defaultUnits[1].title,
-          desc: (d.u2 && d.u2.desc && d.u2.desc.trim()) ? d.u2.desc.trim() : defaultUnits[1].desc,
-          price: (d.u2 && d.u2.price !== undefined && d.u2.price !== "") ? Number(d.u2.price) : defaultUnits[1].price,
-          mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim().length > 10) ? d.u2.mediaUrl.trim() : defaultUnits[1].mediaUrl
-        },
-        {
-          badge: (d.u3 && d.u3.badge && d.u3.badge.trim()) ? d.u3.badge.trim() : defaultUnits[2].badge,
-          title: (d.u3 && d.u3.title && d.u3.title.trim()) ? d.u3.title.trim() : defaultUnits[2].title,
-          desc: (d.u3 && d.u3.desc && d.u3.desc.trim()) ? d.u3.desc.trim() : defaultUnits[2].desc,
-          price: (d.u3 && d.u3.price !== undefined && d.u3.price !== "") ? Number(d.u3.price) : defaultUnits[2].price,
-          mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim().length > 10) ? d.u3.mediaUrl.trim() : defaultUnits[2].mediaUrl
-        }
-      ];
+      units = defaultUnits.map(function(def, idx) {
+        var u = d["u" + (idx + 1)] || {};
+        var validMedia = (u.mediaUrl && u.mediaUrl.trim().length > 10) ? u.mediaUrl.trim() : def.mediaUrl;
+        return {
+          badge: (u.badge && u.badge.trim()) ? u.badge.trim() : def.badge,
+          title: (u.title && u.title.trim()) ? u.title.trim() : def.title,
+          desc: (u.desc && u.desc.trim()) ? u.desc.trim() : def.desc,
+          price: (u.price !== undefined && u.price !== "") ? Number(u.price) : def.price,
+          mediaUrl: validMedia
+        };
+      });
     } catch (e) {
       units = defaultUnits;
     }
@@ -355,6 +343,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
