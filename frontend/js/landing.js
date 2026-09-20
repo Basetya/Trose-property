@@ -108,7 +108,7 @@ function initDynamicUnits() {
   }
   }
 
-      catalogEl.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
+        catalogEl.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
   catalogEl.innerHTML = units.map((u, idx) => {
     // Kunci gambar: jika u.mediaUrl kosong, selalu gunakan foto default bawaan
     const rawMedia = (u.mediaUrl && u.mediaUrl.trim() !== "") ? u.mediaUrl.trim() : defaultUnits[idx].mediaUrl;
@@ -367,6 +367,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
