@@ -74,19 +74,38 @@ function initDynamicUnits() {
     }
   ];
 
-  let units = defaultUnits;
+    let units = defaultUnits;
   const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
   if (savedCMS) {
     try {
       const d = JSON.parse(savedCMS);
       units = [
-        { ...defaultUnits[0], ...(d.u1 || {}), mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim()) ? d.u1.mediaUrl : defaultUnits[0].mediaUrl },
-        { ...defaultUnits[1], ...(d.u2 || {}), mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim()) ? d.u2.mediaUrl : defaultUnits[1].mediaUrl },
-        { ...defaultUnits[2], ...(d.u3 || {}), mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim()) ? d.u3.mediaUrl : defaultUnits[2].mediaUrl }
+        {
+          badge: (d.u1 && d.u1.badge) ? d.u1.badge : defaultUnits[0].badge,
+          title: (d.u1 && d.u1.title) ? d.u1.title : defaultUnits[0].title,
+          desc: (d.u1 && d.u1.desc) ? d.u1.desc : defaultUnits[0].desc,
+          price: (d.u1 && d.u1.price !== undefined && d.u1.price !== "") ? Number(d.u1.price) : defaultUnits[0].price,
+          mediaUrl: (d.u1 && d.u1.mediaUrl && d.u1.mediaUrl.trim()) ? d.u1.mediaUrl : defaultUnits[0].mediaUrl
+        },
+        {
+          badge: (d.u2 && d.u2.badge) ? d.u2.badge : defaultUnits[1].badge,
+          title: (d.u2 && d.u2.title) ? d.u2.title : defaultUnits[1].title,
+          desc: (d.u2 && d.u2.desc) ? d.u2.desc : defaultUnits[1].desc,
+          price: (d.u2 && d.u2.price !== undefined && d.u2.price !== "") ? Number(d.u2.price) : defaultUnits[1].price,
+          mediaUrl: (d.u2 && d.u2.mediaUrl && d.u2.mediaUrl.trim()) ? d.u2.mediaUrl : defaultUnits[1].mediaUrl
+        },
+        {
+          badge: (d.u3 && d.u3.badge) ? d.u3.badge : defaultUnits[2].badge,
+          title: (d.u3 && d.u3.title) ? d.u3.title : defaultUnits[2].title,
+          desc: (d.u3 && d.u3.desc) ? d.u3.desc : defaultUnits[2].desc,
+          price: (d.u3 && d.u3.price !== undefined && d.u3.price !== "") ? Number(d.u3.price) : defaultUnits[2].price,
+          mediaUrl: (d.u3 && d.u3.mediaUrl && d.u3.mediaUrl.trim()) ? d.u3.mediaUrl : defaultUnits[2].mediaUrl
+        }
       ];
     } catch (e) {
       units = defaultUnits;
     }
+  }
   }
 
   target.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8";
@@ -345,6 +364,7 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
 
 
 
