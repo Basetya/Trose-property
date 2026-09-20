@@ -1,7 +1,7 @@
 ﻿/**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v155.0.0 (Hard Cache Purge & Force Media Sync) (Zero-Regression Media Card & Multi-Container Resolver)
+ * Version: v149.0.0 (Zero-Regression Media Card & Multi-Container Resolver)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -80,6 +80,18 @@ function initDynamicUnits() {
   ];
 
   let units = defaultUnits;
+  const savedCMS = localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+  if (savedCMS) {
+    try {
+      const d = JSON.parse(savedCMS);
+      units = [
+        { ...defaultUnits[0], ...(d.u1 || {}) },
+        { ...defaultUnits[1], ...(d.u2 || {}) },
+        { ...defaultUnits[2], ...(d.u3 || {}) }
+      ];
+    } catch (e) {
+      units = defaultUnits;
+    }
   }
 
   catalogEl.className = "grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8";
@@ -336,4 +348,3 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
-
