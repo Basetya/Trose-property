@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Kusuma Properti Manager - Frontend Application Core
  * File: frontend/js/app.js
  * Version: v146.0.0 (Pure Real Database Engine & Clean Admin Cockpit)
@@ -444,19 +444,22 @@ function savePopularUnitsCMS() {
     u1: {
       badge: document.getElementById("cms-u1-badge")?.value || "",
       title: document.getElementById("cms-u1-title")?.value || "",
-      desc: document.getElementById("cms-u1-desc")?.value || "",
+      desc: document.getElementById('cms-u1-desc')?.value || '',
+      mediaUrl: document.getElementById('cms-u1-media')?.value.trim() || '',
       price: document.getElementById("cms-u1-price")?.value || "0"
     },
     u2: {
       badge: document.getElementById("cms-u2-badge")?.value || "",
       title: document.getElementById("cms-u2-title")?.value || "",
-      desc: document.getElementById("cms-u2-desc")?.value || "",
+      desc: document.getElementById('cms-u2-desc')?.value || '',
+      mediaUrl: document.getElementById('cms-u2-media')?.value.trim() || '',
       price: document.getElementById("cms-u2-price")?.value || "0"
     },
     u3: {
       badge: document.getElementById("cms-u3-badge")?.value || "",
       title: document.getElementById("cms-u3-title")?.value || "",
-      desc: document.getElementById("cms-u3-desc")?.value || "",
+      desc: document.getElementById('cms-u3-desc')?.value || '',
+      mediaUrl: document.getElementById('cms-u3-media')?.value.trim() || '',
       price: document.getElementById("cms-u3-price")?.value || "0"
     }
   };
@@ -470,6 +473,9 @@ function loadPopularUnitsCMS() {
   if (!saved) return;
   try {
     const d = JSON.parse(saved);
+    if (d.u1 && document.getElementById("cms-u1-media")) document.getElementById("cms-u1-media").value = d.u1.mediaUrl || "";
+    if (d.u2 && document.getElementById("cms-u2-media")) document.getElementById("cms-u2-media").value = d.u2.mediaUrl || "";
+    if (d.u3 && document.getElementById("cms-u3-media")) document.getElementById("cms-u3-media").value = d.u3.mediaUrl || "";
     if (d.u1) {
       if (document.getElementById("cms-u1-badge")) document.getElementById("cms-u1-badge").value = d.u1.badge;
       if (document.getElementById("cms-u1-title")) document.getElementById("cms-u1-title").value = d.u1.title;
