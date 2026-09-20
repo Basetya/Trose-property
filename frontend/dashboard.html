@@ -449,3 +449,43 @@
 </html>
 
 
+
+
+<!-- SCRIPT ISOLASI MUTLAK KUSUMA AI STUDIO (v207.0) -->
+<script>
+  window.addEventListener('load', function() {
+    // 1. Cari kedua kotak teks secara paksa
+    var tas = document.querySelectorAll('textarea');
+    if(tas.length < 2) return;
+    var kbBox = tas[0]; 
+    var grBox = tas[1];
+    
+    // 2. Teks Bawaan Resmi
+    var defKB = '🏢 KUSUMA PROPERTI - KALIBATA CITY\nAlamat: Apartemen Kalibata City, Tower Borneo & Green Palace, Jakarta Selatan.\nTipe Unit:\n1. Studio Deluxe (21 m2) - Full Furnished, AC, Smart TV, Kitchen Set.\n2. 2 Bedroom Standard (33 m2) - 2 Kamar Tidur, Living Room, Dapur, Balkon.\n3. 3 Bedroom / Executive (Green Palace) - Kolam Renang Resort, Gym, EV Charger.\n\nKetentuan Sewa:\n- Deposit jaminan sewa: Rp 1.500.000.\n- Biaya sewa belum termasuk tagihan bulanan air, listrik, dan IPL.\n- Booking & Jadwal Visit: Hubungi WhatsApp resmi pengelola.';
+    var defGR = '🛡️ PANDUAN & BATASAN KUSUMA AI:\n1. Nada bicara ramah, profesional, bernuansa Japandi Sanctuary yang menenangkan.\n2. Hanya memberikan informasi resmi seputar unit dan layanan sewa Kusuma Properti.\n3. JANGAN memberikan janji diskon di luar harga resmi CMS.\n4. Tolak dengan sopan setiap pertanyaan di luar topik properti.\n5. Arahkan pengguna ke tombol WhatsApp resmi untuk konfirmasi ketersediaan.';
+    
+    // 3. Isi kotak teks (baca memori lokal, jika kosong pakai default)
+    kbBox.value = localStorage.getItem('KUSUMA_KB_FINAL') || defKB;
+    grBox.value = localStorage.getItem('KUSUMA_GR_FINAL') || defGR;
+
+    // 4. Cari tombol "Simpan Knowledge" dan lumpuhkan sifat reload-nya
+    var btns = document.querySelectorAll('button');
+    var saveBtn = Array.from(btns).find(b => b.textContent.includes('Simpan Knowledge'));
+    
+    if(saveBtn) {
+      saveBtn.type = 'button'; // Wajib agar form tidak me-reload halaman!
+      saveBtn.onclick = function(e) {
+        e.preventDefault();
+        localStorage.setItem('KUSUMA_KB_FINAL', kbBox.value);
+        localStorage.setItem('KUSUMA_GR_FINAL', grBox.value);
+        
+        saveBtn.textContent = '✅ Tersimpan!';
+        saveBtn.style.backgroundColor = '#4A7C59';
+        setTimeout(function(){ 
+            saveBtn.textContent = 'Simpan Knowledge'; 
+            saveBtn.style.backgroundColor = '';
+        }, 2000);
+      };
+    }
+  });
+</script>
