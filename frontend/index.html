@@ -275,7 +275,155 @@
     </div>
   </div>
 
+  <!-- Floating Owner Funnel Trigger (Kiri Bawah) -->
+  <div id="floating-owner-funnel" class="fixed bottom-4 md:bottom-6 left-4 md:left-6 z-40">
+    <button id="floating-btn-owner-funnel" type="button" class="inline-flex items-center gap-2.5 px-3.5 md:px-5 py-2.5 md:py-3 bg-[#FAF7F2] hover:bg-[#F4EFE6] text-[#2C2C2A] border-2 border-[#8C5835] rounded-full shadow-xl transition transform hover:scale-105 group font-sans">
+      <div class="w-8 h-8 rounded-full bg-[#8C5835] text-white flex items-center justify-center shrink-0 shadow-sm group-hover:bg-[#704326] transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+      </div>
+      <div class="text-left">
+        <p class="text-[9px] md:text-[10px] uppercase tracking-wider text-[#8C5835] font-bold leading-none">Titip Sewa / Jual</p>
+        <p class="text-xs md:text-sm font-extrabold text-[#2C2C2A] tracking-tight whitespace-nowrap"><span class="hidden sm:inline">Anda </span>Pemilik Unit<span class="hidden sm:inline"> Kalibata City?</span><span class="sm:hidden">?</span></p>
+      </div>
+    </button>
+  </div>
+
+  <!-- Modal Owner Lead Generation Funnel -->
+  <div id="owner-funnel-modal" class="fixed inset-0 z-50 bg-[#2C2C2A]/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="japandi-panel bg-[#FAF7F2] border border-[#DDD3C2] rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden my-auto transform transition-all">
+      
+      <!-- Modal Header -->
+      <div class="bg-[#F4EFE6] px-6 py-4 border-b border-[#E8DFD3] flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-2xl bg-[#8C5835] text-white flex items-center justify-center font-bold shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-sm md:text-base font-extrabold text-[#2C2C2A] leading-tight">Titip Sewa / Jual Unit Kalibata City</h3>
+            <p class="text-[10px] md:text-xs text-[#8C5835] font-semibold">Biar tim profesional Kusuma Properti yang urus</p>
+          </div>
+        </div>
+        <button id="owner-funnel-close-btn" type="button" class="w-8 h-8 rounded-full bg-white border border-[#E8DFD3] text-[#737370] hover:text-[#2C2C2A] flex items-center justify-center font-bold text-lg hover:bg-[#F4EFE6] transition">
+          &times;
+        </button>
+      </div>
+
+      <!-- Form Container -->
+      <div id="owner-funnel-form-container" class="p-6 space-y-4">
+        <p class="text-xs text-[#737370] leading-relaxed">
+          Maksimalkan potensi sewa unit Anda dengan sistem pengelolaan transparan, laporan keuangan rutin, dan penyewa terverifikasi. Isi formulir singkat berikut:
+        </p>
+
+        <div id="owner-funnel-alert" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+
+        <form id="owner-funnel-form" class="space-y-3.5">
+          <div>
+            <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Nama Lengkap *</label>
+            <input type="text" id="owner-lead-name" required placeholder="Contoh: Budi Santoso" class="w-full px-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Nomor WhatsApp Aktif *</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-bold text-[#8C5835]">+62</span>
+              <input type="tel" id="owner-lead-phone" required placeholder="81234567890" class="w-full pl-12 pr-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Tower Unit *</label>
+              <select id="owner-lead-tower" required class="w-full px-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+                <option value="Akasia">Tower Akasia</option>
+                <option value="Borneo">Tower Borneo</option>
+                <option value="Cendana">Tower Cendana</option>
+                <option value="Damar">Tower Damar</option>
+                <option value="Ebony">Tower Ebony</option>
+                <option value="Flamboyan">Tower Flamboyan</option>
+                <option value="Gaharu">Tower Gaharu</option>
+                <option value="Hebras">Tower Hebras</option>
+                <option value="Kemuning">Tower Kemuning</option>
+                <option value="Jasmine">Tower Jasmine</option>
+                <option value="Lotus">Tower Lotus</option>
+                <option value="Mawar">Tower Mawar</option>
+                <option value="Nusa Indah">Tower Nusa Indah</option>
+                <option value="Palem">Tower Palem</option>
+                <option value="Raffles">Tower Raffles</option>
+                <option value="Sakura">Tower Sakura</option>
+                <option value="Tulip">Tower Tulip</option>
+                <option value="Viola">Tower Viola</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Nomor Unit *</label>
+              <input type="text" id="owner-lead-unit" required placeholder="Contoh: 12AF / 05BC" class="w-full px-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] uppercase focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Tipe Unit *</label>
+              <select id="owner-lead-type" required class="w-full px-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+                <option value="Studio">Studio (21 m²)</option>
+                <option value="1 Bedroom">1 Bedroom</option>
+                <option value="2 Bedroom">2 Bedroom (33 m²)</option>
+                <option value="3 Bedroom">3 Bedroom / Green Palace</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Ekspektasi Tarif Sewa / Bln</label>
+              <input type="text" id="owner-lead-price" placeholder="Contoh: 3.500.000" class="w-full px-3.5 py-2.5 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-[#2C2C2A] uppercase tracking-wide mb-1">Catatan Tambahan (Opsional)</label>
+            <textarea id="owner-lead-notes" rows="2" placeholder="Kondisi interior (furnish/kosongan), preferensi waktu survey unit, dll." class="w-full px-3.5 py-2 bg-white border border-[#DDD3C2] rounded-xl text-xs text-[#2C2C2A] focus:outline-none focus:ring-1 focus:ring-[#8C5835]"></textarea>
+          </div>
+
+          <div class="pt-2">
+            <button id="owner-funnel-submit-btn" type="submit" class="w-full py-3 px-4 bg-[#8C5835] hover:bg-[#704326] text-white font-extrabold rounded-xl text-xs md:text-sm transition shadow-md flex items-center justify-center gap-2">
+              <svg id="owner-funnel-submit-spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span id="owner-funnel-submit-text">Kirim Data Unit</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success Container (Warm Confirmation) -->
+      <div id="owner-funnel-success-container" class="hidden p-8 text-center space-y-4">
+        <div class="w-16 h-16 rounded-full bg-[#EAF0EB] text-[#3A5A40] flex items-center justify-center mx-auto shadow-inner">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+        <div class="space-y-1.5">
+          <h4 class="text-lg md:text-xl font-display font-bold text-[#2C2C2A]">Data Anda Telah Kami Terima</h4>
+          <p class="text-xs md:text-sm text-[#737370] max-w-sm mx-auto leading-relaxed">
+            Data Anda telah kami terima, tim kami akan segera menghubungi via WhatsApp untuk jadwal survey.
+          </p>
+        </div>
+        <div class="pt-3">
+          <button id="owner-funnel-success-close-btn" type="button" class="px-6 py-2.5 bg-[#FAF7F2] hover:bg-[#F4EFE6] border border-[#DDD3C2] text-[#2C2C2A] text-xs font-bold rounded-xl transition shadow-sm">
+            Tutup Halaman
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="js/landing.js"></script>
+  <script src="js/owner-funnel.js"></script>
 </body>
 </html>

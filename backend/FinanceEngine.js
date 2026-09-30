@@ -1,5 +1,5 @@
 /**
- * Kusuma Properti Manager - 3-Tier Financial Engine (v9.0)
+ * Trose Property Manager - 3-Tier Financial Engine (v8.1)
  * File: backend/FinanceEngine.gs
  */
 
@@ -15,6 +15,7 @@ function generateFinancialStatements() {
   let pmManagementFees = 0;
 
   leases.forEach(l => {
+    // Sinkronisasi header skema SheetSchema: Management_Commission_Fee
     const commFee = Number(l.Management_Commission_Fee || l.Leasing_Commission_Fee || 0);
     pmLeasingFees += commFee;
   });
