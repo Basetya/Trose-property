@@ -64,6 +64,11 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify(leadResult)).setMimeType(ContentService.MimeType.JSON);
     }
 
+    if (payload.action === "purgeUatTestData" && typeof handleOwnerLeadTeardown === "function") {
+      var purgeResult = handleOwnerLeadTeardown(payload);
+      return ContentService.createTextOutput(JSON.stringify(purgeResult)).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var sender = String(payload.sender || "").replace(/\D/g, "");
     var incomingText = (payload.message || "").trim();
 

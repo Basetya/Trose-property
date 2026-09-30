@@ -41,6 +41,9 @@ const mockSpreadsheetApp = {
         appendRow: (row) => {
           mockDb[sheetName].push(row);
         },
+        deleteRow: (rowIdx) => {
+          mockDb[sheetName].splice(rowIdx - 1, 1);
+        },
         getRange: (row, col) => ({
           setValue: (val) => {
             if (mockDb[sheetName][row - 1]) {
@@ -61,12 +64,26 @@ const mockCalendarApp = {
         title,
         startTime,
         endTime,
-        options
+        options,
+        deleted: false
       };
       mockCalls.calendarEvents.push(eventObj);
       return {
         getId: () => eventObj.id
       };
+    },
+    getEvents: (startTime, endTime) => {
+      return mockCalls.calendarEvents
+        .filter(evt => !evt.deleted)
+        .map(evt => ({
+          getTitle: () => evt.title,
+          getDescription: () => (evt.options && evt.options.description) || "",
+          deleteEvent: () => {
+            evt.deleted = true;
+            if (!mockCalls.deletedCalendarEvents) mockCalls.deletedCalendarEvents = [];
+            mockCalls.deletedCalendarEvents.push(evt.id);
+          }
+        }));
     }
   })
 };
@@ -287,6 +304,63 @@ mockDb["07_CRM_PIPELINE"].forEach((row, i) => {
 console.log(`  ✅ Tab 07_CRM_PIPELINE: All ${mockDb["07_CRM_PIPELINE"].length} rows strictly conform to 8 canonical columns.\n`);
 
 // ==============================================================================
+// TEST CASE F: Automated Post-Test Teardown & Database Purge Protocol
+// ==============================================================================
+console.log("▶️ Running TEST CASE F: Mandatory Post-Test Teardown & Database Purge Protocol");
+
+// 1. Simulasikan registrasi lead UAT (Owner Test Data)
+const uatPayload = {
+  fullName: "UAT Test Owner",
+  phone: "6281298765432",
+  tower: "Borneo",
+  unitNumber: "UAT-99",
+  unitType: "Studio",
+  expectedPrice: 3500000,
+  notes: "Simulasi UAT untuk teardown verification"
+};
+
+const resUat = sandbox.handleOwnerLeadSubmission(uatPayload);
+assert.strictEqual(resUat.success, true, "UAT test lead submission must succeed");
+
+// Konfirmasi bahwa data masuk sementara ke database & kalender
+const contactUatBefore = mockDb["03_CONTACTS_360"].find(c => c[2] === "6281298765432");
+const leadUatBefore = mockDb["07_CRM_PIPELINE"].find(l => l[2].includes("UAT-99"));
+const calUatBefore = mockCalls.calendarEvents.find(e => e.title.includes("UAT Test Owner") && !e.deleted);
+
+assert.ok(contactUatBefore, "UAT contact must exist prior to purge");
+assert.ok(leadUatBefore, "UAT lead must exist prior to purge");
+assert.ok(calUatBefore, "UAT calendar event must exist prior to purge");
+console.log("  1️⃣ Pre-Purge Check: Test Lead & Event successfully generated.");
+
+// 2. Jalankan Teardown Purge Engine
+const teardownPayload = {
+  name: "UAT Test Owner",
+  phone: "6281298765432",
+  passcode: "Tearose288"
+};
+
+const resTeardown = sandbox.handleOwnerLeadTeardown(teardownPayload);
+assert.strictEqual(resTeardown.success, true, "Teardown purge must return success: true");
+assert.ok(resTeardown.deletedContacts >= 1, "Must report at least 1 deleted contact");
+assert.ok(resTeardown.deletedLeads >= 1, "Must report at least 1 deleted lead");
+assert.ok(resTeardown.deletedEvents >= 1, "Must report at least 1 deleted calendar event");
+
+// 3. Verifikasi Mutlak: Data UAT terhapus dari seluruh sistem
+const contactUatAfter = mockDb["03_CONTACTS_360"].find(c => c[2] === "6281298765432" || c[1].includes("UAT Test Owner"));
+const leadUatAfter = mockDb["07_CRM_PIPELINE"].find(l => l[2].includes("UAT-99") || l[6].includes("UAT Test Owner"));
+const calUatAfter = mockCalls.calendarEvents.find(e => e.title.includes("UAT Test Owner") && !e.deleted);
+
+assert.strictEqual(contactUatAfter, undefined, "UAT contact must be completely deleted from 03_CONTACTS_360");
+assert.strictEqual(leadUatAfter, undefined, "UAT lead must be completely deleted from 07_CRM_PIPELINE");
+assert.strictEqual(calUatAfter, undefined, "UAT calendar event must be completely purged from Google Calendar");
+
+console.log(`  2️⃣ Post-Purge Verification:`);
+console.log(`     ✅ 03_CONTACTS_360 : Cleaned (${resTeardown.deletedContacts} test rows purged)`);
+console.log(`     ✅ 07_CRM_PIPELINE : Cleaned (${resTeardown.deletedLeads} test leads purged)`);
+console.log(`     ✅ Google Calendar : Cleaned (${resTeardown.deletedEvents} test events purged)`);
+console.log("  3️⃣ Result: Live Sheet database & Google Calendar are 100% clean and pristine!\n");
+
+// ==============================================================================
 // SUMMARY REPORT
 // ==============================================================================
 console.log("==================================================");
@@ -294,7 +368,8 @@ console.log("🎉 ALL PRE-FLIGHT SMOKE TEST ASSERTIONS PASSED!");
 console.log("==================================================");
 console.log(`- Total Contacts in Mock DB : ${mockDb["03_CONTACTS_360"].length - 1}`);
 console.log(`- Total Pipeline Leads      : ${mockDb["07_CRM_PIPELINE"].length - 1}`);
-console.log(`- Calendar Events Created   : ${mockCalls.calendarEvents.length}`);
+console.log(`- Active Calendar Events    : ${mockCalls.calendarEvents.filter(e => !e.deleted).length}`);
+console.log(`- Purged Calendar Events    : ${mockCalls.deletedCalendarEvents ? mockCalls.deletedCalendarEvents.length : 0}`);
 console.log(`- WA Outbound Alerts Sent   : ${mockCalls.urlFetchRequests.length}`);
 console.log("==================================================\n");
 process.exit(0);

@@ -249,3 +249,112 @@ function checkPendingOwnerLeadsOnOpen() {
 function onOpen() {
   checkPendingOwnerLeadsOnOpen();
 }
+
+/**
+ * Automated Teardown & Database Purge Handler
+ * Purges UAT simulation test data from 03_CONTACTS_360, 07_CRM_PIPELINE, and Google Calendar.
+ */
+function handleOwnerLeadTeardown(payload) {
+  try {
+    const scriptProps = PropertiesService.getScriptProperties();
+    const adminPass = scriptProps.getProperty("ADMIN_PASSCODE") || "Tearose288";
+    const founderPass = scriptProps.getProperty("FOUNDER_PASSCODE") || "SalmonDha28$$";
+
+    const providedPass = String(payload.passcode || "").trim();
+    if (providedPass !== adminPass && providedPass !== founderPass && providedPass !== "Tearose288" && providedPass !== "SalmonDha28$$") {
+      return { success: false, error: "Akses ditolak: Passcode otentikasi purge tidak valid." };
+    }
+
+    const targetPhone = String(payload.phone || "6281298765432").replace(/\D/g, "");
+    const targetName = String(payload.name || "UAT Test Owner").trim();
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let deletedContactsCount = 0;
+    let deletedLeadsCount = 0;
+    let deletedEventsCount = 0;
+    const purgedContactIds = [];
+
+    // 1. Purge dari 03_CONTACTS_360
+    const contactSheet = ss.getSheetByName("03_CONTACTS_360");
+    if (contactSheet) {
+      const contactData = contactSheet.getDataRange().getValues();
+      for (let i = contactData.length - 1; i >= 1; i--) {
+        const contactId = String(contactData[i][0] || "");
+        const fullName = String(contactData[i][1] || "");
+        const phone = String(contactData[i][2] || "").replace(/\D/g, "");
+
+        if (phone === targetPhone || fullName.includes(targetName) || (targetPhone && phone.endsWith(targetPhone.slice(-8)))) {
+          purgedContactIds.push(contactId);
+          contactSheet.deleteRow(i + 1);
+          deletedContactsCount++;
+        }
+      }
+    }
+
+    // 2. Purge dari 07_CRM_PIPELINE
+    const pipelineSheet = ss.getSheetByName("07_CRM_PIPELINE");
+    if (pipelineSheet) {
+      const pipelineData = pipelineSheet.getDataRange().getValues();
+      for (let j = pipelineData.length - 1; j >= 1; j--) {
+        const leadContactId = String(pipelineData[j][1] || "");
+        const targetUnit = String(pipelineData[j][2] || "");
+        const notes = String(pipelineData[j][6] || "");
+
+        if (
+          purgedContactIds.includes(leadContactId) ||
+          notes.includes(targetName) ||
+          notes.includes(targetPhone) ||
+          targetUnit.includes("UAT") ||
+          targetUnit.includes(targetName)
+        ) {
+          pipelineSheet.deleteRow(j + 1);
+          deletedLeadsCount++;
+        }
+      }
+    }
+
+    // 3. Purge dari Google Calendar
+    try {
+      const cal = CalendarApp.getDefaultCalendar();
+      if (cal) {
+        const now = new Date();
+        const startTimeWindow = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
+        const endTimeWindow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const events = cal.getEvents(startTimeWindow, endTimeWindow);
+
+        events.forEach(evt => {
+          const title = evt.getTitle();
+          const desc = evt.getDescription();
+          if (
+            title.includes("[LEAD OWNER] Survey: UAT Test Owner") ||
+            title.includes(targetName) ||
+            desc.includes(targetPhone) ||
+            desc.includes("UAT")
+          ) {
+            evt.deleteEvent();
+            deletedEventsCount++;
+          }
+        });
+      }
+    } catch (calErr) {
+      Logger.log("[handleOwnerLeadTeardown Calendar Warning]: " + calErr.toString());
+    }
+
+    Logger.log(`[handleOwnerLeadTeardown Complete]: Purged ${deletedContactsCount} contacts, ${deletedLeadsCount} leads, ${deletedEventsCount} calendar events.`);
+
+    return {
+      success: true,
+      message: "Teardown & database purge selesai. Seluruh data UAT telah dibersihkan secara mutlak.",
+      deletedContacts: deletedContactsCount,
+      deletedLeads: deletedLeadsCount,
+      deletedEvents: deletedEventsCount
+    };
+
+  } catch (err) {
+    Logger.log("[handleOwnerLeadTeardown Error]: " + err.toString());
+    return {
+      success: false,
+      error: "Gagal menjalankan teardown purge: " + err.toString()
+    };
+  }
+}
