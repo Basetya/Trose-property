@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v156.0.0 (Bulletproof Unit Renderer & Safe Parser)
+ * Version: v157.0.0 (Zero-Dummy & Anti-404 Fallback Guard)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateHeroAndFooterCopy();
 });
 
-// 1. Terapkan Pengaturan Visual Japandi
+// 1. Terapkeun Pangaturan Visual Japandi
 function initVisualTheme() {
   const saved = localStorage.getItem("KUSUMA_VISUAL_SETTINGS");
   if (saved) {
@@ -28,37 +28,38 @@ function initVisualTheme() {
         document.documentElement.style.setProperty("--japandi-bg-contrast", `${s.contrast}%`);
       }
     } catch (e) {
-      console.warn("Gagal memuat tema visual:", e);
+      console.warn("Gagal ngamuat téma visual:", e);
     }
   }
 }
 
-// 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video
+// 2. Muat Katalog 3 Unit Populer Kalayan Media Foto/Video Asli (BEBAS DUMMY)
 function initDynamicUnits() {
   const target = document.getElementById('dynamic-unit-catalog');
   if (!target) return;
 
+  // Gambar dasar unit lokal resmi Kusuma Properti (sanés gambar dummy Unsplash)
   const defaultUnits = [
     {
       badge: 'Single / Eksekutif',
       title: 'Studio Deluxe',
       desc: 'Luas 21 m² • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV.',
       price: 3000000,
-      mediaUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80'
+      mediaUrl: 'img/unit1.jpg'
     },
     {
       badge: 'Paling Favorit',
       title: '2 Bedroom Standard',
       desc: 'Luas 33 m² • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon.',
       price: 4200000,
-      mediaUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80'
+      mediaUrl: 'img/unit2.jpg'
     },
     {
       badge: 'Green Palace',
       title: '3 Bedroom',
       desc: 'Akses Kolam Renang Tematik • Gym Indoor • Interior Modern + EV Charger.',
       price: 4000000,
-      mediaUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
+      mediaUrl: 'img/unit3.jpg'
     }
   ];
 
@@ -66,46 +67,42 @@ function initDynamicUnits() {
 
   try {
     const rawData = localStorage.getItem('kp_popular_units_data') || 
-                    localStorage.getItem('KUSUMA_POPULAR_UNITS_CMS') ||
-                    localStorage.getItem('kp_unit1_content');
+                    localStorage.getItem('KUSUMA_POPULAR_UNITS_CMS');
 
     if (rawData) {
       const parsed = JSON.parse(rawData);
 
-      // Skenario A: Tersimpan format 3 unit { u1: {...}, u2: {...}, u3: {...} }
       if (parsed.u1 || parsed.u2 || parsed.u3) {
         units = defaultUnits.map((def, idx) => {
           const item = parsed['u' + (idx + 1)];
           if (!item) return def;
+
+          let rawMedia = (item.media || item.mediaUrl || "").trim();
+
+          // SARINGAN HATE-HATE: Upami link mangrupa format dummy rusak '/d/unit_', langsung tolak sarta pigunakeun gambar lokal resmi!
+          if (!rawMedia || rawMedia.includes('/d/unit_') || rawMedia.length < 5) {
+            rawMedia = def.mediaUrl;
+          }
+
           return {
             badge: item.badge || def.badge,
             title: item.nama || item.title || def.title,
             desc: item.deskripsi || item.desc || def.desc,
             price: item.tarif || item.price || def.price,
-            mediaUrl: item.media || item.mediaUrl || def.mediaUrl
+            mediaUrl: rawMedia
           };
         });
-      } 
-      // Skenario B: Tersimpan format 1 unit langsung { badge, nama, deskripsi, media, tarif }
-      else if (parsed.nama || parsed.badge || parsed.media) {
-        units[0] = {
-          badge: parsed.badge || defaultUnits[0].badge,
-          title: parsed.nama || parsed.title || defaultUnits[0].title,
-          desc: parsed.deskripsi || parsed.desc || defaultUnits[0].desc,
-          price: parsed.tarif || parsed.price || defaultUnits[0].price,
-          mediaUrl: parsed.media || parsed.mediaUrl || defaultUnits[0].mediaUrl
-        };
       }
     }
   } catch (err) {
-    console.error("Gagal membaca storage unit, kembali ke default:", err);
+    console.error("Gagal maca data storage unit:", err);
     units = defaultUnits;
   }
 
-  // Render HTML ke Target Grid
+  // Render HTML Kartu Unit
   target.className = 'grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8';
   target.innerHTML = units.map((u, idx) => {
-    const rawMedia = (u.mediaUrl && u.mediaUrl.trim().length > 5) ? u.mediaUrl.trim() : defaultUnits[idx].mediaUrl;
+    const rawMedia = u.mediaUrl;
     const isVideo = rawMedia.startsWith('data:video') || rawMedia.endsWith('.mp4') || rawMedia.endsWith('.webm');
     
     let mediaHtml = '';
@@ -147,7 +144,7 @@ function initDynamicUnits() {
   }).join('');
 }
 
-// 3. Sinkronisasi & Penanganan Tombol WhatsApp
+// 3. Sinkronisasi Tombol WhatsApp
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
 function buildSingleWaLink(unitName = "") {
@@ -197,7 +194,7 @@ function initWhatsAppButtons() {
   };
 }
 
-// 4. Prompt System & Knowledge Base Kalibata City
+// 4. Prompt System & Basis Pangaweruh Kalibata City
 const KUSUMA_AI_SYSTEM_PROMPT = `
 Anda adalah 'Kusuma AI Concierge', Asisten Konsultan Real Estate Resmi Kusuma Properti di Apartemen Kalibata City, Jakarta Selatan.
 Lokasi Kantor: Tower Flamboyan Lt. GF (Ground Floor).
@@ -211,7 +208,7 @@ DATABASE HARGA & FASILITAS KALIBATA CITY:
 5. Parkir: Basement mobil luas (tersedia sistem harian & member bulanan) dan gedung parkir motor bertingkat.
 `;
 
-// 5. Mesin Pemanggil Gemini AI Realtime
+// 5. Mesin Panarosan Gemini AI Realtime
 async function fetchGeminiRealAIReply(userText) {
   const apiKey = (window.APP_CONFIG && window.APP_CONFIG.GEMINI_API_KEY) ? window.APP_CONFIG.GEMINI_API_KEY : "";
   if (!apiKey) return null;
@@ -236,13 +233,13 @@ async function fetchGeminiRealAIReply(userText) {
         }
       }
     } catch (e) {
-      console.warn(`Gagal memanggil model ${model}:`, e);
+      console.warn(`Gagal nyauran modél ${model}:`, e);
     }
   }
   return null;
 }
 
-// 6. Cadangan Pengetahuan Dinamis Lokal
+// 6. Cadangan Waleran Lokal (Fallback)
 function generateDynamicFallbackReply(promptText) {
   const q = String(promptText || "").toLowerCase().trim();
 
@@ -261,7 +258,7 @@ function generateDynamicFallbackReply(promptText) {
   return "Halo! Selamat datang di **Kusuma Properti** Kalibata City. 🙏\n\nKami mengelola pilihan unit sewa bulanan & tahunan (Studio, 2BR, hingga 3BR siap huni).\n\nAda yang bisa kami bantu seputar tarif sewa atau jadwal survei unit?";
 }
 
-// 7. Widget Chatbot AI Controller
+// 7. Pangaturan Widget Chatbot AI
 function initLandingChatbot() {
   const btnAi = document.getElementById("floating-btn-ai") || document.getElementById("chatToggleBtn");
   const popup = document.getElementById("chat-popup") || document.getElementById("chatWidget");
@@ -335,7 +332,7 @@ function initLandingChatbot() {
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 }
 
-// 8. Surgical Copy Updater
+// 8. Pamutahiran Tulisan Hero & Footer
 function updateHeroAndFooterCopy() {
   const allLinksAndButtons = document.querySelectorAll('a, button');
   allLinksAndButtons.forEach(el => {
