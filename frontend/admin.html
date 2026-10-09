@@ -354,14 +354,36 @@
     </div>
   </div>
 
+  <!-- SINKRONISASI MODUL AUTENTIKASI RESMI DARI auth.js -->
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+
   <script>
-    // 1. SISTEM AUTENTIKASI PASSCODE ADMIN
+    // 1. SISTEM AUTENTIKASI: SINKRON OTOMATIS DENGAN auth.js
     function verifikasiPasscode() {
       const input = document.getElementById("inputPass").value.trim();
-      const currentSavedPass = localStorage.getItem("kp_founder_passcode") || localStorage.getItem("kp_passcode") || "1234";
 
-      // Menerima passcode tersimpan atau kata sandi default Kusuma Properti
-      if (input === currentSavedPass || input === "1234" || input === "KUSUMA2026" || input === "admin123") {
+      // Mengambil passcode resmi dari localStorage yang dikelola auth.js
+      const activePasscode = localStorage.getItem("kp_founder_passcode") || 
+                             localStorage.getItem("kp_admin_passcode") || 
+                             localStorage.getItem("kp_passcode") ||
+                             localStorage.getItem("founder_passcode");
+
+      let isValid = false;
+
+      // Cek apakah fungsi verifikasi bawaan auth.js tersedia
+      if (typeof verifyAdminPasscode === "function") {
+        isValid = verifyAdminPasscode(input);
+      } else if (typeof checkPasscode === "function") {
+        isValid = checkPasscode(input);
+      } else if (activePasscode) {
+        isValid = (input === activePasscode);
+      } else {
+        // Fallback default jika belum ada passcode yang disetel
+        isValid = (input === "1234" || input === "admin123");
+      }
+
+      if (isValid) {
         sessionStorage.setItem("kp_cockpit_auth", "true");
         bukaDashboard();
       } else {
@@ -377,6 +399,9 @@
 
     function logoutAdmin() {
       sessionStorage.removeItem("kp_cockpit_auth");
+      if (typeof logoutAdminSession === "function") {
+        logoutAdminSession();
+      }
       location.reload();
     }
 
@@ -395,7 +420,6 @@
       reader.onload = function(e) {
         const base64Data = e.target.result;
 
-        // Kirim berkas ke backend UploadHandler Google Apps Script
         fetch("https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec", {
           method: "POST",
           mode: "no-cors",
@@ -417,7 +441,7 @@
       reader.readAsDataURL(file);
     }
 
-    // 3. PENYIMPANAN 3 UNIT SECARA LOKAL & INTEGRASI
+    // 3. PENYIMPANAN DATA 3 UNIT
     function simpanSemuaUnit() {
       const dataUnits = {
         u1: {
@@ -484,7 +508,7 @@
       }
     }
 
-    // Verifikasi sesi saat halaman pertama dibuka
+    // Auto-login saat refresh jika sesi masih aktif
     window.onload = function() {
       if (sessionStorage.getItem("kp_cockpit_auth") === "true") {
         bukaDashboard();
