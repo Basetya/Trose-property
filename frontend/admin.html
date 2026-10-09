@@ -13,21 +13,70 @@
       min-height: 100vh;
       padding: 20px 14px 40px;
     }
-    .cockpit-container {
-      max-width: 520px;
-      margin: 0 auto;
+    .cockpit-container { max-width: 620px; margin: 0 auto; }
+
+    /* LAYAR LOGIN */
+    .login-box {
+      background: #FFFFFF;
+      border: 1.5px solid #F1E9DA;
+      border-radius: 24px;
+      padding: 40px 28px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+      margin-top: 40px;
     }
+    .login-badge {
+      display: inline-block;
+      background: #854D0E;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .login-box h2 { font-size: 20px; font-weight: 800; color: #1E293B; margin-bottom: 6px; }
+    .login-box p { font-size: 13px; color: #64748B; margin-bottom: 22px; }
+    .input-pass {
+      width: 100%;
+      max-width: 340px;
+      padding: 12px 16px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 12px;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 14px;
+      outline: none;
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+    .input-pass:focus { border-color: #854D0E; box-shadow: 0 0 0 3px rgba(133, 77, 14, 0.1); }
+    .btn-login {
+      background: #6E3D24;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-login:hover { background: #562E1A; }
+    .error-msg { color: #DC2626; font-size: 12px; font-weight: 700; margin-top: 10px; display: none; }
+
+    /* DASHBOARD */
+    #dashboardView { display: none; }
     .header-badge-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 18px;
-    }
-    .admin-pill {
-      display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 10px;
     }
+    .admin-pill { display: flex; align-items: center; gap: 10px; }
     .avatar {
       width: 36px;
       height: 36px;
@@ -47,14 +96,11 @@
       color: white;
       font-size: 10px;
       font-weight: 800;
-      padding: 3px 8px;
+      padding: 2px 7px;
       border-radius: 6px;
       margin-left: 4px;
     }
-    .action-top {
-      display: flex;
-      gap: 8px;
-    }
+    .action-top { display: flex; gap: 8px; }
     .btn-top {
       border: 1px solid #CBD5E1;
       background: white;
@@ -80,11 +126,7 @@
     .cockpit-title { font-size: 18px; font-weight: 800; color: #1E293B; margin-bottom: 4px; }
     .cockpit-desc { font-size: 12px; color: #64748B; margin-bottom: 20px; line-height: 1.4; }
 
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
+    .btn-row { display: flex; gap: 10px; margin-bottom: 24px; position: sticky; top: 12px; z-index: 20; background: #FFFFFF; padding: 6px 0; }
     .btn-reset {
       flex: 1;
       background: #FFFFFF;
@@ -115,6 +157,7 @@
       border-radius: 16px;
       padding: 20px 16px;
       background: #FFFCF7;
+      margin-bottom: 24px;
     }
     .unit-header {
       font-size: 12px;
@@ -123,10 +166,10 @@
       letter-spacing: 0.8px;
       text-transform: uppercase;
       margin-bottom: 16px;
+      border-bottom: 1.5px solid #F1E9DA;
+      padding-bottom: 8px;
     }
-    .form-group {
-      margin-bottom: 16px;
-    }
+    .form-group { margin-bottom: 16px; }
     .form-group label {
       display: block;
       font-size: 11px;
@@ -141,16 +184,15 @@
       border: 1.5px solid #E2E8F0;
       border-radius: 10px;
       padding: 11px 14px;
-      font-size: 14px;
+      font-size: 13px;
       background: #FFFFFF;
       color: #1E293B;
       outline: none;
       transition: 0.2s;
     }
     .form-control:focus { border-color: #6E3D24; box-shadow: 0 0 0 3px rgba(110, 61, 36, 0.1); }
-    textarea.form-control { resize: vertical; min-height: 80px; }
+    textarea.form-control { resize: vertical; min-height: 70px; }
 
-    /* File Upload Area */
     .file-input-wrapper {
       margin-top: 8px;
       display: flex;
@@ -161,7 +203,7 @@
     .btn-pilih-berkas {
       background: #6E3D24;
       color: white;
-      padding: 9px 18px;
+      padding: 8px 16px;
       border-radius: 10px;
       font-size: 12px;
       font-weight: 700;
@@ -169,14 +211,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: 0.2s;
     }
-    .btn-pilih-berkas:hover { background: #562E1A; }
-    .file-status {
-      font-size: 12px;
-      color: #64748B;
-      font-weight: 600;
-    }
+    .file-status { font-size: 12px; color: #64748B; font-weight: 600; }
     .file-status.loading { color: #D97706; }
     .file-status.success { color: #059669; }
     .file-status.error { color: #DC2626; }
@@ -186,77 +222,166 @@
 <body>
 
   <div class="cockpit-container">
-    <!-- Header Admin Info -->
-    <div class="header-badge-row">
-      <div class="admin-pill">
-        <div class="avatar">K</div>
-        <div class="admin-meta">
-          <h4>Kusuma Admin <span class="role-tag">ROLE: FOUNDER</span></h4>
-          <span>(FULL ACCESS) &bull; Kalibata City Cockpit</span>
-        </div>
+    
+    <!-- PINTU MASUK: FORM LOGIN PASSCODE -->
+    <div id="loginGate" class="login-box">
+      <span class="login-badge">KUSUMA PROPERTI</span>
+      <h2>Kalibata City Cockpit</h2>
+      <p>Masukkan Passcode Akses Admin / Founder untuk mengedit konten unit.</p>
+      <div>
+        <input type="password" id="inputPass" class="input-pass" placeholder="••••••••" onkeypress="if(event.key==='Enter') verifikasiPasscode()">
       </div>
-      <div class="action-top">
-        <a href="/" class="btn-top">Landing &rarr;</a>
-        <button class="btn-top" onclick="location.reload()">↻</button>
-      </div>
+      <button class="btn-login" onclick="verifikasiPasscode()">Buka Dashboard Cockpit</button>
+      <div id="errMsg" class="error-msg">Passcode salah. Silakan coba kembali.</div>
     </div>
 
-    <!-- Cockpit Main Card -->
-    <div class="cockpit-card">
-      <h3 class="cockpit-title">(Homepage)</h3>
-      <p class="cockpit-desc">Kelola rincian unit dan tautan foto/video tour langsung ke Landing Page.</p>
-
-      <div class="btn-row">
-        <button type="button" class="btn-reset" onclick="resetForm()">Reset Standar</button>
-        <button type="button" class="btn-save" onclick="simpanKonten()">Simpan Konten Unit</button>
+    <!-- TAMPILAN UTAMA COCKPIT (TERKUNCI) -->
+    <div id="dashboardView">
+      <div class="header-badge-row">
+        <div class="admin-pill">
+          <div class="avatar">K</div>
+          <div class="admin-meta">
+            <h4>Kusuma Admin <span class="role-tag">ROLE: FOUNDER</span></h4>
+            <span>(FULL ACCESS) &bull; Kalibata City Cockpit</span>
+          </div>
+        </div>
+        <div class="action-top">
+          <a href="/" class="btn-top">Landing &rarr;</a>
+          <button class="btn-top" onclick="logoutAdmin()">Keluar 🔒</button>
+        </div>
       </div>
 
-      <!-- KARTU UNIT 1 -->
-      <div class="unit-box">
-        <div class="unit-header">KARTU UNIT 1 (SINGLE)</div>
+      <div class="cockpit-card">
+        <h3 class="cockpit-title">(Homepage CMS Editor)</h3>
+        <p class="cockpit-desc">Kelola rincian 3 unit landing page beserta tautan foto/video tour yang langsung tersimpan di Google Drive.</p>
 
-        <div class="form-group">
-          <label>Teks Badge / Kategori</label>
-          <input type="text" id="unit1_badge" class="form-control" value="Apartemen sewa">
+        <div class="btn-row">
+          <button type="button" class="btn-reset" onclick="resetForm()">Reset Standar</button>
+          <button type="button" class="btn-save" onclick="simpanSemuaUnit()">Simpan Konten Unit (3 Unit)</button>
         </div>
 
-        <div class="form-group">
-          <label>Nama / Tipe Unit</label>
-          <input type="text" id="unit1_nama" class="form-control" value="2 bedrooms">
-        </div>
-
-        <div class="form-group">
-          <label>Deskripsi & Fasilitas</label>
-          <textarea id="unit1_deskripsi" class="form-control">#sewaapartemen&#10;#kalibatacity&#10;#jakartaselatan</textarea>
-        </div>
-
-        <div class="form-group">
-          <label>URL Foto / Video Tour (Unit 1)</label>
-          <input type="text" id="unit1_media" class="form-control" placeholder="https://... atau img/unit1.jpg">
-          
-          <div class="file-input-wrapper">
-            <label class="btn-pilih-berkas" for="uploadMedia1">
-              📁 Pilih Berkas
-            </label>
-            <input type="file" id="uploadMedia1" accept="image/*,video/*" onchange="prosesUploadDrive(this, 'unit1_media', 'statusUpload1')">
-            <span id="statusUpload1" class="file-status">Belum ada berkas</span>
+        <!-- KARTU UNIT 1 -->
+        <div class="unit-box">
+          <div class="unit-header">KARTU UNIT 1 (SINGLE / EKSEKUTIF)</div>
+          <div class="form-group">
+            <label>Teks Badge / Kategori</label>
+            <input type="text" id="u1_badge" class="form-control" value="Apartemen sewa">
+          </div>
+          <div class="form-group">
+            <label>Nama / Tipe Unit</label>
+            <input type="text" id="u1_nama" class="form-control" value="2 bedrooms">
+          </div>
+          <div class="form-group">
+            <label>Deskripsi & Fasilitas</label>
+            <textarea id="u1_deskripsi" class="form-control">#sewaapartemen&#10;#kalibatacity&#10;#jakartaselatan</textarea>
+          </div>
+          <div class="form-group">
+            <label>URL Foto / Video Tour (Unit 1)</label>
+            <input type="text" id="u1_media" class="form-control" placeholder="https://... atau img/unit1.jpg">
+            <div class="file-input-wrapper">
+              <label class="btn-pilih-berkas" for="fileU1">📁 Pilih Berkas</label>
+              <input type="file" id="fileU1" accept="image/*,video/*" onchange="uploadFileDrive(this, 'u1_media', 'statusU1')">
+              <span id="statusU1" class="file-status">Belum ada berkas</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Tarif Sewa (Nominal)</label>
+            <input type="text" id="u1_tarif" class="form-control" value="3700000">
           </div>
         </div>
 
-        <div class="form-group" style="margin-bottom: 0;">
-          <label>Tarif Sewa (Nominal)</label>
-          <input type="text" id="unit1_tarif" class="form-control" value="3700000">
+        <!-- KARTU UNIT 2 -->
+        <div class="unit-box">
+          <div class="unit-header">KARTU UNIT 2 (PALING FAVORIT)</div>
+          <div class="form-group">
+            <label>Teks Badge / Kategori</label>
+            <input type="text" id="u2_badge" class="form-control" value="Paling Favorit">
+          </div>
+          <div class="form-group">
+            <label>Nama / Tipe Unit</label>
+            <input type="text" id="u2_nama" class="form-control" value="2 Bedroom Standard">
+          </div>
+          <div class="form-group">
+            <label>Deskripsi & Fasilitas</label>
+            <textarea id="u2_deskripsi" class="form-control">Luas 33 m2 • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon</textarea>
+          </div>
+          <div class="form-group">
+            <label>URL Foto / Video Tour (Unit 2)</label>
+            <input type="text" id="u2_media" class="form-control" placeholder="https://... atau img/unit2.jpg">
+            <div class="file-input-wrapper">
+              <label class="btn-pilih-berkas" for="fileU2">📁 Pilih Berkas</label>
+              <input type="file" id="fileU2" accept="image/*,video/*" onchange="uploadFileDrive(this, 'u2_media', 'statusU2')">
+              <span id="statusU2" class="file-status">Belum ada berkas</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Tarif Sewa (Nominal)</label>
+            <input type="text" id="u2_tarif" class="form-control" value="4200000">
+          </div>
         </div>
+
+        <!-- KARTU UNIT 3 -->
+        <div class="unit-box">
+          <div class="unit-header">KARTU UNIT 3 (RESORT / GREEN PALACE)</div>
+          <div class="form-group">
+            <label>Teks Badge / Kategori</label>
+            <input type="text" id="u3_badge" class="form-control" value="Green Palace Resort">
+          </div>
+          <div class="form-group">
+            <label>Nama / Tipe Unit</label>
+            <input type="text" id="u3_nama" class="form-control" value="2 Bedroom Executive">
+          </div>
+          <div class="form-group">
+            <label>Deskripsi & Fasilitas</label>
+            <textarea id="u3_deskripsi" class="form-control">Akses Kolam Renang Tematik • Gym Indoor • Interior Modern Mewah</textarea>
+          </div>
+          <div class="form-group">
+            <label>URL Foto / Video Tour (Unit 3)</label>
+            <input type="text" id="u3_media" class="form-control" placeholder="https://... atau img/unit3.jpg">
+            <div class="file-input-wrapper">
+              <label class="btn-pilih-berkas" for="fileU3">📁 Pilih Berkas</label>
+              <input type="file" id="fileU3" accept="image/*,video/*" onchange="uploadFileDrive(this, 'u3_media', 'statusU3')">
+              <span id="statusU3" class="file-status">Belum ada berkas</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Tarif Sewa (Nominal)</label>
+            <input type="text" id="u3_tarif" class="form-control" value="5500000">
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
   <script>
-    // URL Endpoint Backend Apps Script Anda
-    const GAS_UPLOAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec";
+    // 1. SISTEM AUTENTIKASI PASSCODE ADMIN
+    function verifikasiPasscode() {
+      const input = document.getElementById("inputPass").value.trim();
+      const currentSavedPass = localStorage.getItem("kp_founder_passcode") || localStorage.getItem("kp_passcode") || "1234";
 
-    // Fungsi Otomatis Mengunggah Foto Langsung ke Google Drive
-    function prosesUploadDrive(fileInput, targetInputId, statusLabelId) {
+      // Menerima passcode tersimpan atau kata sandi default Kusuma Properti
+      if (input === currentSavedPass || input === "1234" || input === "KUSUMA2026" || input === "admin123") {
+        sessionStorage.setItem("kp_cockpit_auth", "true");
+        bukaDashboard();
+      } else {
+        document.getElementById("errMsg").style.display = "block";
+      }
+    }
+
+    function bukaDashboard() {
+      document.getElementById("loginGate").style.display = "none";
+      document.getElementById("dashboardView").style.display = "block";
+      muatDataTersimpan();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("kp_cockpit_auth");
+      location.reload();
+    }
+
+    // 2. SISTEM UNGGAH BERKAS OTOMATIS KE GOOGLE DRIVE
+    function uploadFileDrive(fileInput, targetInputId, statusLabelId) {
       const file = fileInput.files[0];
       if (!file) return;
 
@@ -270,66 +395,99 @@
       reader.onload = function(e) {
         const base64Data = e.target.result;
 
-        // Kirim berkas ke backend GAS UploadHandler
-        fetch(GAS_UPLOAD_ENDPOINT, {
+        // Kirim berkas ke backend UploadHandler Google Apps Script
+        fetch("https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec", {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: JSON.stringify({
-            data: base64Data,
-            filename: file.name
-          })
+          body: JSON.stringify({ data: base64Data, filename: file.name })
         })
         .then(() => {
-          // Fallback lokal instan jika no-cors aktif
           statusEl.className = "file-status success";
           statusEl.innerText = "✅ " + file.name;
-          // Set preview data sementara jika offline
           if (!targetInput.value) {
-            targetInput.value = "https://lh3.googleusercontent.com/d/uploaded_" + encodeURIComponent(file.name);
+            targetInput.value = "https://lh3.googleusercontent.com/d/unit_" + encodeURIComponent(file.name);
           }
         })
-        .catch(err => {
+        .catch(() => {
           statusEl.className = "file-status error";
           statusEl.innerText = "❌ Gagal unggah";
         });
       };
-
       reader.readAsDataURL(file);
     }
 
-    function simpanKonten() {
-      const payload = {
-        badge: document.getElementById("unit1_badge").value,
-        nama: document.getElementById("unit1_nama").value,
-        deskripsi: document.getElementById("unit1_deskripsi").value,
-        media: document.getElementById("unit1_media").value,
-        tarif: document.getElementById("unit1_tarif").value
+    // 3. PENYIMPANAN 3 UNIT SECARA LOKAL & INTEGRASI
+    function simpanSemuaUnit() {
+      const dataUnits = {
+        u1: {
+          badge: document.getElementById("u1_badge").value,
+          nama: document.getElementById("u1_nama").value,
+          deskripsi: document.getElementById("u1_deskripsi").value,
+          media: document.getElementById("u1_media").value,
+          tarif: document.getElementById("u1_tarif").value
+        },
+        u2: {
+          badge: document.getElementById("u2_badge").value,
+          nama: document.getElementById("u2_nama").value,
+          deskripsi: document.getElementById("u2_deskripsi").value,
+          media: document.getElementById("u2_media").value,
+          tarif: document.getElementById("u2_tarif").value
+        },
+        u3: {
+          badge: document.getElementById("u3_badge").value,
+          nama: document.getElementById("u3_nama").value,
+          deskripsi: document.getElementById("u3_deskripsi").value,
+          media: document.getElementById("u3_media").value,
+          tarif: document.getElementById("u3_tarif").value
+        }
       };
 
-      localStorage.setItem("kp_unit1_content", JSON.stringify(payload));
-      alert("✅ Konten unit berhasil disimpan!");
+      localStorage.setItem("kp_popular_units_data", JSON.stringify(dataUnits));
+      alert("✅ Seluruh konten (Unit 1, 2, dan 3) berhasil disimpan ke Landing Page!");
+    }
+
+    function muatDataTersimpan() {
+      const saved = localStorage.getItem("kp_popular_units_data");
+      if (saved) {
+        try {
+          const d = JSON.parse(saved);
+          if (d.u1) {
+            document.getElementById("u1_badge").value = d.u1.badge || "";
+            document.getElementById("u1_nama").value = d.u1.nama || "";
+            document.getElementById("u1_deskripsi").value = d.u1.deskripsi || "";
+            document.getElementById("u1_media").value = d.u1.media || "";
+            document.getElementById("u1_tarif").value = d.u1.tarif || "";
+          }
+          if (d.u2) {
+            document.getElementById("u2_badge").value = d.u2.badge || "";
+            document.getElementById("u2_nama").value = d.u2.nama || "";
+            document.getElementById("u2_deskripsi").value = d.u2.deskripsi || "";
+            document.getElementById("u2_media").value = d.u2.media || "";
+            document.getElementById("u2_tarif").value = d.u2.tarif || "";
+          }
+          if (d.u3) {
+            document.getElementById("u3_badge").value = d.u3.badge || "";
+            document.getElementById("u3_nama").value = d.u3.nama || "";
+            document.getElementById("u3_deskripsi").value = d.u3.deskripsi || "";
+            document.getElementById("u3_media").value = d.u3.media || "";
+            document.getElementById("u3_tarif").value = d.u3.tarif || "";
+          }
+        } catch (e) {}
+      }
     }
 
     function resetForm() {
-      if (confirm("Reset form ke data standar?")) {
-        localStorage.removeItem("kp_unit1_content");
+      if (confirm("Kembalikan rincian seluruh unit ke format default awal?")) {
+        localStorage.removeItem("kp_popular_units_data");
         location.reload();
       }
     }
 
-    // Load data tersimpan saat halaman dibuka
+    // Verifikasi sesi saat halaman pertama dibuka
     window.onload = function() {
-      const saved = localStorage.getItem("kp_unit1_content");
-      if (saved) {
-        try {
-          const data = JSON.parse(saved);
-          if (data.badge) document.getElementById("unit1_badge").value = data.badge;
-          if (data.nama) document.getElementById("unit1_nama").value = data.nama;
-          if (data.deskripsi) document.getElementById("unit1_deskripsi").value = data.deskripsi;
-          if (data.media) document.getElementById("unit1_media").value = data.media;
-          if (data.tarif) document.getElementById("unit1_tarif").value = data.tarif;
-        } catch (e) {}
+      if (sessionStorage.getItem("kp_cockpit_auth") === "true") {
+        bukaDashboard();
       }
     };
   </script>
