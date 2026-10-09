@@ -162,7 +162,7 @@
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
             <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Outstanding</span>
             <h3 id="stat-outstanding" class="text-lg md:text-2xl font-extrabold text-[#B35436] mt-1 font-serif">Rp 0</h3>
-            <p class="text-[10px] md:text-[11px] text-[#B35436] mt-1 font-medium">Belum Lunas</p>
+            <p id="stat-breakdown-sub" class="text-[10px] md:text-[11px] text-[#B35436] mt-1 font-medium">Belum Lunas</p>
           </div>
           <div class="japandi-card p-4 md:p-5 rounded-2xl">
             <span class="text-[10px] md:text-[11px] font-bold text-[#737370] uppercase tracking-wider">Active Leads</span>
@@ -467,11 +467,11 @@
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 
-  <!-- INTEGRASI PENGUNGGAH GOOGLE DRIVE & SINKRONISASI 3 UNIT CMS -->
+  <!-- INTEGRASI PENGUNGGAH FOTO LOKAL & GOOGLE DRIVE -->
   <script>
     const GAS_UPLOAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec";
 
-    // Fungsi Pengunggah Langsung ke Google Drive dari Dashboard Owner
+    // Fungsi Pengunggah: Langsung Isi Base64 ke Input Media & Tampilkan Pratinjau
     function handleDirectMediaUpload(event, unitIndex) {
       const file = event.target.files[0];
       if (!file) return;
@@ -481,13 +481,14 @@
       const previewBox = document.getElementById(`cms-u${unitIndex}-preview`);
 
       statusEl.className = "text-[10px] text-amber-600 font-bold truncate max-w-[140px]";
-      statusEl.innerText = "⏳ Mengunggah ke Drive...";
+      statusEl.innerText = "⏳ Memproses...";
 
       const reader = new FileReader();
       reader.onload = function(e) {
         const base64Data = e.target.result;
 
-        // Render pratinjau instan
+        // 1. Masukkan data asli ke input URL dan buat pratinjau instan
+        mediaInput.value = base64Data;
         if (previewBox) {
           previewBox.classList.remove("hidden");
           if (file.type.startsWith("image/")) {
@@ -496,7 +497,10 @@
             previewBox.innerHTML = `<div class="text-[11px] text-[#737370] font-bold p-2">🎥 Berkas Video Terpilih</div>`;
           }
         }
+        statusEl.className = "text-[10px] text-emerald-600 font-bold truncate max-w-[140px]";
+        statusEl.innerText = "✅ " + file.name;
 
+        // 2. Kirim cadangan ke Google Drive di latar belakang
         fetch(GAS_UPLOAD_ENDPOINT, {
           method: "POST",
           mode: "no-cors",
@@ -505,18 +509,7 @@
             data: base64Data,
             filename: file.name
           })
-        })
-        .then(() => {
-          statusEl.className = "text-[10px] text-emerald-600 font-bold truncate max-w-[140px]";
-          statusEl.innerText = "✅ " + file.name;
-          if (!mediaInput.value) {
-            mediaInput.value = "https://lh3.googleusercontent.com/d/unit_" + encodeURIComponent(file.name);
-          }
-        })
-        .catch(() => {
-          statusEl.className = "text-[10px] text-rose-600 font-bold truncate max-w-[140px]";
-          statusEl.innerText = "❌ Gagal unggah";
-        });
+        }).catch(() => {});
       };
 
       reader.readAsDataURL(file);
@@ -566,7 +559,7 @@
             if (d.u1.media) {
               document.getElementById("cms-u1-media").value = d.u1.media;
               const prev = document.getElementById("cms-u1-preview");
-              if (prev && d.u1.media.startsWith("http")) {
+              if (prev && (d.u1.media.startsWith("http") || d.u1.media.startsWith("data:image"))) {
                 prev.classList.remove("hidden");
                 prev.innerHTML = `<img src="${d.u1.media}" class="w-full h-full object-cover">`;
               }
@@ -580,7 +573,7 @@
             if (d.u2.media) {
               document.getElementById("cms-u2-media").value = d.u2.media;
               const prev = document.getElementById("cms-u2-preview");
-              if (prev && d.u2.media.startsWith("http")) {
+              if (prev && (d.u2.media.startsWith("http") || d.u2.media.startsWith("data:image"))) {
                 prev.classList.remove("hidden");
                 prev.innerHTML = `<img src="${d.u2.media}" class="w-full h-full object-cover">`;
               }
@@ -594,7 +587,7 @@
             if (d.u3.media) {
               document.getElementById("cms-u3-media").value = d.u3.media;
               const prev = document.getElementById("cms-u3-preview");
-              if (prev && d.u3.media.startsWith("http")) {
+              if (prev && (d.u3.media.startsWith("http") || d.u3.media.startsWith("data:image"))) {
                 prev.classList.remove("hidden");
                 prev.innerHTML = `<img src="${d.u3.media}" class="w-full h-full object-cover">`;
               }
@@ -616,7 +609,7 @@
     document.addEventListener("DOMContentLoaded", loadPopularUnitsCMS);
   </script>
 
-  <!-- SCRIPT ISOLASI MUTLAK KUSUMA AI STUDIO (v209.0) -->
+  <!-- SCRIPT ISOLASI MUTLAK KUSUMA AI STUDIO -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var aiInterval = setInterval(function() {
