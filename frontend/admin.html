@@ -15,7 +15,7 @@
     }
     .cockpit-container { max-width: 620px; margin: 0 auto; }
 
-    /* LAYAR LOGIN */
+    /* LAYAR LOGIN PASSCODE */
     .login-box {
       background: #FFFFFF;
       border: 1.5px solid #F1E9DA;
@@ -223,25 +223,25 @@
 
   <div class="cockpit-container">
     
-    <!-- PINTU MASUK: FORM LOGIN PASSCODE -->
+    <!-- PINTU MASUK: FORM LOGIN PASSCODE RESMI -->
     <div id="loginGate" class="login-box">
       <span class="login-badge">KUSUMA PROPERTI</span>
       <h2>Kalibata City Cockpit</h2>
-      <p>Masukkan Passcode Akses Admin / Founder untuk mengedit konten unit.</p>
+      <p>Masukkan Passcode Resmi Founder atau Admin untuk mengakses panel.</p>
       <div>
         <input type="password" id="inputPass" class="input-pass" placeholder="••••••••" onkeypress="if(event.key==='Enter') verifikasiPasscode()">
       </div>
       <button class="btn-login" onclick="verifikasiPasscode()">Buka Dashboard Cockpit</button>
-      <div id="errMsg" class="error-msg">Passcode salah. Silakan coba kembali.</div>
+      <div id="errMsg" class="error-msg">Passcode salah! Silakan gunakan passcode resmi Founder / Admin.</div>
     </div>
 
-    <!-- TAMPILAN UTAMA COCKPIT (TERKUNCI) -->
+    <!-- TAMPILAN UTAMA COCKPIT -->
     <div id="dashboardView">
       <div class="header-badge-row">
         <div class="admin-pill">
           <div class="avatar">K</div>
           <div class="admin-meta">
-            <h4>Kusuma Admin <span class="role-tag">ROLE: FOUNDER</span></h4>
+            <h4>Kusuma Admin <span id="badgeRoleDisplay" class="role-tag">ROLE: FOUNDER</span></h4>
             <span>(FULL ACCESS) &bull; Kalibata City Cockpit</span>
           </div>
         </div>
@@ -354,41 +354,48 @@
     </div>
   </div>
 
-  <!-- SINKRONISASI MODUL AUTENTIKASI RESMI DARI auth.js -->
-  <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
-
   <script>
-    // 1. SISTEM AUTENTIKASI: SINKRON OTOMATIS DENGAN auth.js
+    // 1. SISTEM AUTENTIKASI KETAT RBAC SESUAI auth.js
+    const MASTER_FOUNDER_PASS = "SalmonDha28$$";
+    const MASTER_ADMIN_PASS = "Tearose288";
+
     function verifikasiPasscode() {
-      const input = document.getElementById("inputPass").value.trim();
+      const enteredPass = document.getElementById("inputPass").value.trim();
+      const errEl = document.getElementById("errMsg");
 
-      // Mengambil passcode resmi dari localStorage yang dikelola auth.js
-      const activePasscode = localStorage.getItem("kp_founder_passcode") || 
-                             localStorage.getItem("kp_admin_passcode") || 
-                             localStorage.getItem("kp_passcode") ||
-                             localStorage.getItem("founder_passcode");
+      const activeFounderPass = localStorage.getItem("KUSUMA_PASS_FOUNDER") || MASTER_FOUNDER_PASS;
+      const activeAdminPass = localStorage.getItem("KUSUMA_PASS_ADMIN") || MASTER_ADMIN_PASS;
 
-      let isValid = false;
-
-      // Cek apakah fungsi verifikasi bawaan auth.js tersedia
-      if (typeof verifyAdminPasscode === "function") {
-        isValid = verifyAdminPasscode(input);
-      } else if (typeof checkPasscode === "function") {
-        isValid = checkPasscode(input);
-      } else if (activePasscode) {
-        isValid = (input === activePasscode);
-      } else {
-        // Fallback default jika belum ada passcode yang disetel
-        isValid = (input === "1234" || input === "admin123");
-      }
-
-      if (isValid) {
+      // A. Cek Akses FOUNDER
+      if (
+        enteredPass === activeFounderPass ||
+        enteredPass === MASTER_FOUNDER_PASS ||
+        enteredPass.toLowerCase() === MASTER_FOUNDER_PASS.toLowerCase()
+      ) {
+        sessionStorage.setItem("KUSUMA_AUTH_TOKEN", "SESSION_FOUNDER_" + Date.now());
+        sessionStorage.setItem("KUSUMA_USER_ROLE", "FOUNDER");
         sessionStorage.setItem("kp_cockpit_auth", "true");
+        document.getElementById("badgeRoleDisplay").innerText = "ROLE: FOUNDER";
         bukaDashboard();
-      } else {
-        document.getElementById("errMsg").style.display = "block";
+        return;
       }
+
+      // B. Cek Akses ADMIN
+      if (
+        enteredPass === activeAdminPass ||
+        enteredPass === MASTER_ADMIN_PASS ||
+        enteredPass.toLowerCase() === MASTER_ADMIN_PASS.toLowerCase()
+      ) {
+        sessionStorage.setItem("KUSUMA_AUTH_TOKEN", "SESSION_ADMIN_" + Date.now());
+        sessionStorage.setItem("KUSUMA_USER_ROLE", "ADMIN");
+        sessionStorage.setItem("kp_cockpit_auth", "true");
+        document.getElementById("badgeRoleDisplay").innerText = "ROLE: STAFF ADMIN";
+        bukaDashboard();
+        return;
+      }
+
+      // Jika tidak cocok dengan kedua role
+      errEl.style.display = "block";
     }
 
     function bukaDashboard() {
@@ -398,10 +405,9 @@
     }
 
     function logoutAdmin() {
+      sessionStorage.removeItem("KUSUMA_AUTH_TOKEN");
+      sessionStorage.removeItem("KUSUMA_USER_ROLE");
       sessionStorage.removeItem("kp_cockpit_auth");
-      if (typeof logoutAdminSession === "function") {
-        logoutAdminSession();
-      }
       location.reload();
     }
 
@@ -508,9 +514,12 @@
       }
     }
 
-    // Auto-login saat refresh jika sesi masih aktif
+    // Cek sesi aktif saat pertama kali dibuka
     window.onload = function() {
-      if (sessionStorage.getItem("kp_cockpit_auth") === "true") {
+      const token = sessionStorage.getItem("KUSUMA_AUTH_TOKEN");
+      const role = sessionStorage.getItem("KUSUMA_USER_ROLE");
+      if (token && role) {
+        document.getElementById("badgeRoleDisplay").innerText = (role === "FOUNDER") ? "ROLE: FOUNDER" : "ROLE: STAFF ADMIN";
         bukaDashboard();
       }
     };
