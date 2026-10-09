@@ -1,7 +1,7 @@
 /**
- * Kusuma Properti Manager - Landing Page Dynamic Engine
+ * Kusuma Properti Manager - Mesin Dinamis Landing Page
  * File: frontend/js/landing.js
- * Version: v160.0.0 (Direct Base64 & Zero-Unsplash Fallback Engine)
+ * Version: v168.0.0 (NKRI Edition - Pure Indonesian Localization)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -33,7 +33,7 @@ function initVisualTheme() {
   }
 }
 
-// 2. Muat Katalog 3 Unit Populer (Mendukung Base64 Langsung dari Dashboard)
+// 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video Asli
 function initDynamicUnits() {
   const target = document.getElementById('dynamic-unit-catalog');
   if (!target) return;
@@ -84,10 +84,9 @@ function initDynamicUnits() {
 
           let rawMedia = (item.media || item.mediaUrl || "").trim();
 
-          // PRIORITAS 1: Jika gambar berupa Base64 asli (data:image/...), GUNAKAN LANGSUNG!
-          // Abaikan jika berisi URL rusak /d/unit_
+          // Prioritaskan gambar Base64 asli dari unggahan admin
           if (rawMedia.startsWith('data:image/') || (rawMedia.startsWith('http') && !rawMedia.includes('/d/unit_'))) {
-            // Valid media
+            // Media valid
           } else {
             rawMedia = def.mediaUrl;
           }
@@ -103,7 +102,7 @@ function initDynamicUnits() {
       }
     }
   } catch (err) {
-    console.error("Gagal membaca storage unit:", err);
+    console.error("Gagal membaca data unit:", err);
     units = defaultUnits;
   }
 
@@ -121,7 +120,6 @@ function initDynamicUnits() {
           <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
         </div>`;
     } else {
-      // PENTING: Jika media adalah Base64 (data:image), JANGAN pasang onerror yang membanting ke Unsplash
       const onErrorAttribute = rawMedia.startsWith('data:image') 
         ? '' 
         : `onerror="this.onerror=null; this.src='${backupCdn[idx]}';"`;
@@ -157,7 +155,7 @@ function initDynamicUnits() {
   }).join('');
 }
 
-// 3. Sinkronisasi Tombol WhatsApp
+// 3. Tombol WhatsApp Konsultan
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
 function buildSingleWaLink(unitName = "") {
@@ -207,7 +205,7 @@ function initWhatsAppButtons() {
   };
 }
 
-// 4. Prompt System & Knowledge Base
+// 4. Prompt System & Basis Pengetahuan
 const KUSUMA_AI_SYSTEM_PROMPT = `
 Anda adalah 'Kusuma AI Concierge', Asisten Konsultan Real Estate Resmi Kusuma Properti di Apartemen Kalibata City, Jakarta Selatan.
 Lokasi Kantor: Tower Flamboyan Lt. GF (Ground Floor).
@@ -252,7 +250,7 @@ async function fetchGeminiRealAIReply(userText) {
   return null;
 }
 
-// 6. Cadangan Pengetahuan Lokal
+// 6. Cadangan Jawaban Lokal (Fallback)
 function generateDynamicFallbackReply(promptText) {
   const q = String(promptText || "").toLowerCase().trim();
 
@@ -271,7 +269,7 @@ function generateDynamicFallbackReply(promptText) {
   return "Halo! Selamat datang di **Kusuma Properti** Kalibata City. 🙏\n\nKami mengelola pilihan unit sewa bulanan & tahunan (Studio, 2BR, hingga 3BR siap huni).\n\nAda yang bisa kami bantu seputar tarif sewa atau jadwal survei unit?";
 }
 
-// 7. Widget Chatbot AI
+// 7. Kontroler Widget Chatbot AI
 function initLandingChatbot() {
   const btnAi = document.getElementById("floating-btn-ai") || document.getElementById("chatToggleBtn");
   const popup = document.getElementById("chat-popup") || document.getElementById("chatWidget");
@@ -345,7 +343,7 @@ function initLandingChatbot() {
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 }
 
-// 8. Pemutakhiran Salinan Teks
+// 8. Pemutakhiran Salinan Teks Hero & Footer
 function updateHeroAndFooterCopy() {
   const allLinksAndButtons = document.querySelectorAll('a, button');
   allLinksAndButtons.forEach(el => {
