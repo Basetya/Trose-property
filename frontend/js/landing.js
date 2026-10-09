@@ -1,7 +1,7 @@
 /**
  * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v158.0.0 (Anti-Broken-Image & Direct CDN Fallback Guard)
+ * Version: v160.0.0 (Direct Base64 & Zero-Unsplash Fallback Engine)
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateHeroAndFooterCopy();
 });
 
-// 1. Terapkeun Pangaturan Visual Japandi
+// 1. Terapkan Pengaturan Visual Japandi
 function initVisualTheme() {
   const saved = localStorage.getItem("KUSUMA_VISUAL_SETTINGS");
   if (saved) {
@@ -28,18 +28,17 @@ function initVisualTheme() {
         document.documentElement.style.setProperty("--japandi-bg-contrast", `${s.contrast}%`);
       }
     } catch (e) {
-      console.warn("Gagal ngamuat tema visual:", e);
+      console.warn("Gagal memuat tema visual:", e);
     }
   }
 }
 
-// 2. Muat Katalog 3 Unit Populer kalayan Garansi Gambar Teu Rusak
+// 2. Muat Katalog 3 Unit Populer (Mendukung Base64 Langsung dari Dashboard)
 function initDynamicUnits() {
   const target = document.getElementById('dynamic-unit-catalog');
   if (!target) return;
 
-  // CDN Gambar Nyata Apartemen anu 100% hurung tur teu matak 404
-  const cdnFallback = [
+  const backupCdn = [
     'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
@@ -51,21 +50,21 @@ function initDynamicUnits() {
       title: 'Studio Deluxe',
       desc: 'Luas 21 m² • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV.',
       price: 3000000,
-      mediaUrl: cdnFallback[0]
+      mediaUrl: backupCdn[0]
     },
     {
       badge: 'Paling Favorit',
       title: '2 Bedroom Standard',
       desc: 'Luas 33 m² • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon.',
       price: 4200000,
-      mediaUrl: cdnFallback[1]
+      mediaUrl: backupCdn[1]
     },
     {
       badge: 'Green Palace',
       title: '3 Bedroom',
       desc: 'Akses Kolam Renang Tematik • Gym Indoor • Interior Modern + EV Charger.',
       price: 4000000,
-      mediaUrl: cdnFallback[2]
+      mediaUrl: backupCdn[2]
     }
   ];
 
@@ -85,9 +84,12 @@ function initDynamicUnits() {
 
           let rawMedia = (item.media || item.mediaUrl || "").trim();
 
-          // SARINGAN KUKUH: Upami aya link palsu Google Drive (/d/unit_) atanapi link kosong, ganti ku CDN anu pasti hurung
-          if (!rawMedia || rawMedia.includes('/d/unit_') || rawMedia.length < 10) {
-            rawMedia = cdnFallback[idx];
+          // PRIORITAS 1: Jika gambar berupa Base64 asli (data:image/...), GUNAKAN LANGSUNG!
+          // Abaikan jika berisi URL rusak /d/unit_
+          if (rawMedia.startsWith('data:image/') || (rawMedia.startsWith('http') && !rawMedia.includes('/d/unit_'))) {
+            // Valid media
+          } else {
+            rawMedia = def.mediaUrl;
           }
 
           return {
@@ -101,11 +103,11 @@ function initDynamicUnits() {
       }
     }
   } catch (err) {
-    console.error("Gagal maca data storage unit:", err);
+    console.error("Gagal membaca storage unit:", err);
     units = defaultUnits;
   }
 
-  // Render HTML
+  // Render HTML ke Target Grid
   target.className = 'grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8';
   target.innerHTML = units.map((u, idx) => {
     const rawMedia = u.mediaUrl;
@@ -119,9 +121,14 @@ function initDynamicUnits() {
           <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
         </div>`;
     } else {
+      // PENTING: Jika media adalah Base64 (data:image), JANGAN pasang onerror yang membanting ke Unsplash
+      const onErrorAttribute = rawMedia.startsWith('data:image') 
+        ? '' 
+        : `onerror="this.onerror=null; this.src='${backupCdn[idx]}';"`;
+
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
-          <img src="${rawMedia}" alt="${u.title}" loading="lazy" class="w-full h-full object-cover transition duration-500 hover:scale-105" onerror="this.onerror=null; this.src='${cdnFallback[idx]}';">
+          <img src="${rawMedia}" alt="${u.title}" loading="eager" class="w-full h-full object-cover transition duration-500 hover:scale-105" ${onErrorAttribute}>
           <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
         </div>`;
     }
@@ -150,7 +157,7 @@ function initDynamicUnits() {
   }).join('');
 }
 
-// 3. Tombol WhatsApp
+// 3. Sinkronisasi Tombol WhatsApp
 let targetAdminWa = (window.APP_CONFIG && window.APP_CONFIG.DEFAULT_WA) ? window.APP_CONFIG.DEFAULT_WA : "628135600058";
 
 function buildSingleWaLink(unitName = "") {
@@ -200,7 +207,7 @@ function initWhatsAppButtons() {
   };
 }
 
-// 4. Prompt System & Basis Pengetahuan
+// 4. Prompt System & Knowledge Base
 const KUSUMA_AI_SYSTEM_PROMPT = `
 Anda adalah 'Kusuma AI Concierge', Asisten Konsultan Real Estate Resmi Kusuma Properti di Apartemen Kalibata City, Jakarta Selatan.
 Lokasi Kantor: Tower Flamboyan Lt. GF (Ground Floor).
@@ -245,7 +252,7 @@ async function fetchGeminiRealAIReply(userText) {
   return null;
 }
 
-// 6. Cadangan Waleran Lokal
+// 6. Cadangan Pengetahuan Lokal
 function generateDynamicFallbackReply(promptText) {
   const q = String(promptText || "").toLowerCase().trim();
 
@@ -338,7 +345,7 @@ function initLandingChatbot() {
   document.getElementById("quick-prompt-2br")?.addEventListener("click", () => sendAiChat("Apakah saya bisa survei unit 2 Bedroom hari ini?"));
 }
 
-// 8. Pamutahiran Tulisan
+// 8. Pemutakhiran Salinan Teks
 function updateHeroAndFooterCopy() {
   const allLinksAndButtons = document.querySelectorAll('a, button');
   allLinksAndButtons.forEach(el => {
