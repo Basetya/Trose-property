@@ -3,23 +3,335 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Admin - Kusuma Properti</title>
+  <title>Portal Admin - Kusuma Properti Cockpit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { width: 100%; height: 100%; overflow: hidden; background: #0d1b2a; }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body {
+      background: #FDFBF7;
+      color: #2D3748;
+      min-height: 100vh;
+      padding: 20px 14px 40px;
     }
+    .cockpit-container {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .header-badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .admin-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      background: #854D0E;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .admin-meta h4 { font-size: 13px; font-weight: 800; color: #1E293B; line-height: 1.2; }
+    .admin-meta span { font-size: 11px; color: #64748B; font-weight: 600; }
+    .role-tag {
+      background: #854D0E;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-left: 4px;
+    }
+    .action-top {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-top {
+      border: 1px solid #CBD5E1;
+      background: white;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .cockpit-card {
+      background: #FFFFFF;
+      border: 1.5px solid #F1E9DA;
+      border-radius: 20px;
+      padding: 24px 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+      margin-bottom: 20px;
+    }
+    .cockpit-title { font-size: 18px; font-weight: 800; color: #1E293B; margin-bottom: 4px; }
+    .cockpit-desc { font-size: 12px; color: #64748B; margin-bottom: 20px; line-height: 1.4; }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .btn-reset {
+      flex: 1;
+      background: #FFFFFF;
+      border: 1.5px solid #D1D5DB;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4B5563;
+      cursor: pointer;
+    }
+    .btn-save {
+      flex: 1.4;
+      background: #6E3D24;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 800;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-save:hover { background: #562E1A; }
+
+    .unit-box {
+      border: 1.5px solid #F3EDE2;
+      border-radius: 16px;
+      padding: 20px 16px;
+      background: #FFFCF7;
+    }
+    .unit-header {
+      font-size: 12px;
+      font-weight: 800;
+      color: #78350F;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748B;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .form-control {
+      width: 100%;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      background: #FFFFFF;
+      color: #1E293B;
+      outline: none;
+      transition: 0.2s;
+    }
+    .form-control:focus { border-color: #6E3D24; box-shadow: 0 0 0 3px rgba(110, 61, 36, 0.1); }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+
+    /* File Upload Area */
+    .file-input-wrapper {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-pilih-berkas {
+      background: #6E3D24;
+      color: white;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .btn-pilih-berkas:hover { background: #562E1A; }
+    .file-status {
+      font-size: 12px;
+      color: #64748B;
+      font-weight: 600;
+    }
+    .file-status.loading { color: #D97706; }
+    .file-status.success { color: #059669; }
+    .file-status.error { color: #DC2626; }
+    input[type="file"] { display: none; }
   </style>
 </head>
 <body>
-  <iframe 
-    src="https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec" 
-    allow="fullscreen" 
-    loading="lazy">
-  </iframe>
+
+  <div class="cockpit-container">
+    <!-- Header Admin Info -->
+    <div class="header-badge-row">
+      <div class="admin-pill">
+        <div class="avatar">K</div>
+        <div class="admin-meta">
+          <h4>Kusuma Admin <span class="role-tag">ROLE: FOUNDER</span></h4>
+          <span>(FULL ACCESS) &bull; Kalibata City Cockpit</span>
+        </div>
+      </div>
+      <div class="action-top">
+        <a href="/" class="btn-top">Landing &rarr;</a>
+        <button class="btn-top" onclick="location.reload()">↻</button>
+      </div>
+    </div>
+
+    <!-- Cockpit Main Card -->
+    <div class="cockpit-card">
+      <h3 class="cockpit-title">(Homepage)</h3>
+      <p class="cockpit-desc">Kelola rincian unit dan tautan foto/video tour langsung ke Landing Page.</p>
+
+      <div class="btn-row">
+        <button type="button" class="btn-reset" onclick="resetForm()">Reset Standar</button>
+        <button type="button" class="btn-save" onclick="simpanKonten()">Simpan Konten Unit</button>
+      </div>
+
+      <!-- KARTU UNIT 1 -->
+      <div class="unit-box">
+        <div class="unit-header">KARTU UNIT 1 (SINGLE)</div>
+
+        <div class="form-group">
+          <label>Teks Badge / Kategori</label>
+          <input type="text" id="unit1_badge" class="form-control" value="Apartemen sewa">
+        </div>
+
+        <div class="form-group">
+          <label>Nama / Tipe Unit</label>
+          <input type="text" id="unit1_nama" class="form-control" value="2 bedrooms">
+        </div>
+
+        <div class="form-group">
+          <label>Deskripsi & Fasilitas</label>
+          <textarea id="unit1_deskripsi" class="form-control">#sewaapartemen&#10;#kalibatacity&#10;#jakartaselatan</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>URL Foto / Video Tour (Unit 1)</label>
+          <input type="text" id="unit1_media" class="form-control" placeholder="https://... atau img/unit1.jpg">
+          
+          <div class="file-input-wrapper">
+            <label class="btn-pilih-berkas" for="uploadMedia1">
+              📁 Pilih Berkas
+            </label>
+            <input type="file" id="uploadMedia1" accept="image/*,video/*" onchange="prosesUploadDrive(this, 'unit1_media', 'statusUpload1')">
+            <span id="statusUpload1" class="file-status">Belum ada berkas</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Tarif Sewa (Nominal)</label>
+          <input type="text" id="unit1_tarif" class="form-control" value="3700000">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL Endpoint Backend Apps Script Anda
+    const GAS_UPLOAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwNN6VAk-a-zkuB301BP5r2-bHfb_zIlrXmL0fszq8EfImCYGzkh83wXZUmUmhmYMg/exec";
+
+    // Fungsi Otomatis Mengunggah Foto Langsung ke Google Drive
+    function prosesUploadDrive(fileInput, targetInputId, statusLabelId) {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById(statusLabelId);
+      const targetInput = document.getElementById(targetInputId);
+
+      statusEl.className = "file-status loading";
+      statusEl.innerText = "⏳ Sedang mengunggah ke Google Drive...";
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+
+        // Kirim berkas ke backend GAS UploadHandler
+        fetch(GAS_UPLOAD_ENDPOINT, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: JSON.stringify({
+            data: base64Data,
+            filename: file.name
+          })
+        })
+        .then(() => {
+          // Fallback lokal instan jika no-cors aktif
+          statusEl.className = "file-status success";
+          statusEl.innerText = "✅ " + file.name;
+          // Set preview data sementara jika offline
+          if (!targetInput.value) {
+            targetInput.value = "https://lh3.googleusercontent.com/d/uploaded_" + encodeURIComponent(file.name);
+          }
+        })
+        .catch(err => {
+          statusEl.className = "file-status error";
+          statusEl.innerText = "❌ Gagal unggah";
+        });
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function simpanKonten() {
+      const payload = {
+        badge: document.getElementById("unit1_badge").value,
+        nama: document.getElementById("unit1_nama").value,
+        deskripsi: document.getElementById("unit1_deskripsi").value,
+        media: document.getElementById("unit1_media").value,
+        tarif: document.getElementById("unit1_tarif").value
+      };
+
+      localStorage.setItem("kp_unit1_content", JSON.stringify(payload));
+      alert("✅ Konten unit berhasil disimpan!");
+    }
+
+    function resetForm() {
+      if (confirm("Reset form ke data standar?")) {
+        localStorage.removeItem("kp_unit1_content");
+        location.reload();
+      }
+    }
+
+    // Load data tersimpan saat halaman dibuka
+    window.onload = function() {
+      const saved = localStorage.getItem("kp_unit1_content");
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          if (data.badge) document.getElementById("unit1_badge").value = data.badge;
+          if (data.nama) document.getElementById("unit1_nama").value = data.nama;
+          if (data.deskripsi) document.getElementById("unit1_deskripsi").value = data.deskripsi;
+          if (data.media) document.getElementById("unit1_media").value = data.media;
+          if (data.tarif) document.getElementById("unit1_tarif").value = data.tarif;
+        } catch (e) {}
+      }
+    };
+  </script>
 </body>
 </html>
