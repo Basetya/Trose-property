@@ -6,9 +6,54 @@
   <title>Kusuma Properti Manager - Admin Cockpit</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #2C2C2A;
+    }
+    .japandi-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #E8DFD3;
+      box-shadow: 0 4px 20px rgba(44, 44, 42, 0.04);
+    }
+  </style>
 </head>
-<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen pb-20 md:pb-0 font-sans">
-  
+<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen pb-20 md:pb-0 font-sans relative">
+
+  <!-- 🔒 MODAL OVERLAY PROTEKSI SANDI ADMIN (JAPANDI SHIELD) -->
+  <div id="authGuardModal" class="fixed inset-0 z-50 bg-[#2C2C2A]/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-[#FAF7F2] border border-[#E8DFD3] p-6 sm:p-8 rounded-3xl max-w-sm w-full text-center shadow-2xl space-y-5">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-[#8C5835] text-white flex items-center justify-center font-serif text-2xl font-bold shadow-lg">
+        K
+      </div>
+      <div>
+        <h3 class="text-lg font-extrabold text-[#2C2C2A]">Akses Cockpit Terbatas</h3>
+        <p class="text-xs text-[#737370] mt-1">Masukkan Passcode Admin atau Founder untuk mengelola Kusuma Properti.</p>
+      </div>
+      <div class="space-y-3">
+        <input 
+          type="password" 
+          id="guardPasscodeInput" 
+          placeholder="Masukkan Passcode" 
+          class="w-full px-4 py-3 bg-white border border-[#E8DFD3] rounded-xl text-center text-sm font-mono tracking-widest text-[#2C2C2A] focus:outline-none focus:ring-2 focus:ring-[#8C5835]"
+          onkeydown="if(event.key==='Enter') verifyAdminPasscode();"
+        >
+        <p id="guardErrorMsg" class="text-xs font-bold text-[#B35436] hidden">❌ Passcode salah, akses ditolak!</p>
+        <button 
+          onclick="verifyAdminPasscode()" 
+          class="w-full py-3 bg-[#8C5835] hover:bg-[#704326] text-white font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-md"
+        >
+          Buka Kunci Akses
+        </button>
+      </div>
+      <div class="pt-2">
+        <a href="index.html" class="text-[11px] text-[#737370] hover:text-[#8C5835] underline font-semibold">
+          &larr; Kembali ke Landing Page
+        </a>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobile Header Bar -->
   <header class="md:hidden sticky top-0 z-40 japandi-panel px-4 py-3 flex items-center justify-between border-b border-[#E8DFD3]">
     <div class="flex items-center gap-2.5">
@@ -463,31 +508,52 @@
 
   <!-- SCRIPT INTEGRASI KEAMANAN & FITUR COCKPIT -->
   <script src="js/config.js"></script>
-  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 
-  <!-- PENGAMAN PROTEKSI PASSCODE: PASTIKAN TIDAK MACET DI LAYAR PUTIH -->
+  <!-- 🛡️ LOGIKA MODAL PROTEKSI PASSCODE KOKOH & ANTI-JEBOL -->
   <script>
-    (function enforceAdminSession() {
-      const isAuth = sessionStorage.getItem("KUSUMA_AUTH_TOKEN") || 
-                     sessionStorage.getItem("kp_cockpit_auth") ||
-                     localStorage.getItem("kp_cockpit_auth");
-      
-      // Jika belum terotentikasi, alihkan dengan aman ke portal admin/login
-      if (!isAuth) {
-        const passPrompt = prompt("Masukkan Passcode Admin Kusuma Properti:");
-        const MASTER_FOUNDER = "SalmonDha28$$";
-        const savedPass = localStorage.getItem("KUSUMA_PASS_FOUNDER") || MASTER_FOUNDER;
-        
-        if (passPrompt === savedPass || passPrompt === MASTER_FOUNDER || passPrompt === "admin123") {
-          sessionStorage.setItem("kp_cockpit_auth", "true");
-          sessionStorage.setItem("KUSUMA_AUTH_TOKEN", "auth_" + Date.now());
-        } else {
-          alert("Akses ditolak. Passcode salah.");
-          window.location.href = "admin";
-        }
+    const MASTER_FOUNDER = "SalmonDha28$$";
+    const MASTER_ADMIN = "Tearose288";
+
+    function checkAuthGuard() {
+      const modal = document.getElementById("authGuardModal");
+      const isAuth = sessionStorage.getItem("KUSUMA_COCKPIT_UNLOCKED");
+
+      if (isAuth === "true") {
+        modal.classList.add("hidden");
+      } else {
+        modal.classList.remove("hidden");
+        setTimeout(() => document.getElementById("guardPasscodeInput")?.focus(), 200);
       }
-    })();
+    }
+
+    function verifyAdminPasscode() {
+      const input = document.getElementById("guardPasscodeInput");
+      const errorMsg = document.getElementById("guardErrorMsg");
+      const entered = input.value.trim();
+      const savedFounder = localStorage.getItem("KUSUMA_PASS_FOUNDER") || MASTER_FOUNDER;
+
+      if (entered === savedFounder || entered === MASTER_FOUNDER || entered === MASTER_ADMIN) {
+        sessionStorage.setItem("KUSUMA_COCKPIT_UNLOCKED", "true");
+        sessionStorage.setItem("KUSUMA_AUTH_TOKEN", "auth_" + Date.now());
+        document.getElementById("authGuardModal").classList.add("hidden");
+        errorMsg.classList.add("hidden");
+      } else {
+        errorMsg.classList.remove("hidden");
+        input.value = "";
+        input.focus();
+      }
+    }
+
+    function logoutAdminSession() {
+      sessionStorage.removeItem("KUSUMA_COCKPIT_UNLOCKED");
+      sessionStorage.removeItem("KUSUMA_AUTH_TOKEN");
+      sessionStorage.removeItem("kp_cockpit_auth");
+      alert("Sesi Admin telah dikunci kembali.");
+      location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", checkAuthGuard);
   </script>
 
   <!-- SCRIPT KOMPRESI FOTO & CMS PENYIMPANAN 3 UNIT -->
