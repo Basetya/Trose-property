@@ -479,7 +479,96 @@
           </form>
         </div>
 
-        <!-- 7. Tagihan & Rekonsiliasi Terkini -->
+        <!-- 7. Pengaturan Testimoni Publik -->
+        <div class="japandi-card p-5 md:p-7 rounded-3xl space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8DFD3] pb-4">
+            <div>
+              <h3 class="font-extrabold text-base md:text-lg text-[#2C2C2A] flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#8C5835]"></span>
+                Pengaturan Testimoni Publik
+              </h3>
+              <p class="text-xs text-[#737370]">Kelola visibilitas ulasan penghuni di landing page publik & kustomisasi ulasannya.</p>
+            </div>
+            <!-- Toggle Switch (Checkbox): Tampilkan Seksi Testimoni di Web Utama (Aktif/Nonaktif) -->
+            <label class="inline-flex items-center gap-3 cursor-pointer select-none bg-[#FAF7F2] border border-[#E8DFD3] px-3.5 py-2 rounded-2xl hover:border-[#8C5835] transition">
+              <input type="checkbox" id="toggle-testimonials-enabled" class="sr-only peer" checked>
+              <div class="relative w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#3A5A40]"></div>
+              <span class="text-xs font-bold text-[#2C2C2A]" id="toggle-testimonials-label">Tampilkan Seksi Testimoni di Web Utama (Aktif)</span>
+            </label>
+          </div>
+
+          <!-- Form Edit 3 Testimoni Default -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Testimoni 1 -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#E8DFD3] space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-[#8C5835] uppercase">Testimoni 1</span>
+                <span class="text-amber-500 text-xs">★★★★★</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama Klien</label>
+                <input type="text" id="testi-name-1" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tipe Unit / Tower</label>
+                <input type="text" id="testi-unit-1" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Ulasan</label>
+                <textarea id="testi-review-1" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]"></textarea>
+              </div>
+            </div>
+
+            <!-- Testimoni 2 -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#E8DFD3] space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-[#8C5835] uppercase">Testimoni 2</span>
+                <span class="text-amber-500 text-xs">★★★★★</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama Klien</label>
+                <input type="text" id="testi-name-2" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tipe Unit / Tower</label>
+                <input type="text" id="testi-unit-2" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Ulasan</label>
+                <textarea id="testi-review-2" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]"></textarea>
+              </div>
+            </div>
+
+            <!-- Testimoni 3 -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#E8DFD3] space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-[#8C5835] uppercase">Testimoni 3</span>
+                <span class="text-amber-500 text-xs">★★★★★</span>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama Klien</label>
+                <input type="text" id="testi-name-3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tipe Unit / Tower</label>
+                <input type="text" id="testi-unit-3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Ulasan</label>
+                <textarea id="testi-review-3" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+            <button type="button" onclick="resetTestimonialsSettings()" class="text-xs text-[#8C5835] hover:underline font-bold">Kembalikan Ulasan Default</button>
+            <button type="button" id="btn-save-testimonials" onclick="saveTestimonialsSettings()" class="px-5 py-2.5 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">
+              Simpan Pengaturan Testimoni
+            </button>
+          </div>
+        </div>
+
+        <!-- 8. Tagihan & Rekonsiliasi Terkini -->
         <div class="japandi-card p-5 md:p-7 rounded-3xl">
           <h3 class="font-extrabold text-base md:text-lg text-[#2C2C2A] mb-4">Tagihan & Rekonsiliasi Terkini</h3>
           <div class="overflow-x-auto">
@@ -808,5 +897,115 @@ FASILITAS KAWASAN:
       }
     });
   </script>
+
+
+  <!-- SCRIPT PENGATURAN TESTIMONI PUBLIK -->
+  <script>
+    const DEFAULT_TESTIMONIALS_DASH = [
+      {
+        name: "Dimas Prasetyo",
+        unit: "Penyewa Tipe Studio (Tower Borneo)",
+        review: "Pelayanan sangat cepat dan ramah dari Bu Kusuma. Unitnya bersih, full furnished persis seperti foto, dan akses ke Stasiun Kalibata tinggal jalan kaki 5 menit."
+      },
+      {
+        name: "Sarah Amalia",
+        unit: "Penyewa 2 Bedroom (Tower Kemuning)",
+        review: "Sangat terbantu cari unit 2BR siap huni untuk keluarga. Proses sewa transparan, deposit aman dikembalikan tepat waktu, dan kantor Flamboyan GF responsif sekali."
+      },
+      {
+        name: "Bambang Wibowo",
+        unit: "Pemilik Unit (Tower Flamboyan)",
+        review: "Sebagai owner, saya percayakan pengelolaan unit ke Kusuma Properti. Pembayaran sewa selalu tertib, penyewa terseleksi rapi, dan kondisi unit tetap terawat prima."
+      }
+    ];
+
+    function loadTestimonialsDashboard() {
+      const toggleEl = document.getElementById("toggle-testimonials-enabled");
+      const labelEl = document.getElementById("toggle-testimonials-label");
+
+      let isEnabled = true;
+      let items = DEFAULT_TESTIMONIALS_DASH;
+
+      const saved = localStorage.getItem("KP_TESTIMONIALS_CONFIG");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed.enabled === "boolean") isEnabled = parsed.enabled;
+          if (Array.isArray(parsed.items) && parsed.items.length === 3) items = parsed.items;
+        } catch(e) {}
+      }
+
+      if (toggleEl) {
+        toggleEl.checked = isEnabled;
+        if (labelEl) {
+          labelEl.textContent = isEnabled 
+            ? "Tampilkan Seksi Testimoni di Web Utama (Aktif)" 
+            : "Tampilkan Seksi Testimoni di Web Utama (Nonaktif)";
+        }
+        toggleEl.onchange = () => {
+          if (labelEl) {
+            labelEl.textContent = toggleEl.checked 
+              ? "Tampilkan Seksi Testimoni di Web Utama (Aktif)" 
+              : "Tampilkan Seksi Testimoni di Web Utama (Nonaktif)";
+          }
+        };
+      }
+
+      for (let i = 1; i <= 3; i++) {
+        const item = items[i - 1] || DEFAULT_TESTIMONIALS_DASH[i - 1];
+        const nameEl = document.getElementById("testi-name-" + i);
+        const unitEl = document.getElementById("testi-unit-" + i);
+        const reviewEl = document.getElementById("testi-review-" + i);
+        if (nameEl) nameEl.value = item.name || "";
+        if (unitEl) unitEl.value = item.unit || "";
+        if (reviewEl) reviewEl.value = item.review || "";
+      }
+    }
+
+    function saveTestimonialsSettings() {
+      const toggleEl = document.getElementById("toggle-testimonials-enabled");
+      const isEnabled = toggleEl ? toggleEl.checked : true;
+      const items = [];
+
+      for (let i = 1; i <= 3; i++) {
+        const def = DEFAULT_TESTIMONIALS_DASH[i - 1];
+        const name = document.getElementById("testi-name-" + i)?.value.trim() || def.name;
+        const unit = document.getElementById("testi-unit-" + i)?.value.trim() || def.unit;
+        const review = document.getElementById("testi-review-" + i)?.value.trim() || def.review;
+        items.push({ name, unit, review });
+      }
+
+      const config = {
+        enabled: isEnabled,
+        items: items
+      };
+
+      localStorage.setItem("KP_TESTIMONIALS_CONFIG", JSON.stringify(config));
+
+      const saveBtn = document.getElementById("btn-save-testimonials");
+      if (saveBtn) {
+        const origText = saveBtn.innerHTML;
+        saveBtn.innerHTML = "✨ Berhasil Disimpan!";
+        saveBtn.style.backgroundColor = "#4A7C59";
+        setTimeout(() => {
+          saveBtn.innerHTML = origText;
+          saveBtn.style.backgroundColor = "";
+        }, 2000);
+      }
+
+      alert("✅ Pengaturan Testimoni Publik berhasil disimpan!");
+    }
+
+    function resetTestimonialsSettings() {
+      if (confirm("Kembalikan ulasan testimoni ke template standar default?")) {
+        localStorage.removeItem("KP_TESTIMONIALS_CONFIG");
+        loadTestimonialsDashboard();
+        alert("🔄 Ulasan testimoni default berhasil dimuat ulang!");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadTestimonialsDashboard);
+  </script>
 </body>
 </html>
+

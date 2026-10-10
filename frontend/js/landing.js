@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDynamicUnits();
   initWhatsAppButtons();
   initLandingChatbot();
+  initTestimonials();
   updateHeroAndFooterCopy();
 });
 
@@ -430,3 +431,82 @@ function updateHeroAndFooterCopy() {
     }
   });
 }
+
+// 9. Modul Testimoni Klien Dinamis (Japandi Sanctuary)
+const DEFAULT_TESTIMONIALS = [
+  {
+    name: "Dimas Prasetyo",
+    unit: "Penyewa Tipe Studio (Tower Borneo)",
+    review: "Pelayanan sangat cepat dan ramah dari Bu Kusuma. Unitnya bersih, full furnished persis seperti foto, dan akses ke Stasiun Kalibata tinggal jalan kaki 5 menit."
+  },
+  {
+    name: "Sarah Amalia",
+    unit: "Penyewa 2 Bedroom (Tower Kemuning)",
+    review: "Sangat terbantu cari unit 2BR siap huni untuk keluarga. Proses sewa transparan, deposit aman dikembalikan tepat waktu, dan kantor Flamboyan GF responsif sekali."
+  },
+  {
+    name: "Bambang Wibowo",
+    unit: "Pemilik Unit (Tower Flamboyan)",
+    review: "Sebagai owner, saya percayakan pengelolaan unit ke Kusuma Properti. Pembayaran sewa selalu tertib, penyewa terseleksi rapi, dan kondisi unit tetap terawat prima."
+  }
+];
+
+function initTestimonials() {
+  const section = document.getElementById("testimonials-section");
+  const container = document.getElementById("testimonials-container");
+  if (!section || !container) return;
+
+  let config = {
+    enabled: true,
+    items: DEFAULT_TESTIMONIALS
+  };
+
+  const saved = localStorage.getItem("KP_TESTIMONIALS_CONFIG");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (typeof parsed.enabled === "boolean") {
+        config.enabled = parsed.enabled;
+      }
+      if (Array.isArray(parsed.items) && parsed.items.length > 0) {
+        config.items = parsed.items;
+      }
+    } catch (e) {
+      console.warn("Gagal parse KP_TESTIMONIALS_CONFIG:", e);
+    }
+  }
+
+  // Jika status enabled === false: tambahkan class hidden pada elemen #testimonials-section
+  if (config.enabled === false) {
+    section.classList.add("hidden");
+    return;
+  }
+
+  // Jika status enabled === true (atau belum disetel/default): hilangkan class hidden dan render
+  section.classList.remove("hidden");
+  container.innerHTML = config.items.map(item => `
+    <div class="japandi-card rounded-3xl border border-[#E8DFD3] bg-white/90 p-6 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition">
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex text-amber-500 text-sm tracking-wider" aria-label="Rating 5 Bintang">
+            ★★★★★
+          </div>
+          <span class="text-[10px] font-bold text-[#8C5835] bg-[#F4EFE6] px-2.5 py-0.5 rounded-full border border-[#E8DFD3]">Terverifikasi</span>
+        </div>
+        <p class="text-xs sm:text-sm text-[#2C2C2A] leading-relaxed italic">
+          "${item.review || ''}"
+        </p>
+      </div>
+      <div class="pt-3 border-t border-[#E8DFD3]/60 flex items-center gap-3">
+        <div class="w-9 h-9 rounded-full bg-[#8C5835]/15 text-[#8C5835] font-bold flex items-center justify-center text-xs shadow-inner">
+          ${(item.name || 'K').charAt(0)}
+        </div>
+        <div>
+          <h5 class="font-bold text-xs text-[#2C2C2A]">${item.name || ''}</h5>
+          <p class="text-[10px] text-[#737370]">${item.unit || ''}</p>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
