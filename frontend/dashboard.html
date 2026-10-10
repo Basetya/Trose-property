@@ -6,24 +6,36 @@
   <title>Kusuma Properti Manager - Admin Cockpit</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/custom.css">
+  <style>
+    /* Pengaman tampilan agar tidak pernah tertutup layar putih */
+    body {
+      background-color: #FAF7F2;
+      color: #2C2C2A;
+    }
+    .japandi-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #E8DFD3;
+      box-shadow: 0 4px 20px rgba(44, 44, 42, 0.04);
+    }
+  </style>
 </head>
-<body class="bg-japandi-canvas text-[#2C2C2A] min-h-screen pb-20 md:pb-0">
+<body class="min-h-screen pb-20 md:pb-0 font-sans">
   
   <!-- Mobile Header Bar -->
-  <header class="md:hidden sticky top-0 z-40 japandi-panel px-4 py-3 flex items-center justify-between border-b border-[#E8DFD3]">
+  <header class="md:hidden sticky top-0 z-40 bg-white/90 backdrop-blur px-4 py-3 flex items-center justify-between border-b border-[#E8DFD3]">
     <div class="flex items-center gap-2.5">
       <button onclick="toggleMobileDrawer()" class="p-2 rounded-xl bg-white border border-[#E8DFD3] text-[#2C2C2A] hover:bg-[#F4EFE6] focus:outline-none">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
       <div class="w-8 h-8 rounded-xl bg-[#8C5835] text-white flex items-center justify-center font-bold text-sm shadow">K</div>
       <div>
-        <h1 class="font-bold text-xs text-[#2C2C2A] leading-tight font-sans">Kusuma Admin</h1>
+        <h1 class="font-bold text-xs text-[#2C2C2A] leading-tight">Kusuma Admin</h1>
         <p class="text-[10px] text-[#8C5835] font-semibold">Kalibata City Cockpit</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
       <a href="index.html" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-white border border-[#E8DFD3] text-[10px] font-bold text-[#2C2C2A]">Landing &rarr;</a>
-      <button onclick="fetchDashboard()" class="p-1.5 rounded-lg bg-white border border-[#E8DFD3] text-[#2C2C2A]" title="Segarkan">
+      <button onclick="location.reload()" class="p-1.5 rounded-lg bg-white border border-[#E8DFD3] text-[#2C2C2A]" title="Segarkan">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
       </button>
     </div>
@@ -41,49 +53,335 @@
           <button onclick="toggleMobileDrawer()" class="p-1.5 rounded-lg text-[#737370] hover:text-[#2C2C2A]">&times;</button>
         </div>
         <nav class="space-y-1 text-xs font-semibold">
-          <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#8C5835] text-white shadow">
+          <a href="dashboard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#8C5835] text-white shadow">
             <span>Dashboard Cockpit</span>
           </a>
           <a href="index.html" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
             <span>Lihat Landing Page &rarr;</span>
           </a>
-          <a href="crm.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>CRM & Akuisisi</span>
-          </a>
-          <a href="units.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Inventaris Unit</span>
-          </a>
-          <a href="leases.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Sewa & Penyewa</span>
-          </a>
-          <a href="billing.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Tagihan & Faktur</span>
-          </a>
-          <a href="finance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Laporan Keuangan</span>
-          </a>
-          <a href="inspections.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Inspeksi Unit</span>
-          </a>
-          <a href="maintenance.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
-            <span>Pemeliharaan</span>
+          <a href="admin" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-[#2C2C2A] hover:bg-[#F4EFE6]">
+            <span>Portal Admin Bersih</span>
           </a>
         </nav>
       </div>
       <div class="pt-4 border-t border-[#E8DFD3]">
-        <button onclick="logoutAdminSession()" class="w-full text-xs text-[#B35436] p-2 text-center rounded-xl bg-[#F8ECE8] border border-[#F0D5CD] font-bold">
-          Keluar Sesi Admin
-        </button>
+        <a href="index.html" class="block w-full text-xs text-[#B35436] p-2 text-center rounded-xl bg-[#F8ECE8] border border-[#F0D5CD] font-bold">
+          Kembali ke Halaman Depan
+        </a>
       </div>
     </div>
   </div>
 
   <div class="flex h-screen overflow-hidden">
     <!-- Desktop Sidebar -->
-    <aside class="w-64 japandi-panel border-r border-[#E8DFD3] p-5 flex flex-col justify-between hidden md:flex">
+    <aside class="w-64 bg-[#FAF7F2] border-r border-[#E8DFD3] p-5 flex flex-col justify-between hidden md:flex shrink-0">
       <div>
         <div class="flex items-center gap-3 mb-6">
           <div class="w-10 h-10 rounded-2xl bg-[#8C5835] text-white flex items-center justify-center font-serif text-xl font-bold shadow-md">K</div>
           <div>
-            <h1 class="font-extrabold text-base text-[#2C2C2A] leading-tight font-sans">Kusuma</h1>
-            <p class="text-xs
+            <h1 class="font-extrabold text-base text-[#2C2C2A] leading-tight">Kusuma</h1>
+            <p class="text-xs text-[#8C5835] font-semibold">Admin Kalibata City</p>
+          </div>
+        </div>
+        <nav class="space-y-1 text-sm font-semibold">
+          <a href="dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#8C5835] text-white shadow-sm">
+            <span>Dashboard Cockpit</span>
+          </a>
+          <a href="index.html" target="_blank" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#737370] hover:bg-[#F4EFE6] hover:text-[#2C2C2A] transition">
+            <span>Landing Page &rarr;</span>
+          </a>
+          <a href="admin" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[#737370] hover:bg-[#F4EFE6] hover:text-[#2C2C2A] transition">
+            <span>Portal Admin Bersih</span>
+          </a>
+        </nav>
+      </div>
+      <div class="space-y-3">
+        <div class="japandi-card p-3 rounded-xl text-xs bg-white">
+          <p class="text-[#737370] font-medium">Status CMS:</p>
+          <p class="font-mono text-[#3A5A40] font-bold mt-0.5">● Siap Digunakan</p>
+        </div>
+        <a href="index.html" class="block w-full text-xs text-[#737370] hover:text-[#B35436] p-2 text-center rounded-xl hover:bg-[#F4EFE6] transition font-bold">
+          Keluar ke Website
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 bg-[#F5F2EB]/50">
+      <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-[#2C2C2A]">Dashboard Cockpit</h2>
+            <p class="text-xs md:text-sm text-[#737370]">Kelola unit dan konten tampil langsung di Landing Page tanpa repot.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a href="admin" class="px-3.5 py-2 bg-white hover:bg-[#F4EFE6] text-[#2C2C2A] border border-[#E8DFD3] text-xs font-bold rounded-xl transition shadow-sm">
+              Buka Versi /admin
+            </a>
+            <button onclick="location.reload()" class="px-3.5 py-2 bg-[#8C5835] text-white text-xs font-bold rounded-xl transition shadow-sm">
+              🔄 Segarkan
+            </button>
+          </div>
+        </div>
+
+        <!-- 🖼️ PANEL CMS: EDITOR 3 UNIT POPULER -->
+        <div class="japandi-card p-5 md:p-7 rounded-3xl space-y-5 border-2 border-[#8C5835]/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 class="font-extrabold text-base md:text-lg text-[#2C2C2A] flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-[#8C5835]"></span>
+                CMS Editor: 3 Tipe Unit Populer (Homepage)
+              </h3>
+              <p class="text-xs text-[#737370]">Pilih foto langsung dari galeri HP/laptop dan klik simpan.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="resetPopularUnitsCMS()" class="text-xs text-[#737370] hover:text-[#B35436] font-bold px-3 py-1.5 rounded-xl border border-[#E8DFD3] hover:bg-[#F4EFE6] transition">Reset Standar</button>
+              <button type="button" onclick="savePopularUnitsCMS()" class="px-5 py-2.5 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-2 cursor-pointer">Simpan Konten Unit</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            
+            <!-- UNIT 1 CMS -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#E8DFD3] space-y-3">
+              <span class="text-[11px] font-bold text-[#8C5835] uppercase tracking-wider">Kartu Unit 1 (Single)</span>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Badge / Kategori</label>
+                <input type="text" id="cms-u1-badge" value="Single / Eksekutif" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama / Tipe Unit</label>
+                <input type="text" id="cms-u1-title" value="Studio Deluxe" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Deskripsi & Fasilitas</label>
+                <textarea id="cms-u1-desc" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]">Luas 21 m2 • Full Furnished • AC, Spring Bed, Kitchen Set, Smart TV</textarea>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#8C5835] uppercase">Foto Unit 1</label>
+                <input type="text" id="cms-u1-media" placeholder="data:image/... atau tautan gambar" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+                <div class="mt-2 flex items-center gap-2">
+                  <label class="cursor-pointer px-3 py-1.5 bg-[#8C5835] hover:bg-[#704326] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <span>📁 Pilih Berkas</span>
+                    <input type="file" id="cms-u1-file" accept="image/*,video/mp4" onchange="handleDirectMediaUpload(event, 1)" class="hidden">
+                  </label>
+                  <span id="cms-u1-status" class="text-[10px] text-[#737370] truncate max-w-[140px]">Belum ada berkas</span>
+                </div>
+                <div id="cms-u1-preview" class="mt-2 hidden w-full h-28 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <input type="number" id="cms-u1-price" value="3000000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+            </div>
+
+            <!-- UNIT 2 CMS -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#D4A373] space-y-3">
+              <span class="text-[11px] font-bold text-[#8C5835] uppercase tracking-wider">Kartu Unit 2 (Paling Favorit)</span>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Badge / Kategori</label>
+                <input type="text" id="cms-u2-badge" value="Paling Favorit" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama / Tipe Unit</label>
+                <input type="text" id="cms-u2-title" value="2 Bedroom Standard" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Deskripsi & Fasilitas</label>
+                <textarea id="cms-u2-desc" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]">Luas 33 m2 • 2 Kamar Tidur • Living Room, Dapur Lengkap, Balkon</textarea>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#8C5835] uppercase">Foto Unit 2</label>
+                <input type="text" id="cms-u2-media" placeholder="data:image/... atau tautan gambar" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+                <div class="mt-2 flex items-center gap-2">
+                  <label class="cursor-pointer px-3 py-1.5 bg-[#8C5835] hover:bg-[#704326] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <span>📁 Pilih Berkas</span>
+                    <input type="file" id="cms-u2-file" accept="image/*,video/mp4" onchange="handleDirectMediaUpload(event, 2)" class="hidden">
+                  </label>
+                  <span id="cms-u2-status" class="text-[10px] text-[#737370] truncate max-w-[140px]">Belum ada berkas</span>
+                </div>
+                <div id="cms-u2-preview" class="mt-2 hidden w-full h-28 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <input type="number" id="cms-u2-price" value="4200000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+            </div>
+
+            <!-- UNIT 3 CMS -->
+            <div class="bg-[#FAF7F2] p-4 rounded-2xl border border-[#E8DFD3] space-y-3">
+              <span class="text-[11px] font-bold text-[#3A5A40] uppercase tracking-wider">Kartu Unit 3 (Resort / Executive)</span>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Teks Badge / Kategori</label>
+                <input type="text" id="cms-u3-badge" value="Green Palace Resort" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Nama / Tipe Unit</label>
+                <input type="text" id="cms-u3-title" value="2 Bedroom Executive" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Deskripsi & Fasilitas</label>
+                <textarea id="cms-u3-desc" rows="3" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs leading-relaxed focus:outline-none focus:ring-1 focus:ring-[#8C5835]">Akses Kolam Renang Tematik • Gym Indoor • Interior Modern</textarea>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#8C5835] uppercase">Foto Unit 3</label>
+                <input type="text" id="cms-u3-media" placeholder="data:image/... atau tautan gambar" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+                <div class="mt-2 flex items-center gap-2">
+                  <label class="cursor-pointer px-3 py-1.5 bg-[#8C5835] hover:bg-[#704326] text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    <span>📁 Pilih Berkas</span>
+                    <input type="file" id="cms-u3-file" accept="image/*,video/mp4" onchange="handleDirectMediaUpload(event, 3)" class="hidden">
+                  </label>
+                  <span id="cms-u3-status" class="text-[10px] text-[#737370] truncate max-w-[140px]">Belum ada berkas</span>
+                </div>
+                <div id="cms-u3-preview" class="mt-2 hidden w-full h-28 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
+              </div>
+              <div>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <input type="number" id="cms-u3-price" value="5500000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- SCRIPT PEMROSES FOTO & PENYIMPANAN DATA -->
+  <script>
+    function toggleMobileDrawer() {
+      const drawer = document.getElementById("mobile-drawer");
+      if (drawer) drawer.classList.toggle("hidden");
+    }
+
+    // 1. Kompresi Foto Otomatis Ringan
+    function compressImageFile(file, maxWidth, quality, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          callback(compressedDataUrl);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 2. Unggah Berkas Langsung
+    function handleDirectMediaUpload(event, unitIndex) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById(`cms-u${unitIndex}-status`);
+      const mediaInput = document.getElementById(`cms-u${unitIndex}-media`);
+      const previewBox = document.getElementById(`cms-u${unitIndex}-preview`);
+
+      statusEl.className = "text-[10px] text-amber-600 font-bold truncate max-w-[140px]";
+      statusEl.innerText = "⏳ Memproses...";
+
+      compressImageFile(file, 900, 0.7, function(lightweightBase64) {
+        mediaInput.value = lightweightBase64;
+
+        if (previewBox) {
+          previewBox.classList.remove("hidden");
+          previewBox.innerHTML = `<img src="${lightweightBase64}" class="w-full h-full object-cover">`;
+        }
+
+        const sizeKb = Math.round(lightweightBase64.length / 1024);
+        statusEl.className = "text-[10px] text-emerald-600 font-bold truncate max-w-[140px]";
+        statusEl.innerText = "✅ Siap (" + sizeKb + " KB)";
+      });
+    }
+
+    // 3. Simpan Perubahan ke LocalStorage
+    function savePopularUnitsCMS() {
+      const dataUnits = {
+        u1: {
+          badge: document.getElementById("cms-u1-badge").value,
+          title: document.getElementById("cms-u1-title").value,
+          desc: document.getElementById("cms-u1-desc").value,
+          media: document.getElementById("cms-u1-media").value,
+          price: document.getElementById("cms-u1-price").value
+        },
+        u2: {
+          badge: document.getElementById("cms-u2-badge").value,
+          title: document.getElementById("cms-u2-title").value,
+          desc: document.getElementById("cms-u2-desc").value,
+          media: document.getElementById("cms-u2-media").value,
+          price: document.getElementById("cms-u2-price").value
+        },
+        u3: {
+          badge: document.getElementById("cms-u3-badge").value,
+          title: document.getElementById("cms-u3-title").value,
+          desc: document.getElementById("cms-u3-desc").value,
+          media: document.getElementById("cms-u3-media").value,
+          price: document.getElementById("cms-u3-price").value
+        }
+      };
+
+      try {
+        localStorage.setItem("kp_popular_units_data", JSON.stringify(dataUnits));
+        localStorage.setItem("KUSUMA_POPULAR_UNITS_CMS", JSON.stringify(dataUnits));
+        alert("✅ Seluruh perubahan unit berhasil disimpan ke Landing Page!");
+      } catch (err) {
+        alert("Peringatan: Ukuran foto terlalu besar untuk memori peramban.");
+      }
+    }
+
+    // 4. Muat Data Tersimpan
+    function loadPopularUnitsCMS() {
+      const saved = localStorage.getItem("kp_popular_units_data") || localStorage.getItem("KUSUMA_POPULAR_UNITS_CMS");
+      if (saved) {
+        try {
+          const d = JSON.parse(saved);
+          ['u1', 'u2', 'u3'].forEach(key => {
+            if (d[key]) {
+              const u = d[key];
+              if (u.badge) document.getElementById(`cms-${key}-badge`).value = u.badge;
+              if (u.title || u.nama) document.getElementById(`cms-${key}-title`).value = u.title || u.nama;
+              if (u.desc || u.deskripsi) document.getElementById(`cms-${key}-desc`).value = u.desc || u.deskripsi;
+              if (u.media) {
+                document.getElementById(`cms-${key}-media`).value = u.media;
+                const prev = document.getElementById(`cms-${key}-preview`);
+                if (prev && (u.media.startsWith("http") || u.media.startsWith("data:image"))) {
+                  prev.classList.remove("hidden");
+                  prev.innerHTML = `<img src="${u.media}" class="w-full h-full object-cover">`;
+                }
+              }
+              if (u.price || u.tarif) document.getElementById(`cms-${key}-price`).value = u.price || u.tarif;
+            }
+          });
+        } catch (e) {}
+      }
+    }
+
+    function resetPopularUnitsCMS() {
+      if (confirm("Kembalikan konten unit ke pengaturan default?")) {
+        localStorage.removeItem("kp_popular_units_data");
+        localStorage.removeItem("KUSUMA_POPULAR_UNITS_CMS");
+        location.reload();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadPopularUnitsCMS);
+  </script>
+</body>
+</html>
