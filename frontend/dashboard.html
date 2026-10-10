@@ -334,7 +334,7 @@
                 <div id="cms-u1-preview" class="mt-2 hidden w-full h-24 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">HARGA JUAL/SEWA (ANGKA)</label>
                 <input type="number" id="cms-u1-price" value="3000000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
               </div>
             </div>
@@ -367,7 +367,7 @@
                 <div id="cms-u2-preview" class="mt-2 hidden w-full h-24 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">HARGA JUAL/SEWA (ANGKA)</label>
                 <input type="number" id="cms-u2-price" value="4200000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
               </div>
             </div>
@@ -400,7 +400,7 @@
                 <div id="cms-u3-preview" class="mt-2 hidden w-full h-24 rounded-xl overflow-hidden border border-[#E8DFD3] bg-white shadow-inner flex items-center justify-center"></div>
               </div>
               <div>
-                <label class="block text-[10px] font-bold text-[#737370] uppercase">Tarif Sewa (Angka)</label>
+                <label class="block text-[10px] font-bold text-[#737370] uppercase">HARGA JUAL/SEWA (ANGKA)</label>
                 <input type="number" id="cms-u3-price" value="5500000" class="w-full mt-1 px-3 py-1.5 bg-white border border-[#E8DFD3] rounded-lg text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-[#8C5835]">
               </div>
             </div>
@@ -474,7 +474,7 @@
             </div>
             <div class="flex justify-between items-center pt-1">
               <button type="button" onclick="resetToStandardDefaults()" class="text-xs text-[#8C5835] hover:underline font-bold">Template Default</button>
-              <button type="button" id="btn-save-knowledge" class="px-5 py-2.5 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">Simpan Basis Pengetahuan</button>
+              <button type="button" id="btn-save-knowledge" onclick="handleSaveAiConfig(event)" class="px-5 py-2.5 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2 cursor-pointer">Simpan Basis Pengetahuan</button>
             </div>
           </form>
         </div>
@@ -708,6 +708,105 @@
     }
 
     document.addEventListener("DOMContentLoaded", loadPopularUnitsCMS);
+  </script>
+
+  <!-- SCRIPT KUSUMA AI BASIS PENGETAHUAN & BATASAN STUDIO -->
+  <script>
+    const KUSUMA_DEFAULT_KB = `KUSUMA PROPERTI KALIBATA CITY - BASIS PENGETAHUAN RESMI
+Kantor Operasional: Tower Flamboyan Lt. GF (Ground Floor), Apartemen Kalibata City, Rawajati, Pancoran, Jakarta Selatan.
+WhatsApp Hotline: 08135600058 (Kusuma Properti Management).
+
+SPESIFIKASI UNIT & RENTANG HARGA:
+1. Tipe Studio (21 m2):
+   - Sewa: Rp 2.800.000 - Rp 3.500.000 / bulan (Full Furnished, AC, Kitchen Set, Queen Bed, Kulkas).
+   - Jual: Rp 220.000.000 - Rp 280.000.000 (Sertifikat Hak Milik Satuan Rumah Susun / SHMSRS).
+2. Tipe 2 Bedroom (33 m2):
+   - Sewa: Rp 3.800.000 - Rp 4.800.000 / bulan (2 Kamar, Ruang Tamu, Kitchen Set, Balkon).
+   - Jual: Rp 340.000.000 - Rp 450.000.000 (Siap huni, semi/full furnished).
+3. Tipe Green Palace Resort (Studio / 2BR / 3BR):
+   - Sewa: Rp 4.500.000 - Rp 6.500.000 / bulan.
+   - Akses Eksklusif: Kolam renang tematik resort, Gym & Fitness center indoor, Access Card private.
+
+FASILITAS KAWASAN:
+- Mall Kalibata City Square (KCS) di basement terhubung langsung dengan seluruh tower.
+- Transportasi: 200 meter (3-5 menit jalan kaki) ke Stasiun KRL Duren Kalibata.
+- Area parkir mobil basement luas (sistem langganan member/harian) dan gedung parkir motor khusus.`;
+
+    const KUSUMA_DEFAULT_GR = `ATURAN KETAT PERILAKU KUSUMA AI CONCIERGE:
+1. Identitas: Selalu ramah, profesional, sopan, dan mencerminkan pelayanan hangat Kusuma Properti.
+2. Lingkup Terbatas: HANYA menjawab pertanyaan seputar sewa, beli, fasilitas, tata tertib, dan informasi seputar Apartemen Kalibata City. Tolak pertanyaan di luar konteks ini secara sopan.
+3. Anti-Halusinasi Harga: Jangan pernah menjanjikan harga di luar rentang resmi tanpa konfirmasi admin. Arahkan pengguna untuk klik tombol "Konsultasi WA" atau hubungi WhatsApp 08135600058 untuk negosiasi dan survei unit.
+4. Keamanan & Kebijakan: Jangan berikan data pribadi pemilik/penyewa lain.`;
+
+    function loadAiConfigStudio() {
+      const kbEl = document.getElementById("ai-kb-text");
+      const grEl = document.getElementById("ai-guardrail-text");
+      if (!kbEl || !grEl) return;
+
+      const savedKB = localStorage.getItem("KUSUMA_AI_KB") || localStorage.getItem("KUSUMA_KB_FINAL_V209") || localStorage.getItem("KUSUMA_AI_KB_V206");
+      const savedGR = localStorage.getItem("KUSUMA_AI_GUARDRAILS") || localStorage.getItem("KUSUMA_GR_FINAL_V209") || localStorage.getItem("KUSUMA_AI_GR_V206");
+
+      kbEl.value = (savedKB && savedKB.trim() !== "") ? savedKB : KUSUMA_DEFAULT_KB;
+      grEl.value = (savedGR && savedGR.trim() !== "") ? savedGR : KUSUMA_DEFAULT_GR;
+    }
+
+    function resetToStandardDefaults() {
+      const kbEl = document.getElementById("ai-kb-text");
+      const grEl = document.getElementById("ai-guardrail-text");
+      if (!kbEl || !grEl) return;
+
+      kbEl.value = KUSUMA_DEFAULT_KB;
+      grEl.value = KUSUMA_DEFAULT_GR;
+
+      localStorage.setItem("KUSUMA_AI_KB", KUSUMA_DEFAULT_KB);
+      localStorage.setItem("KUSUMA_AI_GUARDRAILS", KUSUMA_DEFAULT_GR);
+      localStorage.setItem("KUSUMA_KB_FINAL_V209", KUSUMA_DEFAULT_KB);
+      localStorage.setItem("KUSUMA_GR_FINAL_V209", KUSUMA_DEFAULT_GR);
+      localStorage.setItem("KUSUMA_AI_KB_V206", KUSUMA_DEFAULT_KB);
+      localStorage.setItem("KUSUMA_AI_GR_V206", KUSUMA_DEFAULT_GR);
+
+      alert("🔄 Template resmi Knowledge Base & Guardrails berhasil dimuat ulang!");
+    }
+
+    function handleSaveAiConfig(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      const kbEl = document.getElementById("ai-kb-text");
+      const grEl = document.getElementById("ai-guardrail-text");
+      const saveBtn = document.getElementById("btn-save-knowledge");
+
+      if (!kbEl || !grEl) return;
+
+      const kbVal = kbEl.value.trim() || KUSUMA_DEFAULT_KB;
+      const grVal = grEl.value.trim() || KUSUMA_DEFAULT_GR;
+
+      localStorage.setItem("KUSUMA_AI_KB", kbVal);
+      localStorage.setItem("KUSUMA_AI_GUARDRAILS", grVal);
+      localStorage.setItem("KUSUMA_KB_FINAL_V209", kbVal);
+      localStorage.setItem("KUSUMA_GR_FINAL_V209", grVal);
+      localStorage.setItem("KUSUMA_AI_KB_V206", kbVal);
+      localStorage.setItem("KUSUMA_AI_GR_V206", grVal);
+
+      if (saveBtn) {
+        const origText = saveBtn.innerHTML;
+        saveBtn.innerHTML = "✨ Berhasil Disimpan!";
+        saveBtn.style.backgroundColor = "#4A7C59";
+        setTimeout(() => {
+          saveBtn.innerHTML = origText;
+          saveBtn.style.backgroundColor = "";
+        }, 2000);
+      }
+
+      alert("✅ Basis Pengetahuan & Batasan Perilaku AI berhasil disimpan!");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadAiConfigStudio();
+      const saveBtn = document.getElementById("btn-save-knowledge");
+      if (saveBtn && !saveBtn.hasAttribute("data-ai-bound")) {
+        saveBtn.setAttribute("data-ai-bound", "true");
+        saveBtn.addEventListener("click", handleSaveAiConfig);
+      }
+    });
   </script>
 </body>
 </html>
