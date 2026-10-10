@@ -1,8 +1,11 @@
 /**
- * Kusuma Properti Manager - Mesin Dinamis Landing Page
+ * Kusuma Properti Manager - Landing Page Dynamic Engine
  * File: frontend/js/landing.js
- * Version: v168.0.0 (NKRI Edition - Pure Indonesian Localization)
+ * Version: v175.0.0 (Pure Cloud GAS Sync Engine - Universal Multi-Device Edition)
  */
+
+// MASUKKAN URL DEPLOYMENT GOOGLE APPS SCRIPT ANDA DI SINI
+const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
 
 document.addEventListener("DOMContentLoaded", () => {
   initVisualTheme();
@@ -33,8 +36,8 @@ function initVisualTheme() {
   }
 }
 
-// 2. Muat Katalog 3 Unit Populer Lengkap dengan Media Foto/Video Asli
-function initDynamicUnits() {
+// 2. Muat Katalog 3 Unit Populer (Sinkronisasi Langsung dari Cloud GAS)
+async function initDynamicUnits() {
   const target = document.getElementById('dynamic-unit-catalog');
   if (!target) return;
 
@@ -68,65 +71,85 @@ function initDynamicUnits() {
     }
   ];
 
-  let units = [...defaultUnits];
+  let rawCloudData = null;
 
-  try {
-    const rawData = localStorage.getItem('kp_popular_units_data') || 
-                    localStorage.getItem('KUSUMA_POPULAR_UNITS_CMS');
-
-    if (rawData) {
-      const parsed = JSON.parse(rawData);
-
-      if (parsed.u1 || parsed.u2 || parsed.u3) {
-        units = defaultUnits.map((def, idx) => {
-          const item = parsed['u' + (idx + 1)];
-          if (!item) return def;
-
-          let rawMedia = (item.media || item.mediaUrl || "").trim();
-
-          // Prioritaskan gambar Base64 asli dari unggahan admin
-          if (rawMedia.startsWith('data:image/') || (rawMedia.startsWith('http') && !rawMedia.includes('/d/unit_'))) {
-            // Media valid
-          } else {
-            rawMedia = def.mediaUrl;
-          }
-
-          return {
-            badge: item.badge || def.badge,
-            title: item.nama || item.title || def.title,
-            desc: item.deskripsi || item.desc || def.desc,
-            price: item.tarif || item.price || def.price,
-            mediaUrl: rawMedia
-          };
-        });
+  // A. Mengambil data unit terbaru dari Google Apps Script Cloud
+  if (GAS_WEBAPP_URL && !GAS_WEBAPP_URL.includes("AKfycbx...")) {
+    try {
+      const res = await fetch(`${GAS_WEBAPP_URL}?action=GET_POPULAR_UNITS&t=${Date.now()}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.status === "success" && json.data) {
+          rawCloudData = json.data;
+          // Perbarui memori lokal browser pengunjung
+          localStorage.setItem("kp_popular_units_data", JSON.stringify(rawCloudData));
+        }
       }
+    } catch (e) {
+      console.warn("Gagal mengambil data dari Google Apps Script, beralih ke memori lokal:", e);
     }
-  } catch (err) {
-    console.error("Gagal membaca data unit:", err);
-    units = defaultUnits;
   }
 
-  // Render HTML ke Target Grid
+  // B. Cadangan: Baca memori lokal jika sambungan internet/GAS sedang sibuk
+  if (!rawCloudData) {
+    const rawLocal = localStorage.getItem('kp_popular_units_data') || 
+                     localStorage.getItem('KUSUMA_POPULAR_UNITS_CMS');
+    if (rawLocal) {
+      try {
+        rawCloudData = JSON.parse(rawLocal);
+      } catch (err) {
+        console.error("Gagal mengurai data unit lokal:", err);
+      }
+    }
+  }
+
+  let units = [...defaultUnits];
+
+  if (rawCloudData && (rawCloudData.u1 || rawCloudData.u2 || rawCloudData.u3)) {
+    units = defaultUnits.map((def, idx) => {
+      const item = rawCloudData['u' + (idx + 1)];
+      if (!item) return def;
+
+      let rawMedia = (item.media || item.mediaUrl || "").trim();
+
+      // Prioritas media: Base64 asli atau URL publik yang valid (abaikan link rusak Google Drive)
+      if (rawMedia.startsWith('data:image/') || (rawMedia.startsWith('http') && !rawMedia.includes('/d/unit_'))) {
+        // Media valid terverifikasi
+      } else {
+        rawMedia = def.mediaUrl;
+      }
+
+      return {
+        badge: item.badge || def.badge,
+        title: item.nama || item.title || def.title,
+        desc: item.deskripsi || item.desc || def.desc,
+        price: item.tarif || item.price || def.price,
+        mediaUrl: rawMedia
+      };
+    });
+  }
+
+  // C. Render Tampilan Kartu ke Grid Homepage
   target.className = 'grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-8';
   target.innerHTML = units.map((u, idx) => {
-    const rawMedia = u.mediaUrl;
-    const isVideo = rawMedia.startsWith('data:video') || rawMedia.endsWith('.mp4') || rawMedia.endsWith('.webm');
+    const isVideo = u.mediaUrl.startsWith('data:video') || u.mediaUrl.endsWith('.mp4') || u.mediaUrl.endsWith('.webm');
     
     let mediaHtml = '';
     if (isVideo) {
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-black">
-          <video src="${rawMedia}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
+          <video src="${u.mediaUrl}" autoplay muted loop playsinline class="w-full h-full object-cover"></video>
           <span class="absolute top-2 right-2 px-2 py-0.5 bg-black/60 text-white rounded text-[10px] font-bold">VIDEO TOUR</span>
         </div>`;
     } else {
-      const onErrorAttribute = rawMedia.startsWith('data:image') 
+      // Jika format gambar Base64, hindari penggunaan onerror yang membanting ke dummy
+      const onErrorAttribute = u.mediaUrl.startsWith('data:image') 
         ? '' 
         : `onerror="this.onerror=null; this.src='${backupCdn[idx]}';"`;
 
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
-          <img src="${rawMedia}" alt="${u.title}" loading="eager" class="w-full h-full object-cover transition duration-500 hover:scale-105" ${onErrorAttribute}>
+          <img src="${u.mediaUrl}" alt="${u.title}" loading="eager" class="w-full h-full object-cover transition duration-500 hover:scale-105" ${onErrorAttribute}>
           <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
         </div>`;
     }
@@ -148,7 +171,7 @@ function initDynamicUnits() {
             <span class="text-[10px] text-[#737370] uppercase">Mulai Dari</span>
             <p class="text-base font-bold font-mono text-[#8C5835]">Rp ${formattedPrice}<span class="text-xs font-normal text-[#737370]">/bln</span></p>
           </div>
-          <button onclick="handleInquireUnit(event, '${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition">Tanya Unit</button>
+          <button onclick="handleInquireUnit(event, '${u.title}')" class="px-4 py-2 bg-[#8C5835] hover:bg-[#704326] text-white text-xs font-bold rounded-xl shadow-sm transition cursor-pointer">Tanya Unit</button>
         </div>
       </div>
     `;
