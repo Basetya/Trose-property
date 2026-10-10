@@ -156,7 +156,6 @@ async function initDynamicUnits() {
       mediaHtml = `
         <div class="w-full h-48 rounded-2xl overflow-hidden mb-4 relative bg-[#F4EFE6]">
           <img src="${u.mediaUrl}" alt="${u.title}" loading="eager" class="w-full h-full object-cover transition duration-500 hover:scale-105" ${onErrorAttribute}>
-          <span class="absolute top-2 right-2 px-2.5 py-1 bg-[#2C2C2A]/70 text-white rounded-lg text-[10px] font-bold tracking-wider uppercase">FOTO ASLI</span>
         </div>`;
     }
 
